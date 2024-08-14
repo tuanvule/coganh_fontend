@@ -9,7 +9,7 @@ export default function Post_list({ posts, set_post_chunk_index, set_is_reset_po
   console.log(posts)
 
   function handle_send_notification(u_id, content) {
-    fetch(`http://192.168.1.249:5000/send_notification/${u_id}`, {
+    fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/send_notification/${u_id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -32,7 +32,7 @@ export default function Post_list({ posts, set_post_chunk_index, set_is_reset_po
     let is_delete = window.confirm("bạn có chắc muốn xóa")
     if (is_delete) {
       let notification = prompt("nhập lý do muốn xóa")
-      fetch(`http://192.168.1.249:5000/delete_post/${id}`)
+      fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/delete_post/${id}`)
         .then(res => res.json())
         .then(data => {
           if(author_id) {
@@ -45,7 +45,7 @@ export default function Post_list({ posts, set_post_chunk_index, set_is_reset_po
   }
 
   function handle_accept(id, author_id, post_title) {
-    fetch(`http://192.168.1.249:5000/accept_post/${id}`)
+    fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/accept_post/${id}`)
       .then(res => res.json())
       .then(data => {
         if(author_id) {
@@ -57,13 +57,20 @@ export default function Post_list({ posts, set_post_chunk_index, set_is_reset_po
   }
 
   useEffect(() => {
-    fetch(`http://192.168.1.249:5000/get_unpublic_posts?page=${UPP_chunk_index}&size=9`)
+    fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/get_unpublic_posts?page=${UPP_chunk_index}&size=9`)
     .then(res => res.json())
     .then(data => {
       set_un_public_posts(data)
     })
     .catch(err => console.log(err))
   }, [is_reset_post])
+
+  function handle_message(author_id) {
+    let notification = prompt("Nhập tin nhắn bạn muốn gửi")
+    if(notification) {
+      handle_send_notification(author_id, notification)
+    }
+  }
 
   return (
     <div className=" h-full flex flex-col">
@@ -76,8 +83,8 @@ export default function Post_list({ posts, set_post_chunk_index, set_is_reset_po
           {un_public_post && un_public_post.map(post =>
             <li className="relative h-96 bg-[#0b427e] rounded-lg overflow-hidden shadow-2xl hover:shadow-blue-300 hover:scale-105 transition-all">
               <div onClick={() => handle_accept(post.id, post.author_id, post.title)} className="w-10 h-10 grid place-content-center text-xl bg-blue-500 absolute z-[100000000] left-0 hover:brightness-90 cursor-pointer"><i class="fa-solid fa-check"></i></div>
-              
               <div onClick={() => handle_delete(post.id, post.author_id)} className="w-10 h-10 grid place-content-center text-xl bg-red-400 absolute z-[100000000] right-0 hover:brightness-90 cursor-pointer"><i class="fa-solid fa-xmark"></i></div>
+              <div onClick={() => handle_message(post.author_id)} className="w-10 h-10 grid place-content-center text-xl bg-slate-400 absolute z-[100000000] right-0 top-10 hover:brightness-90 cursor-pointer"><i class="fa-solid fa-comment"></i></div>
               <div onClick={() => history("/post/" + post.post_id, { state: post })} className=" w-full h-2/4 select-none bg-white brightness-95 cursor-pointer">
                 <img className=" object-contain " src={post.image_url[0] ? post.image_url[0] : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTErUSgyq868y3dMVxYIbdUe1d9NV1tL4jtbA&s"}></img>
               </div>
@@ -103,6 +110,7 @@ export default function Post_list({ posts, set_post_chunk_index, set_is_reset_po
           {posts && posts.map(post =>
             <li className="relative h-96 bg-[#0b427e] rounded-lg overflow-hidden shadow-2xl hover:shadow-blue-300 hover:scale-105 transition-all">
               <div onClick={() => handle_delete(post.id)} className="w-10 h-10 grid place-content-center text-xl bg-red-400 absolute z-[100000000] right-0 hover:brightness-90 cursor-pointer"><i class="fa-solid fa-xmark"></i></div>
+              <div onClick={() => handle_message(post.author_id)} className="w-10 h-10 grid place-content-center text-xl bg-slate-400 absolute z-[100000000] right-0 top-10 hover:brightness-90 cursor-pointer"><i class="fa-solid fa-comment"></i></div>
               <div onClick={() => history("/post/" + post.post_id, { state: post })} className=" w-full h-2/4 select-none bg-white brightness-95 cursor-pointer">
                 <img className=" object-contain " src={post.image_url[0] ? post.image_url[0] : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTErUSgyq868y3dMVxYIbdUe1d9NV1tL4jtbA&s"}></img>
               </div>

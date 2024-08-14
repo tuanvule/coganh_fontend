@@ -15,7 +15,7 @@ export default function Home() {
                     Chúng mình mong bạn sẽ học được thêm điều gì mới từ sản phẩm này
                 </h1>
                 <br />
-                <a className="menu_btn block no-underline text-white text-xl border text-center cursor-pointer transition-all duration-[0.2s] ease-linear m-5 px-[60px] py-2.5 rounded-[5px] border-solid border-[#007BFF] hover:bg-[#007BFF] hover:no-underline hover:text-white" onClick={() => history("/menu")}>
+                <a className="menu_btn block no-underline dark:text-white text-xl border text-center cursor-pointer transition-all duration-[0.2s] ease-linear m-5 px-[60px] py-2.5 rounded-[5px] border-solid border-[#007BFF] hover:bg-[#007BFF] hover:no-underline hover:text-white" onClick={() => history("/menu")}>
                     Menu
                 </a>
             </div>

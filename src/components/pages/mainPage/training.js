@@ -24,7 +24,7 @@ export default function Training() {
     const [comment_count, set_comment_count] = useState(0)
     var task_id = id
     useEffect(() => {
-        if (task.task_name) {
+        if (task.challenger && user.username) {
             var { demo_code, inp_oup, task_name, content, accepted_count, submission_count, input_title } = task
             console.log(task, demo_code)
             var default_code = task.challenger[user.username] ? task.challenger[user.username].current_submit.code : demo_code
@@ -37,7 +37,7 @@ export default function Training() {
     }, [task])
     // useEffect(() => {
     //     if(!task_name) {
-    //         fetch(`http://192.168.1.249:5000/get_task_by_id/${task_id}`)
+    //         fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/get_task_by_id/${task_id}`)
     //         .then(res => res.json())
     //         .then(data => {
     //             // console.log(data)
@@ -84,7 +84,7 @@ export default function Training() {
 
     useEffect(() => {
         console.log("Asd")
-        fetch("http://192.168.1.249:5000/get_task/" + task_id)
+        fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_task/" + task_id)
             .then(res => res.json())
             .then(data => {
                 console.log(data)
@@ -137,7 +137,7 @@ export default function Training() {
             //     hangle_view_code(code_history)
             // }
         }
-        if(task.challenger[username]) {
+        if(username && task.challenger && task.challenger[username]) {
             hangle_view_code(JSON.parse(JSON.stringify(task.challenger[username].submissions)).reverse().map(sub => sub.code))
         }
         // render_summissions(true)
@@ -209,7 +209,7 @@ export default function Training() {
             })
             let formatter = new Intl.DateTimeFormat([], options);
 
-            fetch("http://192.168.1.249:5000/run_task", {
+            fetch("https://coganh-cloud-tixakavkna-as.a.run.app/run_task", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -264,7 +264,7 @@ export default function Training() {
                 return
             }
             let formatter = new Intl.DateTimeFormat([], options);
-            fetch("http://192.168.1.249:5000/submit_code", {
+            fetch("https://coganh-cloud-tixakavkna-as.a.run.app/submit_code", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -439,7 +439,7 @@ export default function Training() {
     }, [task, user, code])
 
     return (
-        <div className="h-screen">
+        <div className="h-screen bg-[#111c2c] text-white">
             {is_require_login && <Login_require set_is_require_login={set_is_require_login} />}
             <div
                 className="cover"
@@ -608,17 +608,17 @@ export default function Training() {
                         <div className="help_title">Các bài blog</div>
                         <ul className="help_list p-0">
                             <li className="help_item help_blog">
-                                <a onClick={() => history("/post/" + "1719022233537", { state: "1719022233537" })}>
+                                <a onClick={() => history("/post/" + "1719022233537")}>
                                     Kiểm tra nước đi hợp lệ
                                 </a>
                             </li>
                             <li className="help_item help_blog">
-                                <a onClick={() => history("/post/" + "1719228535494", { state: "1719228535494" })}>
+                                <a onClick={() => history("/post/" + "1719228535494")}>
                                     Kiểm tra gánh chẹt
                                 </a>
                             </li>
                             <li className="help_item help_blog">
-                                <a onClick={() => history("/post/" + "1720181857262", { state: "1720181857262" })}>
+                                <a onClick={() => history("/post/" + "1720181857262")}>
                                     Kiểm tra vây
                                 </a>
                             </li>

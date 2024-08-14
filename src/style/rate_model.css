@@ -10,7 +10,7 @@
     padding: 20px;
     z-index: 10000000000;
     user-select: none;
-    display: none;
+    /* display: none; */
 }
 
 .RM_game_display {
@@ -308,4 +308,12 @@
         display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+@media (max-width: 600px) {
+    .RM_rate {
+        scale: 75%;
+        width: 125%;
+        transform: translateX(-67%) translateY(-67%);
+    }
 }

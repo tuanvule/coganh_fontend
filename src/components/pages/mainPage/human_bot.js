@@ -10,7 +10,7 @@ import move_audio from "../../../static/move-self.mp3"
 import fireSound_audio from "../../../static/fireSound.mp3"
 import fire_webp from "../../../static/img/fire.webp"
 
-import createRateModel from "../../modal/rate_model"
+import CreateRateModel from "../../modal/rate_model"
 
 import "../../../style/human_bot.css"
 import "../../../style/rate_model.css"
@@ -23,6 +23,9 @@ export default function Human_Bot() {
 
     const [ bot, set_bot ] = useState("Master")
     const [ reload, set_reload ] = useState()
+    const [ is_open_rate_modal, set_is_open_rate_modal ] = useState({})
+    const [ rate, set_rate ] = useState()
+    const isMoblie = (window.innerWidth <= 600)
 
     useEffect(() => {
         console.log("human_bot")
@@ -49,6 +52,14 @@ export default function Human_Bot() {
         let dem
         let chessEnemy
 
+        if (window.outerWidth <= 600) {
+            rs = 0.5
+            radius = 8
+        } else {
+            rs = 1
+            radius = 16
+        }
+
         // let username = user.username
 
         let selectedChess
@@ -61,31 +72,29 @@ export default function Human_Bot() {
         fireSound.volume = 0.6
 
         const rate_btn = $(".rate_btn")
-        const rate = $(".RM_rate")
-        const ske_loading = $(".RM_ske_loading")
 
         play_again_btn.onclick = () => set_reload(Math.random())
 
         const gridHTML = `
-<div class="HB_grid">
+<div class="HB_grid dark:bg-white bg-slate-200">
 <div class="HB_row1"></div>
 <div class="HB_row2"></div>            
 <div class="HB_row3"></div>
 <div class="HB_row4"></div>
 </div>
-<div class="HB_grid">
+<div class="HB_grid dark:bg-white bg-slate-200">
 <div class="HB_row1"></div>
 <div class="HB_row2"></div>            
 <div class="HB_row3"></div>
 <div class="HB_row4"></div>
 </div>
-<div class="HB_grid">
+<div class="HB_grid dark:bg-white bg-slate-200">
 <div class="HB_row1"></div>
 <div class="HB_row2"></div>            
 <div class="HB_row3"></div>
 <div class="HB_row4"></div>
 </div>
-<div class="HB_grid">
+<div class="HB_grid dark:bg-white bg-slate-200">
 <div class="HB_row1"></div>
 <div class="HB_row2"></div>            
 <div class="HB_row3"></div>
@@ -204,12 +213,18 @@ export default function Human_Bot() {
         let rateModel
 
         rate_btn.onclick = () => {
-            rate.classList.toggle("RM_appear")
-            rate_btn.classList.toggle("active")
-            console.log({ move_list: move_list, img_data: img_data })
-            if (rateModel) return
+            // rate.classList.toggle("RM_appear")
+            if(rate_btn.classList.contains("active")) {
+                console.log({is_open: rate_btn.classList.contains("active"), is_loading: true})
+                rate_btn.classList.remove("active")
+                set_is_open_rate_modal({is_open: false, is_loading: true})
+                return
+            } else {
+                set_is_open_rate_modal({is_open: true, is_loading: true})
+                rate_btn.classList.add("active")
+            }
             rateModel = true
-            fetch("http://192.168.1.249:5000/get_rate", {
+            fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_rate", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -231,8 +246,10 @@ export default function Human_Bot() {
                             img_url: url,
                         })
                     })
-                    rateModel = createRateModel(".RM_rate", rating)
-                    rateModel.start()
+                    set_rate(rating)
+                    set_is_open_rate_modal({is_open: true, is_loading: false})
+                    // rateModel = createRateModel(".RM_rate", rating)
+                    // rateModel.start()
                 })
         }
 
@@ -519,7 +536,7 @@ export default function Human_Bot() {
 
                 console.log(JSON.parse(JSON.stringify(data)))
 
-                fetch("http://192.168.1.249:5000/get_pos_of_playing_chess", {
+                fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_pos_of_playing_chess", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -569,7 +586,7 @@ export default function Human_Bot() {
         });
 
         window.onresize = function (event) {
-            if (window.outerWidth <= 500) {
+            if (window.outerWidth <= 600) {
                 rs = 0.5
                 radius = 8
             } else {
@@ -647,9 +664,9 @@ export default function Human_Bot() {
     }, [username, reload])
 
     return (
-        <div className="flex h-screen justify-around items-center">
+        <div className={`h-screen relative flex ${isMoblie && "flex-col"} justify-around items-center overflow-hidden`}>
             <div className="game_state pc">
-                <div className="game_turn game_turn-bot_">
+                <div className="game_turn game_turn-bot">
                     <div className="bot_avatar_pc">
                         <img src={Master} alt="" />
                     </div>
@@ -681,54 +698,8 @@ export default function Human_Bot() {
                 </div>
             </div>
             <canvas />
-            <div className="RM_rate">
-                <div className="RM_game_display">
-                    <i className="fa-solid fa-angle-left RM_arrow_left" />
-                    <div className="RM_img_main">
-                        <ul className="RM_img_list p-0 m-0">
-                            <li className="RM_img_item RM_default">
-                                <img src={chessboard1} alt="" />
-                            </li>
-                        </ul>
-                        <div className="RM_counter">0</div>
-                    </div>
-                    <i className="fa-solid fa-angle-right RM_arrow_right" />
-                    <div className="RM_loader">
-                        <div className="RM_loading" />
-                    </div>
-                </div>
-                <div className="RM_game_rate">
-                    <div className="RM_rate_list">
-                        <ul className="RM_overview p-0">
-                            <div className="RM_header">
-                                <div className="RM_player RM_you">
-                                    <div className="RM_content">Bạn</div>
-                                </div>
-                                <div className="RM_move_count">MOVES: 20</div>
-                                <div className="RM_player RM_enemy">
-                                    <div className="RM_content">Đối thủ</div>
-                                </div>
-                            </div>
-                        </ul>
-                        <div className="RM_spacing" />
-                        <ul className="RM_detail p-0"></ul>
-                    </div>
-                    <div className="RM_ske_loading">
-                        <ul className="RM_ske_loading-overview p-0">
-                            <li />
-                            <li />
-                            <li />
-                            <li />
-                        </ul>
-                        <div className="RM_spacing" />
-                        <ul className="RM_ske_loading-detail p-0">
-                            <li />
-                            <li />
-                            <li />
-                        </ul>
-                    </div>
-                </div>
-            </div>
+            {console.log(is_open_rate_modal.is_open)}
+            { is_open_rate_modal.is_open && <CreateRateModel data={rate} is_loading={is_open_rate_modal.is_loading}/>}
             <input
                 type="checkbox"
                 name=""
@@ -741,15 +712,15 @@ export default function Human_Bot() {
                     <i className="fa-solid fa-angles-up arrow_up" />
                     <i className="fa-solid fa-angles-down arrow_down" />
                 </label>
-                <div className="HB_game_status">Game on...</div>
-                <a onClick={() => history("/menu")} className="HB_menu_btn">
+                <div className="HB_game_status text-white dark:bg-[#007BFF] bg-[#2997ff]">Game on...</div>
+                <a onClick={() => history("/menu")} className={` dark:bg-[#111c2c] bg-[#0062d9] ${isMoblie ? "HB_menu_btn" : "fixed top-5 left-5 HB_menu_btn"}`}>
                     Menu
                 </a>
-                <div className="rate_btn">Xem đánh giá</div>
-                <div className="play_again_btn">Play again</div>
+                <div className="rate_btn hidden dark:bg-[#111c2c] bg-[#0062d9] text-white">Xem đánh giá</div>
+                <div className="play_again_btn dark:bg-[#111c2c] bg-[#0062d9] text-white">Play again</div>
             </div>
             <div className="overflow">
-                <div className="choose_bot_model">
+                <div className="choose_bot_model dark:bg-[#242527] bg-[#a3dcff] lg:scale-100 sm:scale-50">
                     <div className="choose_bot_model-title">Chọn bot</div>
                     <div className="bot_list">
                         <div className="bot_list_block">
@@ -777,7 +748,7 @@ export default function Human_Bot() {
                             </div>
                         </div>
                     </div>
-                    <div className="fight_btn">Thách đấu</div>
+                    <div className="fight_btn border dark:border-[#ccc] border-[#333]">Thách đấu</div>
                 </div>
             </div>
             {/* <img className="fire" src={fire_webp} alt="" hidden/> */}

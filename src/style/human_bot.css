@@ -41,7 +41,8 @@ canvas {
 }
 
 .game_turn_info.unavalable {
-    background-color: #333;
+    /* background-color: #333; */
+    background-color: rgba(0,0,0,0.4);
 }
 
 /* .game_turn-bot {
@@ -120,7 +121,7 @@ canvas {
     font-size: 26px;
     padding: 10px 40px;
     margin-bottom: 40px;
-    background-color: #007BFF;
+    /* background-color: #007BFF; */
     border-radius: 10px;
     width: 214px;
     text-align: center;
@@ -201,7 +202,7 @@ canvas {
 .HB_grid {
     height: 250px;
     width: 250px;
-    background-color: #fff;
+    /* background-color: #fff; */
     position: relative;
     overflow: hidden;
 }
@@ -315,7 +316,7 @@ canvas {
     flex-direction: column;
     /* justify-content: center; */
     align-items: center;
-    background-color: #242527;
+    /* background-color: #242527; */
     padding: 60px 0 40px;
 }
 
@@ -391,7 +392,7 @@ canvas {
     user-select: none;
     font-size: 20px;
     padding: 14px 40px;
-    border: 1px solid #ccc;
+    /* border: 1px solid #ccc; */
     border-radius: 5px;
     text-align: center;
     cursor: not-allowed;
@@ -412,7 +413,16 @@ canvas {
 .fight_btn.active:hover {
     filter: brightness(90%);
 }
-@media (max-width: 500px) {
+@media (max-width: 600px) {
+    .HB_menu_btn {
+        margin-bottom: 20px;
+        margin-top: 20px;
+    }
+
+    .rate_btn {
+        margin-bottom: 20px;
+    }
+
     .mobile_active {
         display: flex;
     }
@@ -434,7 +444,7 @@ canvas {
 
     .game_turn {
         height: 60px;
-        width: 150px;
+        /* width: 150px; */
     }
 
     .bot_avatar_mobile img,
@@ -472,7 +482,7 @@ canvas {
         bottom: calc(-260px + 37.8px);
         width: 100%;
         padding: 0 0 20px;
-        background-color: #242527;
+        background-color: rgba(0,0,0,0.6);
         transition: .3s all;
         display: flex;
         flex-direction: column;
@@ -580,7 +590,7 @@ canvas {
     .HB_grid {
         height: 101px;
         width: 101px;
-        background-color: #fff;
+        /* background-color: #fff; */
         position: relative;
         overflow: hidden;
     }

@@ -1,55 +1,59 @@
 import * as d3 from "d3";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function CreateTreeSimulation(props) {
+    const [root, set_root] = useState({
+        name: "Root",
+        value: "-inf",
+        default_value: "-inf",
+        MOX: 0,
+        depth: 0,
+        children: [
+            {
+                name: "A",
+                value: "+inf",
+                default_value: "+inf",
+                MOX: 1,
+                depth: 1,
+                children: [
+                    { name: "A1", value: 2, default_value: 2, MOX: 0, depth: 2, children: [] },
+                    { name: "A2", value: 5, default_value: 5, depth: 2, MOX: 0, children: [] }
+                ]
+            },
+            {
+                name: "B",
+                value: "+inf",
+                default_value: "+inf",
+                MOX: 1,
+                depth: 1,
+                children: [
+                    { name: "B1", value: 2, default_value: 2, depth: 2, MOX: 0, children: [] },
+                    { name: "B2", value: 9, default_value: 9, depth: 2, MOX: 0, children: [] }
+                ]
+            },
+            {
+                name: "D",
+                value: "+inf",
+                default_value: "+inf",
+                MOX: 1,
+                depth: 1,
+                children: [
+                    { name: "D1", value: 2, default_value: 2, depth: 2, MOX: 0, children: [] },
+                    { name: "D2", value: 100, default_value: 100, depth: 2, MOX: 0, children: [] }
+                ]
+            }
+        ]
+    })
+
     useEffect(() => {
         const $ = document.querySelector.bind(document)
         const $$ = document.querySelectorAll.bind(document)
+        if($("g")) {
+            $("g").remove()
+        }
 
         const code_rows = $$(".code_row")
-
-        let root = {
-            name: "Root",
-            value: "-inf",
-            default_value: "-inf",
-            MOX: 0,
-            depth: 0,
-            children: [
-                {
-                    name: "A",
-                    value: "+inf",
-                    default_value: "+inf",
-                    MOX: 1,
-                    depth: 1,
-                    children: [
-                        { name: "A1", value: 2, default_value: 2, MOX: 0, depth: 2, children: [] },
-                        { name: "A2", value: 5, default_value: 5, depth: 2, MOX: 0, children: [] }
-                    ]
-                },
-                {
-                    name: "B",
-                    value: "+inf",
-                    default_value: "+inf",
-                    MOX: 1,
-                    depth: 1,
-                    children: [
-                        { name: "B1", value: 2, default_value: 2, depth: 2, MOX: 0, children: [] },
-                        { name: "B2", value: 9, default_value: 9, depth: 2, MOX: 0, children: [] }
-                    ]
-                },
-                {
-                    name: "D",
-                    value: "+inf",
-                    default_value: "+inf",
-                    MOX: 1,
-                    depth: 1,
-                    children: [
-                        { name: "D1", value: 2, default_value: 2, depth: 2, MOX: 0, children: [] },
-                        { name: "D2", value: 100, default_value: 100, depth: 2, MOX: 0, children: [] }
-                    ]
-                }
-            ]
-        };
+        const VI_save_btn = $(".VI_save_btn")
 
         let svg = d3.select("svg"),
             width = +svg.attr("width"),
@@ -79,7 +83,7 @@ export default function CreateTreeSimulation(props) {
             link: null,
             node: null,
             group: null,
-            speed: 1,
+            speed: visualize_speed.value,
             circle_r: 20,
             root_history: [],
             selected_node: {},
@@ -142,7 +146,6 @@ export default function CreateTreeSimulation(props) {
                     bestValue = -Infinity;
                     for (let child of node.children) {
                         let value = await this.minimax(child, depth + 1);
-                        // console.log("MAX: ",value)
                         this.code_row_animation.push([[7, 8, 9, 10], "true"])
                         if (value > bestValue) {
                             bestValue = value;
@@ -226,7 +229,6 @@ export default function CreateTreeSimulation(props) {
 
             // hightlight code roww
             async hightlight(row, type) {
-                console.log(row)
                 if (row.length === 1) {
                     code_rows[row[0]].classList.add("round_top", "round_bottom")
                 } else {
@@ -245,14 +247,14 @@ export default function CreateTreeSimulation(props) {
 
             async animate_all_nodes(nodes) {
                 let _this = this
+                console.log(_this.speed)
                 async function animate(node) {
                     for (let child of node.children) {
                         for (let i = 0; i <= (child.MOX === 0 ? 7 : 15); i++) {
                             await _this.sleep(50 / ((child.MOX === 0 ? 7 : 15) / 7))
                             await _this.hightlight([i], "true")
                         }
-                        // await _this.pause()
-
+                        
                         let nod = d3.select(`.node.${child.name}`)
 
                         let circle = nod.select(`circle`)
@@ -262,7 +264,7 @@ export default function CreateTreeSimulation(props) {
                             .attr("fill", "#ff6565")
                         let text = nod.select("text")
                             .text(d => d.data.default_value)
-                        await _this.sleep(500)
+                        await _this.sleep(500 / _this.speed)
                         await _this.clear_hightlight()
                         await animate(child)
                     }
@@ -571,8 +573,9 @@ export default function CreateTreeSimulation(props) {
                     children: []
                 };
                 selectedNode.data.children.push(newNode);
+                set_root({...root})
                 // rootD3 = d3.hierarchy(root);
-                this.generate_tree(selectedNode);
+                // this.generate_tree(selectedNode);
             },
 
             deleteNode(targetNode, rootNode) {
@@ -604,7 +607,8 @@ export default function CreateTreeSimulation(props) {
                         parentNode.value = typeof targetNode.data.value === "string" ? new_value : targetNode.data.value
                     }
                 }
-                this.generate_tree()
+                // this.generate_tree()
+                set_root({...root})
             },
 
             find_node(selectedNode) {
@@ -624,16 +628,7 @@ export default function CreateTreeSimulation(props) {
             generate_tree(node) {
                 this.clear_data(root)
                 let _this = this
-                // this.is_animation_end = true
                 this.animation_index = 0
-                // root = !isUpdate ? JSON.parse(JSON.stringify(data)) : root
-                // d3.select("g").remove()
-                // svg = d3.select("svg"),
-                //     width = +svg.attr("width"),
-                //     height = +svg.attr("height"),
-                //     g = svg.append("g").attr("transform", "translate(0,100)");
-                // this.content = g
-
                 tree = d3.tree().size([width, height - 160]);
                 rootD3 = d3.hierarchy(root);
 
@@ -751,8 +746,7 @@ export default function CreateTreeSimulation(props) {
                     .attr("y", 35 + (this.circle_r) / 1.4) // Điều chỉnh vị trí y của văn bản
                     .attr("opacity", 0)
 
-
-                this.run_algorithm("minimax")
+                // this.run_algorithm("minimax")
                 minimax_list.innerHTML = new Array(depth + 1).fill(0).map((_, i) => {
                     const MOX = nodes.find(item => item.depth === i).data.MOX
                     return `
@@ -775,6 +769,7 @@ export default function CreateTreeSimulation(props) {
                                     { variable: "default_value", data: typeof node.default_value === "number" ? node.default_value : (Number(item.value) === 0 ? "-inf" : "+inf") }
                                 ]
                             })
+                        set_root({...root})
                     }
                 })
             },
@@ -782,13 +777,17 @@ export default function CreateTreeSimulation(props) {
             handle_event() {
                 node_name.oninput = () => {
                     this.find_node(this.selected_node).name = node_name.value
-                    this.generate_tree(this.selected_node)
+                    // this.generate_tree(this.selected_node)
                 }
                 node_value.oninput = () => {
-                    if (this.selected_node.data.children.length === 0) {
+                    if (this.selected_node.data && this.selected_node.data.children.length === 0) {
                         this.find_node(this.selected_node).default_value = Number(node_value.value)
-                        this.generate_tree(this.selected_node)
+                        this.find_node(this.selected_node).value = Number(node_value.value)
+                        // this.generate_tree(this.selected_node)
                     }
+                }
+                VI_save_btn.onclick = () => {
+                    set_root({...root})
                 }
             },
 
@@ -805,12 +804,14 @@ export default function CreateTreeSimulation(props) {
             async start() {
                 // this.clear_variable()
                 this.generate_tree()
-                this.handle_event()
+                // this.handle_event()
             }
         }
         props.controller(a)
-        // a.start()
-    }, [])
+        a.start()
+        a.handle_event()
+        a.run_algorithm("minimax")
+    }, [root])
 
-    return (<svg width={960} height={600}></svg>)
+    return (<svg className="lg:scale-100 sm:scale-50 sm:-translate-y-1/2" width={960} height={600}></svg>)
 }

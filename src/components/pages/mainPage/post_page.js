@@ -3,14 +3,17 @@ import React, { useContext, useEffect, useState } from 'react'
 import "../../../style/post_page.css"
 import { AppContext } from '../../../context/appContext'
 import Navbar from '../../primary/navbar'
+import logo from "../../../static/img/logo.png"
 
 export default function Post_page() {
   const [posts, set_posts] = useState([])
   const [post_chunk_index, set_post_chunk_index] = useState(0)
   const { history } = useContext(AppContext)
 
+  const is_mobile = (window.innerWidth <= 600)
+
   useEffect(() => {
-    fetch(`http://192.168.1.249:5000/get_posts?page=${post_chunk_index}&size=10`)
+    fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/get_posts?page=${post_chunk_index}&size=10`)
     .then(res => res.json())
     .then(data => {
       set_posts(data)
@@ -44,7 +47,7 @@ export default function Post_page() {
 
   return (
     <div className=" h-full w-full flex justify-center">
-      <Navbar type={{create_content: true}} back_link="/menu"/>
+      <Navbar type={{create_post: true}} back_link="/menu"/>
       <div className="w-[90%] md:w[80%] lg:w-[55%] mt-28">
         <div className="code_guide">
           <img
@@ -82,10 +85,10 @@ export default function Post_page() {
                     <div className="author_avatar dark:bg-white">
                       {post.author[0].toUpperCase()}
                     </div>
-                    <div onClick={() => history("/user/"+post.author_id)} className="author_name dark:text-gray-300">
+                    <div onClick={() => history("/user/"+post.author_id)} className="author_name dark:text-gray-300 lg:text-xl sm:text-[1px] md:text-[1px]">
                       {post.author}
                     </div>
-                    <div className="upload_time dark:text-gray-300">{post.upload_time}</div>
+                    <div className={`upload_time dark:text-gray-300 text-base`}>{post.upload_time}</div>
                   </div>
                   <a
                     onClick={() => history("/post/" + post.post_id, {state: post})}
@@ -93,13 +96,13 @@ export default function Post_page() {
                   >{post.title}</a>
                   <div className="review_decription">{post.description}</div>
                 </div>
-                <a
+                <div
                   onClick={() => history("/post/" + post.post_id, {state: post})}
-                  className="review_img"
+                  className="review_img bg-white place-content-center lg:grid md:grid hidden"
                 >
                   <img className="h-auto" src={post.image_url[0]} alt="" />
                   <div className="back_drop" />
-                </a>
+                </div>
               </div>
             )}
           </div>
@@ -120,21 +123,21 @@ export default function Post_page() {
                   <div className="author_name dark:text-gray-300">
                     {post.author}
                   </div>
-                  <div className="upload_time dark:text-gray-300">{post.upload_time}</div>
+                  <div className={`upload_time dark:text-gray-300 text-base`}>{post.upload_time}</div>
                 </div>
-                <a
+              <a
                   onClick={() => history("/post/" + post.post_id, { state: post })}
                   className="review_title dark:text-gray-200"
                 >{post.title}</a>
                 <div className="review_decription">{post.description}</div>
               </div>
-              <a
+              <div
                 onClick={() => history("/post/" + post.post_id, { state: post })}
-                className="review_img"
+                className="review_img bg-white place-content-center lg:grid md:grid hidden"
               >
-                <img className="h-auto" src={post.image_url[0]} alt="" />
+                <img className="h-auto object-contain" src={post.image_url[0] || logo} alt="" />
                 <div className="back_drop" />
-              </a>
+              </div>
             </div>
             )}
           </div>

@@ -5,13 +5,18 @@ export default function Check_admin_modal() {
     const [is_admin, set_is_admin] = useState(false)
     const input_ref = useRef(null)
     function check_admin() {
-        if(input_ref.current.value === process.env.REACT_APP_ADMIN_CODE) {
-            set_is_admin(true)
-        } else {
-            input_ref.current.value = ""
-            input_ref.current.style.border = "1px solid red"
-            input_ref.current.placeholder = "Sai mật khẩu"
-        }
+        fetch("https://coganh-cloud-tixakavkna-as.a.run.app/check_admin?password="+input_ref.current.value)
+        .then(res => res.json())
+        .then(is_admin => {
+            if(Boolean(is_admin)) {
+                set_is_admin(true)
+            } else {
+                input_ref.current.value = ""
+                input_ref.current.style.border = "1px solid red"
+                input_ref.current.placeholder = "Sai mật khẩu"
+            }
+        })
+        .catch(err => console.log(err))
     }
 
     return (

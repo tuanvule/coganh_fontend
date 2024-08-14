@@ -40,7 +40,7 @@ export default function Login(props) {
 
         console.log(password, name)
 
-        fetch('http://192.168.1.249:5000/handle_login', {
+        fetch('https://coganh-cloud-tixakavkna-as.a.run.app/handle_login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -62,7 +62,7 @@ export default function Login(props) {
     }
 
   return (
-    <div className="card-purple animate-[moveSigninModalToLeft_.6s_ease-in-out] flex flex-col items-center w-[40%] h-[90%] my-auto mr-auto ml-20 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg  text-white">
+    <div className={`lg:card-purple lg:animate-[moveSigninModalToLeft_.6s_ease-in-out_forwards] flex flex-col items-center lg:w-[40%] lg:h-[90%] my-auto mg:ml-auto lg:mr-20 mx-auto w-[90%] h-[60%] bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg  text-white`}>
         <h1 className=" mb-8 mt-20 text-4xl">Đăng nhập</h1>
         <div className="text-xl">
             <h4>Name</h4>

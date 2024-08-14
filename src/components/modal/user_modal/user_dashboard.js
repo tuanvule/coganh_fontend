@@ -6,7 +6,8 @@ import { axisClasses } from '@mui/x-charts/ChartsAxis';
 import { AppContext } from '../../../context/appContext';
 
 export default function User_dashboard({data: {bots, posts, your_tasks, tasks}}) {
-  const {user} = useContext(AppContext)
+  const {user, theme} = useContext(AppContext)
+  const web_theme = theme
 
   const [chart_post_data, set_chart_post_data] = useState([0,0,0,0,0,0,0,0,0,0,0,0])
   const [chart_task_data, set_chart_task_data] = useState([0,0,0,0,0,0,0,0,0,0,0,0])
@@ -59,9 +60,9 @@ export default function User_dashboard({data: {bots, posts, your_tasks, tasks}})
   }, [bots])
 
   return (
-    <div className="w-full flex flex-col justify-between overflow-scroll">
-        <div className="statistical w-full flex justify-between">
-          <div className="statistical_bot w-[40%] h-72 rounded-lg border-blue-400 border-2 bg-[#4F6AF3] py-5 grid grid-rows-5 grid-flow-col">
+    <div className="w-full flex flex-col justify-between">
+        <div className="statistical w-full flex justify-between lg:flex-row flex-col">
+          <div className="statistical_bot lg:w-[40%] w-full h-72 rounded-lg dark:border-blue-400 border-2 bg-[#4F6AF3] py-5 grid grid-rows-5 grid-flow-col">
             <div className="statistical_title text-2xl px-5">Thông số của Bot</div>
             <div className="grid grid-cols-2 row-span-4">
               <div className="flex flex-col items-center justify-center">
@@ -94,7 +95,7 @@ export default function User_dashboard({data: {bots, posts, your_tasks, tasks}})
             </div>
           </div>
 
-          <div className="statistical_posts w-[28%] h-72 rounded-lg border-blue-400 border-2 bg-[#0F2845] p-5 flex flex-col items-center">
+          <div className="statistical_posts  lg:w-[28%] w-full h-72 rounded-lg dark:border-blue-400 border-2 bg-white dark:bg-[#0F2845] p-5 my-4 lg:my-0 flex flex-col items-center">
             <div className="statistical_title text-3xl self-start flex items-center mb-auto"><i className="fa-solid fa-book-open mr-5"></i><span className="text-xl">SỐ BLOG ĐÃ ĐĂNG</span></div>
             <div className="statistical_training-circle mb-[10%]">
               <div className="statistical_bot-circle w-52 h-40 rounded-xl bg-slate-200 grid place-content-center ">
@@ -103,7 +104,7 @@ export default function User_dashboard({data: {bots, posts, your_tasks, tasks}})
             </div>
           </div>
 
-          <div className="statistical_training w-[28%] h-72 rounded-lg border-blue-400 border-2 bg-[#0F2845] p-5 flex flex-col items-center">
+          <div className="statistical_training  lg:w-[28%] w-full h-72 rounded-lg dark:border-blue-400 border-2 bg-white dark:bg-[#0F2845] p-5 flex flex-col items-center">
             <div className="statistical_title text-3xl self-start flex items-center mb-auto"><i class="fa-solid fa-graduation-cap mr-5"></i><span className="text-lg">TASK ĐÃ ĐĂNG</span></div>
 
             <div className="statistical_training-circle w-32 h-32 mb-[16%]">
@@ -114,7 +115,7 @@ export default function User_dashboard({data: {bots, posts, your_tasks, tasks}})
           </div>
         </div>
 
-        <div className="chart_all mt-5 w-full h-96 rounded-lg border-blue-400 border-2 bg-[#0F2845]">
+        <div className="chart_all mt-5 w-full lg:h-96 h-64 rounded-lg dark:border-blue-400 border-2 bg-white dark:bg-[#0F2845]">
         <LineChart
           xAxis={[{scaleType: 'point', data: [`tháng 1`, `tháng 2`, `tháng 3`, `tháng 4`, `tháng 5`, `tháng 6`, `tháng 7`, `tháng 8`, `tháng 9`, `tháng 10`, `tháng 11`, `tháng 12`] }]}
           series={[
@@ -126,10 +127,10 @@ export default function User_dashboard({data: {bots, posts, your_tasks, tasks}})
           sx={(theme) => ({
             [`.${axisClasses.root}`]: {
               [`.${axisClasses.tick}, .${axisClasses.line}`]: {
-                stroke: 'white',
+                stroke: web_theme === "dark" ? 'white' : "black",
               },
               [`.${axisClasses.tickLabel}`]: {
-                fill: 'white',
+                fill: web_theme === "dark" ? 'white' : "black",
               },
             },
             ["& .MuiChartsLegend-series text"]: {
@@ -141,7 +142,7 @@ export default function User_dashboard({data: {bots, posts, your_tasks, tasks}})
           // height={300}
         />
         </div>
-        <div className="chart_all mt-5 w-full h-96 rounded-lg border-blue-400 border-2 bg-[#0F2845]">
+        <div className="chart_all mt-5 w-full lg:h-96 h-64 rounded-lg dark:border-blue-400 border-2 bg-white dark:bg-[#0F2845]">
         <LineChart
           xAxis={[{scaleType: 'point', data: [`tháng 1`, `tháng 2`, `tháng 3`, `tháng 4`, `tháng 5`, `tháng 6`, `tháng 7`, `tháng 8`, `tháng 9`, `tháng 10`, `tháng 11`, `tháng 12`] }]}
           series={[
@@ -153,10 +154,10 @@ export default function User_dashboard({data: {bots, posts, your_tasks, tasks}})
           sx={(theme) => ({
             [`.${axisClasses.root}`]: {
               [`.${axisClasses.tick}, .${axisClasses.line}`]: {
-                stroke: 'white',
+                stroke: web_theme === "dark" ? 'white' : "black",
               },
               [`.${axisClasses.tickLabel}`]: {
-                fill: 'white',
+                fill: web_theme === "dark" ? 'white' : "black",
               },
             },
             ["& .MuiChartsLegend-series text"]: {

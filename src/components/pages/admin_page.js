@@ -30,7 +30,7 @@ export default function ADMIN_page() {
     }, [])
 
     useEffect(() => {
-        fetch(`http://192.168.1.249:5000/get_all_user`)
+        fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/get_all_user`)
             .then(res => res.json())
             .then(data => {
                 let d = []
@@ -46,7 +46,7 @@ export default function ADMIN_page() {
 
     useEffect(() => {
         if (!fetch_posts) return
-        fetch(`http://192.168.1.249:5000/get_all_post?page=${post_chunk_index}&size=9`)
+        fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/get_all_post?page=${post_chunk_index}&size=9`)
             .then(res => res.json())
             .then(data => {
                 set_posts(data)
@@ -57,7 +57,7 @@ export default function ADMIN_page() {
 
     useEffect(() => {
         if (!fetch_tasks) return
-        fetch(`http://192.168.1.249:5000/get_all_task?page=${task_chunk_index}&size=30`)
+        fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/get_all_task?page=${task_chunk_index}&size=30`)
             .then(res => res.json())
             .then(data => {
                 set_tasks(data)

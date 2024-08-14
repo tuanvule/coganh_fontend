@@ -35,17 +35,13 @@ export default function Menu() {
 
     window.onload = null
 
-    window.onpageshow = function (event) {
-      var historyTraversal = event.persisted || (typeof window.performance != "undefined" && window.performance.navigation.type === 2);
-      if (historyTraversal) {
-        window.location.reload();
-      }
-    }
+    // window.onpageshow = function (event) {
+    //   var historyTraversal = event.persisted || (typeof window.performance != "undefined" && window.performance.navigation.type === 2);
+    //   if (historyTraversal) {
+    //     window.location.reload();
+    //   }
+    // }
       fightBotBtn.onclick = () => {
-        if(!user.username) {
-          set_is_require_login(true)
-          return
-        }
         if (isMobile) {
           sign.style.display = "flex"
         } else if (fightable === "False") {
@@ -64,12 +60,7 @@ export default function Menu() {
         }
       }
       visualizeBtn.onclick = () => {
-        if (isMobile) {
-          sign.style.display = "flex"
-        } else {
-          history("/visualize_page")
-          window.location.href = "/visualize_page"
-        }
+        history("/visualize_page")
       }
       training_btn.onclick = () => {
         if (isMobile) {
@@ -81,7 +72,7 @@ export default function Menu() {
       }
       sign_btn.onclick = () => sign.style.display = "none"
       backBtn.onclick = () => notification.style.display = "none"
-    }, [])
+    }, [user])
 
   return (
     <div className=" overflow-scroll dark:bg-[#1e1926] dark:color-white pb-5">
@@ -127,26 +118,24 @@ export default function Menu() {
             </a>
           </div>
           <div className="main_nav_module">
-            <div className="code_require bg-slate-800">
+            <div className="code_require dark:bg-[#0e335b] bg-[#52b1ff]">
               <h2 className="text-2xl font-bold">Programing</h2>
-              <a className="btn create_bot">Create bot</a>
-              {/* <a className="btn bot_bot">Đấu bot</a> */}
-              <a className="btn training">Training</a>
+              <a className="btn dark:bg-[#111c2c] bg-[#007BFF] create_bot">Create bot</a>
+              <a className="btn dark:bg-[#111c2c] bg-[#007BFF] training">Training</a>
             </div>
-            <div className="non_code bg-slate-800">
+            <div className="non_code dark:bg-[#0e335b] bg-[#52b1ff]">
               <h2 className="text-2xl font-bold">Play chess</h2>
-              <a className="btn" href="/human_bot">
+              <a className="btn dark:bg-[#111c2c] bg-[#007BFF]" onClick={() => history("/human_bot")}>
                 Human vs Bot
               </a>
-              {/* <a className="btn" href="/room_manager">Đấu với người</a> */}
             </div>
           </div>
         </div>
-        <div className="detail_module">
+        <div className="detail_module mx-auto w-full">
           <div className="detail_module_title">Others</div>
           <div className="detail_list">
-            <div className="detail_item bg-slate-800">
-              <div className="detail_image">
+            <div className="detail_item dark:bg-[#0e335b] bg-[#52b1ff]">
+              <div className="detail_image dark:bg-black bg-slate-200">
                 <img src={bot_bot} alt="" />
               </div>
               <div className="detail_nav">
@@ -156,7 +145,7 @@ export default function Menu() {
                 <a className="btn2 bot_bot">Bot vs Bot</a>
               </div>
             </div>
-            <div className="detail_item bg-slate-800">
+            <div className="detail_item dark:bg-[#0e335b] bg-[#7ac8ff]">
               <div className="detail_nav">
                 <div className="icon">
                   <i className="fa-solid fa-book-open" />
@@ -165,12 +154,12 @@ export default function Menu() {
                   Blog
                 </a>
               </div>
-              <div className="detail_image">
+              <div className="detail_image dark:bg-black bg-slate-200">
                 <img src={post_page} alt="" />
               </div>
             </div>
-            <div className="detail_item bg-slate-800">
-              <div className="detail_image">
+            <div className="detail_item dark:bg-[#0e335b] bg-[#7ac8ff]">
+              <div className="detail_image dark:bg-black bg-slate-200">
                 <img src={visualize} alt="" />
               </div>
               <div className="detail_nav">
@@ -182,7 +171,7 @@ export default function Menu() {
             </div>
           </div>
         </div>
-        <div className="sign">
+        <div className="sign bg-[#0757ad]">
           <div className="sign_content">
             Chức năng này phù hợp với dạng thiết bị: máy tính, laptop,... Chúng tôi
             khuyên bạn nên sử dụng thiết bị như trên để có trải nghiệm tốt nhất

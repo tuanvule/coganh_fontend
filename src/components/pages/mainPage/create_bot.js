@@ -48,7 +48,7 @@ export default function Create_bot() {
 
     useEffect(() => {
         if(username) {
-            fetch("http://192.168.1.249:5000/get_user_bot/" + user.username)
+            fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_user_bot/" + user.username)
             .then(res => res.json())
             .then(data => {
                 // console.log(data)
@@ -111,25 +111,25 @@ def main(player):
         const result = $(".utility_block-element.result")
         const uniBlock = $$(".utility_block-element")
         const loader = $(".CB_coding_module-nav--CB_runBtn.CB_loader")
-        const video = $(".bot_display-video--result")
-        const debug = $(".bot_display-video--debug")
-        const help = $(".bot_display-video--help")
+        const video = $(".CB_bot_display-video--result")
+        const debug = $(".CB_bot_display-video--debug")
+        const help = $(".CB_bot_display-video--help")
 
         const uniNavItem = $$(".utility_nav-block--item")
         const ruleBtn = $(".utility_nav-block--item.rule")
         const terminalBtn = $(".utility_nav-block--item.terminal")
         const resultBtn = $(".utility_nav-block--item.result")
-        const videoBtn = $(".bot_display_nav-block--item.video")
-        const debugtBtn = $(".bot_display_nav-block--item.debug")
-        const helpBtn = $(".bot_display_nav-block--item.help")
+        const videoBtn = $(".CB_bot_display_nav-block--item.video")
+        const debugtBtn = $(".CB_bot_display_nav-block--item.debug")
+        const helpBtn = $(".CB_bot_display_nav-block--item.help")
         const animation = $(".utility_nav-block .animation")
         const animationChild = $(".utility_nav-block .animation .children")
-        const bDAnimation = $(".bot_display_nav-block .animation")
-        const bDAnimationChild = $(".bot_display_nav-block .animation .children")
-        const botDisplayBlock = $$(".bot_display-video-item")
+        const bDAnimation = $(".CB_bot_display_nav-block .animation")
+        const bDAnimationChild = $(".CB_bot_display_nav-block .animation .children")
+        const botDisplayBlock = $$(".CB_bot_display-video-item")
 
-        const debugArrowRight = $(".bot_display-video--debug .arrow_right")
-        const debugArrowLeft = $(".bot_display-video--debug .arrow_left")
+        const debugArrowRight = $(".CB_bot_display-video--debug .arrow_right")
+        const debugArrowLeft = $(".CB_bot_display-video--debug .arrow_left")
         const debugImageList = $(".debug_img_list")
         const counter = $(".counter")
         const selectDebugNum = $(".selector")
@@ -215,7 +215,7 @@ def main(player):
         let img_url = []
         let rate = []
 
-        var audio = $(".bot_display-video--result");
+        var audio = $(".CB_bot_display-video--result");
         console.log(audio)
         audio.volume = 0.1;
 
@@ -237,7 +237,9 @@ def main(player):
                 return
             }
             saveBtn.dataset.saved = "true"
-            fetch("http://192.168.1.249:5000/save_bot", {
+            console.log({sername: user.username,
+                bot_name: request_data.your_bot_name})
+            fetch("https://coganh-cloud-tixakavkna-as.a.run.app/save_bot", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -245,7 +247,7 @@ def main(player):
                 body: JSON.stringify({
                     code: code.replaceAll('\r', ''),
                     username: user.username,
-                    bot_name: user.username
+                    bot_name: request_data.your_bot_name
                 }),
             })
                 .then(res => res.json())
@@ -305,7 +307,7 @@ def main(player):
                 loadingNavVideoFI.style.display = "none"
             }
 
-            fetch("http://192.168.1.249:5000/debug_bot", {
+            fetch("https://coganh-cloud-tixakavkna-as.a.run.app/debug_bot", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -376,7 +378,7 @@ def main(player):
             video.style.display = "none"
             loadingNavVideoLD.style.display = "block"
             loadingNavVideoCI.style.display = "none"
-            fetch("http://192.168.1.249:5000/run_bot", {
+            fetch("https://coganh-cloud-tixakavkna-as.a.run.app/run_bot", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -539,7 +541,7 @@ def main(player):
             if (mode === "terminal" || mode === "rule" || mode === "result") {
                 uniNavItem.forEach(ele => ele.style.color = "#ccc")
             } else {
-                $$(".bot_display_nav-block--item").forEach(ele => ele.style.color = "#ccc")
+                $$(".CB_bot_display_nav-block--item").forEach(ele => ele.style.color = "#ccc")
             }
             e.style.color = "#fff"
             animationChild.style.right = right;
@@ -647,7 +649,7 @@ def main(player):
     }
 
     return (
-        <div className="h-screen">
+        <div className="h-screen bg-[#111c2c] text-white">
             { is_require_login && <Login_require set_is_require_login={set_is_require_login}/>}
             { is_open_add_bot &&  <Add_bot set_new_bot={set_new_bot} set_is_open_add_bot={set_is_open_add_bot} set_code={set_code} set_selected_bot={set_selected_bot}/>}
             { is_open_remove_bot && <Remove_bot set_selected_bot={set_selected_bot} set_new_bot={set_new_bot} selected_bot={selected_bot} set_is_open_remove_bot={set_is_open_remove_bot}/>}
@@ -666,10 +668,10 @@ def main(player):
             />
             <div className="guide" />
             <div className="CB_container md:max-w-full h-screen">
-                <div className="CB_container_element bot_display">
-                    <div className="bot_display_nav">
-                        <div className="bot_display_nav-block">
-                            <div className="bot_display_nav-block--item video">
+                <div className="CB_container_element CB_bot_display bg-[#262626]">
+                    <div className="CB_bot_display_nav">
+                        <div className="CB_bot_display_nav-block">
+                            <div className="CB_bot_display_nav-block--item video">
                                 VIDEO
                                 <div className="loading_nav_video">
                                     <div className="loader" />
@@ -677,7 +679,7 @@ def main(player):
                                     <i className="fa-solid fa-circle-xmark fail_icon" />
                                 </div>
                             </div>
-                            <div className="bot_display_nav-block--item debug">
+                            <div className="CB_bot_display_nav-block--item debug">
                                 DEBUG
                                 <div className="loading_nav_image">
                                     <div className="loader" />
@@ -685,16 +687,16 @@ def main(player):
                                     <i className="fa-solid fa-circle-xmark fail_icon" />
                                 </div>
                             </div>
-                            <div className="bot_display_nav-block--item help">HELP</div>
+                            <div className="CB_bot_display_nav-block--item help">HELP</div>
                             <div className="animation">
                                 <div className="children" />
                             </div>
                         </div>
                     </div>
-                    <div className="bot_display-video--background">
+                    <div className="CB_bot_display-video--background">
                         <video
                             style={{ display: "auto" }}
-                            className="bot_display-video-item bot_display-video--result inline-block"
+                            className="CB_bot_display-video-item CB_bot_display-video--result inline-block"
                             controls
                             src={src}
                         >
@@ -705,7 +707,7 @@ def main(player):
                         </div>
                         <div
                             style={{ display: "none" }}
-                            className="bot_display-video-item bot_display-video--debug"
+                            className="CB_bot_display-video-item CB_bot_display-video--debug"
                         >
                             <div className="loading_image">
                                 <div className="loader" />
@@ -737,7 +739,7 @@ def main(player):
                         </div>
                         <div
                             style={{ display: "none" }}
-                            className="bot_display-video-item bot_display-video--help"
+                            className="CB_bot_display-video-item CB_bot_display-video--help"
                         >
                             <div className="help_title">Kiến thức cần thiết</div>
                             <ul className="p-0 help_list help_type">
@@ -793,22 +795,22 @@ def main(player):
                             <div className="help_title">Mô phỏng thuật toán</div>
                             <ul className="p-0 help_list">
                                 <li className="help_item help_blog">
-                                    <a href="{{url_for('visualize', id='SctXzAxW6TtcMSPwPm1N')}}">
+                                    <a onClick={() => history("/visualize/"+"SctXzAxW6TtcMSPwPm1N", { state: "SctXzAxW6TtcMSPwPm1N" })}>
                                         minimax
                                     </a>
                                 </li>
                                 <li className="help_item help_blog">
-                                    <a href="{{url_for('visualize', id='OYRJNv4Jqez9dKZjLW27')}}">
+                                    <a onClick={() => history("/visualize/"+"aLzIcTxFR2EfRXVFov07", { state: "aLzIcTxFR2EfRXVFov07" })}>
                                         Kiểm tra nước đi
                                     </a>
                                 </li>
                                 <li className="help_item help_blog">
-                                    <a href="{{url_for('visualize', id='aLzIcTxFR2EfRXVFov07')}}">
+                                    <a onClick={() => history("/visualize/"+"OYRJNv4Jqez9dKZjLW27", { state: "OYRJNv4Jqez9dKZjLW27" })}>
                                         Kiểm tra gánh chẹt
                                     </a>
                                 </li>
                                 <li className="help_item help_blog">
-                                    <a href="{{url_for('visualize', id='1OyReHWrH3zgV5IfcZPk')}}">
+                                    <a onClick={() => history("/visualize/"+"1OyReHWrH3zgV5IfcZPk", { state: "1OyReHWrH3zgV5IfcZPk" })}>
                                         Kiểm tra vây
                                     </a>
                                 </li>
@@ -916,7 +918,7 @@ def main(player):
                             </select>
                         </div>
                         <div className="CB_coding_module-nav--saveBtn CB_active" data-saved="false">
-                            save
+                            Save
                         </div>
                         <div
                             className="CB_coding_module-nav--CB_runBtn CB_loader"
@@ -924,7 +926,7 @@ def main(player):
                         >
                             <div className="CB_coding_module-nav--loading" />
                         </div>
-                        <div className="CB_coding_module-nav--CB_runBtn cb_btn">run</div>
+                        <div className="CB_coding_module-nav--CB_runBtn cb_btn">Run</div>
                         <div className="CB_coding_module-nav--setting">
                             <label htmlFor="check">
                                 <i className="fa-solid fa-gear setting_icon" />
@@ -972,12 +974,20 @@ def main(player):
                                     </option>
                                 )}
                             </select>
-                            <div onClick={() => set_is_open_add_bot(!is_open_add_bot)} className="add_bot bg-gray-700 ml-2 text-sm px-1 rounded-sm cursor-pointer hover:brightness-90">
-                                Add bot
-                            </div>
-                            <div onClick={() => set_is_open_remove_bot(!is_open_remove_bot)} className="remove_bot bg-gray-700 ml-2 text-sm px-1 rounded-sm cursor-pointer hover:brightness-90">
-                                remove bot
-                            </div>
+                            {user.username ? 
+                                <>
+                                    <div onClick={() => set_is_open_add_bot(!is_open_add_bot)} className="add_bot bg-gray-700 ml-2 text-sm px-1 rounded-sm cursor-pointer hover:brightness-90">
+                                        Add bot
+                                    </div>
+                                    <div onClick={() => set_is_open_remove_bot(!is_open_remove_bot)} className="remove_bot bg-gray-700 ml-2 text-sm px-1 rounded-sm cursor-pointer hover:brightness-90">
+                                        remove bot
+                                    </div>
+                                </>
+                            :
+                                <div className=" bg-gray-700 ml-2 text-sm px-1 rounded-sm cursor-pointer hover:brightness-90">
+                                    Bạn phải đăng nhập để sử dụng chức năng này
+                                </div>
+                            }
                         </div>
                         <AceEditor
                             value={code}

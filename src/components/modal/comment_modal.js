@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import { db } from "../../firebase/config"
 import { AppContext } from '../../context/appContext'
 import Login_require from './requirements/login_require'
 
@@ -48,11 +47,7 @@ export default function Comment_modal({ post_id = null, task_id = null, bg = "bg
     });
   }
 
-  function handle_data(querySnapshot, date) {
-    let data = []
-    querySnapshot.forEach((doc) => {
-      data.push(doc.data())
-    });
+  function handle_data(data, date) {
     data = data.reverse()
     set_comment_count(data.length)
     let sorted_data = sort_date(data, date).reverse()
@@ -66,26 +61,24 @@ export default function Comment_modal({ post_id = null, task_id = null, bg = "bg
   console.log("hell3")
 
   useEffect(() => {
+    console.log(post_id, task_id)
     if (post_id) {
-      db.collection("comments").where("post_id", "==", post_id)
-        .get()
-        .then((querySnapshot) => {
-          let data = handle_data(querySnapshot, "comment_time")
-          set_comments(data)
+      fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/get_post_comments/${post_id}`)
+        .then(res => res.json())
+        .then(data => {
+          let comment = handle_data(data, "comment_time")
+          console.log(comment)
+          set_comments(comment)
         })
-        .catch((error) => {
-          console.log("Error getting documents: ", error);
-        });
+        .catch(err => console.log(err))
     } else if (task_id) {
-      db.collection("comments").where("task_id", "==", task_id)
-        .get()
-        .then((querySnapshot) => {
-          let data = handle_data(querySnapshot, "comment_time")
-          set_comments(data)
-        })
-        .catch((error) => {
-          console.log("Error getting documents: ", error);
-        });
+      fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/get_task_comments/${task_id}`)
+      .then(res => res.json())
+      .then(data => {
+        let comment = handle_data(data, "comment_time")
+        set_comments(comment)
+      })
+      .catch(err => console.log(err))
     }
   }, [is_reset])
 
@@ -106,15 +99,33 @@ export default function Comment_modal({ post_id = null, task_id = null, bg = "bg
         return
       } else {
         let formatter = new Intl.DateTimeFormat([], options);
-        db.collection("comments").add({
-          username: user.username,
-          u_id: user.id,
-          comment: value,
-          comment_time: formatter.format(new Date()),
-          post_id: post_id,
-          task_id: task_id
+        fetch('https://coganh-cloud-tixakavkna-as.a.run.app/handle_comment', {
+          method: 'POST',
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: user.username,
+            u_id: user.id,
+            comment: value,
+            comment_time: formatter.format(new Date()),
+            post_id: post_id,
+            task_id: task_id
+          })
         })
-        set_is_reset(Math.random())
+        .then(res => res.json())
+        .then(msg => {
+          console.log(msg)
+          set_is_reset(Math.random())
+        })
+        // db.collection("comments").add({
+        //   username: user.username,
+        //   u_id: user.id,
+        //   comment: value,
+        //   comment_time: formatter.format(new Date()),
+        //   post_id: post_id,
+        //   task_id: task_id
+        // })
       }
     } else {
       set_is_require_user(true)
@@ -125,15 +136,16 @@ export default function Comment_modal({ post_id = null, task_id = null, bg = "bg
     set_value(value)
     max_value_text_ref.current.style.display = "none"
   }
+  console.log(bg)
 
   return (
     <div id='comment_modal' className={` ${bg} w-full ${px} py-4 rounded mt-4 overflow-x-hidden`}>
       {is_require_user && <Login_require set_is_require_login={set_is_require_user} />}
-      <div className="text-2xl text-[#a0d8fa] font-semibold flex items-center"><i class="fa-solid fa-comment mr-4"></i> Comment</div>
+      <div className="text-2xl dark:text-[#a0d8fa] text-[#007bff] font-semibold flex items-center"><i class="fa-solid fa-comment mr-4"></i> Comment</div>
       <div className="my-4 ">
-        <textarea ref={input_ref} value={value} onChange={(e) => handle_input(e.target.value)} className={`w-full h-20 p-2 outline-none ${bg} border border-white focus:border-[#a0d8fa] resize-none rounded`} placeholder="Nhập bình luận tại đây"></textarea>
+        <textarea ref={input_ref} value={value} onChange={(e) => handle_input(e.target.value)} className={`w-full h-20 p-2 outline-none ${bg} dark:placeholder:text-slate-300 placeholder:text-slate-700 border dark:border-white border-[#004ab3] focus:border-[#007bff] resize-none rounded`} placeholder="Nhập bình luận tại đây"></textarea>
         <p ref={max_value_text_ref} className="text-red-400 hidden">Tối đa 350 chữ</p>
-        <div ref={send_btn_ref} onClick={() => handle_send_comment()} className={`text-xl mt-2 px-4 py-1 border border-[#a0d8fa] w-fit rounded hover:brightness-90 cursor-pointer select-none transition-all ${value.length === 0 ? "" : "bg-[#a0d8fa]"}`}><i class="fa-solid fa-paper-plane"></i></div>
+        <div ref={send_btn_ref} onClick={() => handle_send_comment()} className={`text-xl mt-2 px-4 py-1 border dark:border-[#a0d8fa] border-[#007bff] w-fit rounded hover:brightness-90 cursor-pointer select-none transition-all ${value.length === 0 ? "" : "dark:bg-[#a0d8fa] dark:text-black bg-[#007bff] text-white"}`}><i class="fa-solid fa-paper-plane"></i></div>
       </div>
       <ul className="p-0">
         {comments[chunk_index] && comments[chunk_index].map((cm, i) =>
@@ -142,7 +154,7 @@ export default function Comment_modal({ post_id = null, task_id = null, bg = "bg
               <div className="w-10 h-10 grid place-content-center text-3xl rounded-full bg-white text-[#007BFF] font-bold mr-4">{cm && cm.username[0].toUpperCase()}</div>
               <div className="text-lg">
                 <div className="text-lg font-semibold">{cm.username}</div>
-                <div className="text-base text-slate-300">{cm.comment_time}</div>
+                <div className={`text-base ${bg === "bg-[#0e335b]" || bg === "bg-[#262626]" ? "text-slate-300" : "text-slate-700"} `}>{cm.comment_time}</div>
               </div>
             </div>
             <div className="pl-14 mt-1">

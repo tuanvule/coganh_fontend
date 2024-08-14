@@ -11,7 +11,7 @@ export default function Remove_bot({set_selected_bot, selected_bot, set_new_bot,
     useEffect(() => {
         if(delete_btn_Ref.current) {
             delete_btn_Ref.current.onclick = () => {
-                fetch(`http://192.168.1.249:5000/remove_bot?owner=${user.username}&bot_name=${selected_bot.bot_name}`)
+                fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/remove_bot?owner=${user.username}&bot_name=${selected_bot.bot_name}`)
                 .then(res => res.json())
                 .then(data => {
                     set_selected_bot(null)

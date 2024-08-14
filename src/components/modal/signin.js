@@ -1,7 +1,5 @@
 import React, { useContext, useEffect, useId, useRef, useState } from 'react'
 import { AppContext } from '../../context/appContext'
-import { db } from "../../firebase/config"
-import { usehistory } from 'react-router-dom'
 
 export default function Signin(props) {
     const { setUser, history } = useContext(AppContext)
@@ -35,7 +33,7 @@ export default function Signin(props) {
     // const inputAvataRef = useRef()
     // const fileUpload = useRef()
     useEffect(() => {
-        fetch('http://192.168.1.249:5000/get_all_user', {
+        fetch('https://coganh-cloud-tixakavkna-as.a.run.app/get_all_user', {
             method: "GET",
         })
         .then((response) => response.json())
@@ -134,7 +132,6 @@ export default function Signin(props) {
 
     function handleSignup(e) {
         e.preventDefault() 
-        console.log(db)
         const isNameErr = require(value.username, 'name', inputNameRef)
         const isPasswordErr = require(value.password, 'password', inputPasswordRef)
         const isConfirmPasswordErr = confirmPasswordRequire(value.password, inputConfirmPasswordRef)
@@ -143,47 +140,66 @@ export default function Signin(props) {
             console.log({
                 ...value,
             })
-            db.collection("bot").add({
-                "code": `# NOTE: tool
-# valid_move(x, y, board): trả về các nước đi hợp lệ của một quân cờ - ((x, y), ...)
-# distance(x1, y1, x2, y2): trả về số nước đi ít nhất từ (x1, y1) đến (x2, y2) - n
 
-# NOTE: player
-# player.your_pos: vị trí tất cả quân cờ của bản thân - [(x, y), ...]
-# player.opp_pos: vị trí tất cả quân cờ của đối thủ - [(x, y), ...]
-# player.your_side: màu quân cờ của bản thân - 1:🔵
-# player.board: bàn cờ - -1:🔴 / 1:🔵 / 0:∅
-
-# Remember that player.board[y][x] is the tile at (x, y) when printing
-def main(player):
-    move = [[-1,0],[0,-1],[0,1],[1,0]]
-    for x,y in player.your_pos:
-        for mx,my in move:
-            if 0 <= x+mx <= 4 and 0 <= y+my <= 4 and player.board[y+my][x+mx] == 0:
-                return {"selected_pos": (x,y), "new_pos": (x+mx, y+my)}`,
-                "owner": value.username,
-                "fightable": false,
-                "fight_history": [],
-                "bot_name": value.username,
-                "elo": 0,
-                "bot_id": new Date().getUTCMilliseconds(),
-                "is_public": false,
-                "level": 0
-            })
-            db.collection("user").add({
-                ...value,
-                notifications: []
-            })
-            .then(docRef => {
-                localStorage.setItem("username", value.username);
-                localStorage.setItem("id", docRef.id);
-                setUser({
+            fetch('https://coganh-cloud-tixakavkna-as.a.run.app/handle_signin', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
                     ...value,
-                    id: docRef.id,
+                })
+            })
+            .then((res) => res.json())
+            .then((data) => {
+                setUser({
+                    ...data,
                 })
                 history("/menu")
             })
-            .catch(error => console.error("Error adding document: ", error))
+            
+//             db.collection("bot").add({
+//                 "code": `# NOTE: tool
+// # valid_move(x, y, board): trả về các nước đi hợp lệ của một quân cờ - ((x, y), ...)
+// # distance(x1, y1, x2, y2): trả về số nước đi ít nhất từ (x1, y1) đến (x2, y2) - n
+
+// # NOTE: player
+// # player.your_pos: vị trí tất cả quân cờ của bản thân - [(x, y), ...]
+// # player.opp_pos: vị trí tất cả quân cờ của đối thủ - [(x, y), ...]
+// # player.your_side: màu quân cờ của bản thân - 1:🔵
+// # player.board: bàn cờ - -1:🔴 / 1:🔵 / 0:∅
+
+// # Remember that player.board[y][x] is the tile at (x, y) when printing
+// def main(player):
+//     move = [[-1,0],[0,-1],[0,1],[1,0]]
+//     for x,y in player.your_pos:
+//         for mx,my in move:
+//             if 0 <= x+mx <= 4 and 0 <= y+my <= 4 and player.board[y+my][x+mx] == 0:
+//                 return {"selected_pos": (x,y), "new_pos": (x+mx, y+my)}`,
+//                 "owner": value.username,
+//                 "fightable": false,
+//                 "fight_history": [],
+//                 "bot_name": value.username,
+//                 "elo": 0,
+//                 "bot_id": new Date().getUTCMilliseconds(),
+//                 "is_public": false,
+//                 "level": 0
+//             })
+
+//             db.collection("user").add({
+//                 ...value,
+//                 notifications: []
+//             })
+//             .then(docRef => {
+//                 localStorage.setItem("username", value.username);
+//                 localStorage.setItem("id", docRef.id);
+//                 setUser({
+//                     ...value,
+//                     id: docRef.id,
+//                 })
+//                 history("/menu")
+//             })
+//             .catch(error => console.error("Error adding document: ", error))
         }
     }
 
@@ -200,7 +216,7 @@ def main(player):
     }
 
   return (
-    <form ref={formRef} method="GET" action="https://vccp-be.vercelx.app/login/signup" className="card-white animate-[moveSignupModalToLeft_.6s_ease-in-out] flex flex-col items-center w-[40%] h-[90%] my-auto ml-auto mr-20 bg-gradient-to-r from-sky-500 to-indigo-500 rounded-xl text-white">
+    <form ref={formRef} method="GET" className={`card-white lg:animate-[moveSignupModalToLeft_.6s_ease-in-out] flex flex-col items-center lg:w-[40%] lg:h-[90%] my-auto mg:ml-auto lg:mr-20 mx-auto w-[90%] h-[60%] bg-gradient-to-r from-sky-500 to-indigo-500 rounded-xl text-white`}>
       <h1 className=" mb-8 mt-8 text-4xl">Đăng ký</h1>
       <div className="form-group">
           <h4 className=" text-xl">Name</h4>

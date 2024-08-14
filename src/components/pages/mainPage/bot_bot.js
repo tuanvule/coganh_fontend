@@ -4,6 +4,7 @@ import { AppContext } from '../../../context/appContext'
 import "../../../style/bot_bot.css"
 import roll_img from "../../../static/img/roll.png"
 import sword_img from "../../../static/img/sword.png"
+import Login_require from '../../modal/requirements/login_require'
 
 export default function Bot_Bot() {
   const { user, history } = useContext(AppContext)
@@ -14,9 +15,10 @@ export default function Bot_Bot() {
   const [selectedPlayer, set_selectedPlayer] = useState({})
   const [is_open_bot_list, set_is_open_bot_list] = useState(false)
   const [selected_bot, set_selected_bot] = useState(null)
+  const [is_require_login, set_is_require_login] = useState(false)
 
   useEffect(() => {
-    fetch("http://192.168.1.249:5000/get_rank_board", {
+    fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_rank_board", {
       method: "GET",
     })
       .then(res => res.json())
@@ -29,7 +31,7 @@ export default function Bot_Bot() {
 
   useEffect(() => {
     if (user.username) {
-      fetch("http://192.168.1.249:5000/get_user_bots", {
+      fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_user_bots", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -61,7 +63,7 @@ export default function Bot_Bot() {
     let newValue = 0
 
     function resetSuggestion() {
-      fetch("http://192.168.1.249:5000/get_user_bots", {
+      fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_user_bots", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -190,7 +192,7 @@ export default function Bot_Bot() {
       const eElo = parseInt(enemyElo.innerHTML)
       const rankBoard = $(".rank_board_list")
 
-      fetch("http://192.168.1.249:5000/update_rank_board", {
+      fetch("https://coganh-cloud-tixakavkna-as.a.run.app/update_rank_board", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -237,6 +239,10 @@ export default function Bot_Bot() {
 
     fightBtn.onclick = () => {
       if (!selectedPlayer || fightBtnStatus.onLoading) return;
+      if(!user.username) {
+        set_is_require_login(true)
+        return
+      }
       let options = {
         timeZone: 'Asia/Ho_Chi_Minh',
         year: 'numeric',
@@ -262,7 +268,7 @@ export default function Bot_Bot() {
       fightBtn.innerHTML = `<div class="loading_btn"></div>`
       fightBtn.style.backgroundColor = "#191B26"
       fightBtnStatus.onLoading = true
-      fetch("http://192.168.1.249:5000/fight_bot", {
+      fetch("https://coganh-cloud-tixakavkna-as.a.run.app/fight_bot", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -370,6 +376,7 @@ export default function Bot_Bot() {
 
   return (
     <div className="h-screen">
+      {is_require_login && <Login_require set_is_require_login={set_is_require_login}/>}
       <div className="container md:max-w-full">
         <div className="ranking"></div>
         <div className="side_bar-left">

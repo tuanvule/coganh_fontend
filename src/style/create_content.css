@@ -20,7 +20,6 @@
 .CC_title_input {
     padding: 10px 20px;
     flex: 1;
-    margin-right: 10px;
     outline-color: #007BFF;
     border: 1px solid #ccc;
 }
@@ -162,8 +161,9 @@
 
 .CC_inp_title,
 .CC_oup_title {
-    width: 49%;
+    width: 46%;
     font-size: 20px;
+    font-weight: bold;
     color: #333;
     margin: 10px 0 6px;
 }

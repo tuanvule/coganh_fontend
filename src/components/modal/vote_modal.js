@@ -1,10 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { AppContext } from '../../context/appContext';
-import firebase,{db} from "../../firebase/config"
 import Login_require from './requirements/login_require';
 
-var doc_ref_post = db.collection("post");
-export default function Vote_modal({post}) {
+export default function Vote_modal({post, is_mobile}) {
     const {user} = useContext(AppContext)
     const [is_upvote, set_is_upvote] = useState(false)
     const [is_downvote, set_is_downvote] = useState(false)
@@ -30,37 +28,28 @@ export default function Vote_modal({post}) {
             return
         }
         if(!is_upvote) {
-            doc_ref_post.doc(post.id).update({
-                upvote: firebase.firestore.FieldValue.arrayUnion({ username: user.username, id: user.id }),
-                downvote: firebase.firestore.FieldValue.arrayRemove({ username: user.username, id: user.id })
+            fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/up_vote?post_id=${post.id}&username=${user.username}&u_id=${user.id}`)
+            .then(res => res.json())
+            .then(msg => {
+                console.log(msg)
+                set_is_upvote(!is_upvote)
+                if(is_downvote) {
+                    set_vote(vote+2)
+                } else {
+                    set_vote(vote+1)
+                }
+                set_is_downvote(false)
             })
-                .then(() => {
-                    set_is_upvote(!is_upvote)
-                    if(is_downvote) {
-                        set_vote(vote+2)
-                    } else {
-                        set_vote(vote+1)
-                    }
-                    set_is_downvote(false)
-                    console.log("Document successfully updated!");
-                })
-                .catch((error) => {
-                    // The document probably doesn't exist.
-                    console.error("Error updating document: ", error);
-                });
+            .catch(err => console.log(err))
         } else {
-            doc_ref_post.doc(post.id).update({
-                upvote: firebase.firestore.FieldValue.arrayRemove({ username: user.username, id: user.id }),
+            fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/up_vote_reverse?post_id=${post.id}&username=${user.username}&u_id=${user.id}`)
+            .then(res => res.json())
+            .then(msg => {
+                console.log(msg)
+                set_is_upvote(!is_upvote)
+                set_vote(vote-1)
             })
-                .then(() => {
-                    set_is_upvote(!is_upvote)
-                    set_vote(vote-1)
-                    console.log("Document successfully updated!");
-                })
-                .catch((error) => {
-                    // The document probably doesn't exist.
-                    console.error("Error updating document: ", error);
-                });
+            .catch(err => console.log(err))
         }
     }
 
@@ -70,51 +59,39 @@ export default function Vote_modal({post}) {
             return
         }
         if(!is_downvote) {
-
-            doc_ref_post.doc(post.id).update({
-                upvote: firebase.firestore.FieldValue.arrayRemove({ username: user.username, id: user.id }) ,
-                downvote: firebase.firestore.FieldValue.arrayUnion({ username: user.username, id: user.id })
+            fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/down_vote?post_id=${post.id}&username=${user.username}&u_id=${user.id}`)
+            .then(res => res.json())
+            .then(msg => {
+                console.log(msg)
+                if(is_upvote) {
+                    set_vote(vote-2)
+                } else {
+                    set_vote(vote-1)
+                }
+                set_is_downvote(!is_downvote)
+                set_is_upvote(false)
             })
-                .then(() => {
-                    if(is_upvote) {
-                        set_vote(vote-2)
-                    } else {
-                        set_vote(vote-1)
-                    }
-                    set_is_downvote(!is_downvote)
-                    set_is_upvote(false)
-                    // set_vote(vote-2)
-                    console.log("Document successfully updated!");
-                })
-                .catch((error) => {
-                    // The document probably doesn't exist.
-                    console.error("Error updating document: ", error);
-                });
+            .catch(err => console.log(err))
         } else {
-            doc_ref_post.doc(post.id).update({
-                downvote: firebase.firestore.FieldValue.arrayRemove({ username: user.username, id: user.id })
+            fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/down_vote_reverse?post_id=${post.id}&username=${user.username}&u_id=${user.id}`)
+            .then(res => res.json())
+            .then(msg => {
+                console.log(msg)
+                set_is_downvote(!is_downvote)
+                set_vote(vote+1)
             })
-                .then(() => {
-                    set_is_downvote(!is_downvote)
-                    set_vote(vote+1)
-                    console.log("Document successfully updated!");
-                })
-                .catch((error) => {
-                    // The document probably doesn't exist.
-                    console.error("Error updating document: ", error);
-                });
         }
     }
     
     console.log(is_upvote, is_downvote)
     return (
-        <div className=" mb-10 cursor-pointer text-4xl">
+        <div className={`lg:mb-10 mb-0 cursor-pointer lg:text-4xl text-base lg:block flex items-center`}>
             {is_require_login && <Login_require set_is_require_login={set_is_require_login}/>}
-            <div onClick={() => handle_upvote()} className={`h-16 w-16 rounded-full grid place-content-center ${is_upvote ? "bg-blue-500 bg-opacity-100 hover:bg-opacity-100" : "bg-slate-400 bg-opacity-20 hover:bg-opacity-40"}`}>
+            <div onClick={() => handle_upvote()} className={`lg:h-16 lg:w-16 h-6 w-6 rounded-full grid place-content-center ${is_upvote ? "bg-blue-500 bg-opacity-100 hover:bg-opacity-100" : "bg-slate-400 bg-opacity-20 hover:bg-opacity-40"}`}>
                 <i class="fa-solid fa-chevron-up"></i>
             </div>
-            <p className="text-3xl text-center my-2">{vote}</p>
-            <div onClick={() => handle_downvote()} className={`h-16 w-16 rounded-full grid place-content-center ${is_downvote ? "bg-blue-500 bg-opacity-100 hover:bg-opacity-100" : "bg-slate-400 bg-opacity-20 hover:bg-opacity-40"}`}>
+            <p className="lg:text-3xl text-xl text-center my-2 lg:mx-0 mx-3">{vote}</p>
+            <div onClick={() => handle_downvote()} className={`lg:h-16 lg:w-16 h-6 w-6 mr-4 lg:mr-0 rounded-full grid place-content-center ${is_downvote ? "bg-blue-500 bg-opacity-100 hover:bg-opacity-100" : "bg-slate-400 bg-opacity-20 hover:bg-opacity-40"}`}>
                 <i class="fa-solid fa-chevron-down"></i>
             </div>
             {/* {is_vote ? <i class="fa-solid fa-heart"></i> : <i class="fa-regular fa-heart"></i>} */}

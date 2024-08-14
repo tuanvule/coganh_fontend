@@ -13,11 +13,19 @@ export default function Post() {
   const { post_id } = useParams()
   const [post, set_post] = useState({})
   const [comment_count, set_comment_count] = useState(0)
+  const [is_mobile, set_is_mobile] = useState((window.innerWidth < 1025))
+
+  useEffect(() => {
+    window.onresize = () => {
+      set_is_mobile((window.innerWidth < 1025))
+    }
+  }, [])
+
   useEffect(() => {
     if (state) {
       set_post(state)
     } else {
-      fetch("http://192.168.1.249:5000/get_post_by_id/" + post_id)
+      fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_post_by_id/" + post_id)
         .then(res => res.json())
         .then(data => {
           set_post(data)
@@ -31,11 +39,14 @@ export default function Post() {
       if(theme === "dark") {
         item.style.backgroundColor = "#444"
         item.style.color = "#fff"
+      } else {
+        item.style.backgroundColor = "#FBF3Db"
+        item.style.color = "#000"
       }
     })
     document.querySelectorAll("a").forEach(item => {
-        item.style.textDecoration = "underline"
-        item.style.color = "#0866FF"
+      item.style.textDecoration = "underline"
+      item.style.color = "#0866FF"
     })
     document.querySelectorAll("figcaption").forEach(item => {
       if(theme === "dark") {
@@ -43,7 +54,7 @@ export default function Post() {
         item.style.textDecoration = "none"
       }
     })
-  })
+  }, [theme])
 
   function scroll_to_comment() {
     const element = document.querySelector("#comment_modal");
@@ -59,12 +70,14 @@ export default function Post() {
   return (
     <div className="relative w-full h-full flex justify-center">
       <Navbar back_link="/post_page"/>
-      <div className="absolute top-28 left-28 text-6xl select-none">
-        {post && <Vote_modal post={post}/>}
-        <i onClick={() => scroll_to_comment()} class="fa-solid fa-comment text-[#a0d8fa] hover:brightness-90 cursor-pointer"></i>
-        <p className="text-2xl text-center">{comment_count}</p>
-      </div>
-      <div className="P_container">
+      {!is_mobile &&
+        <div className="absolute top-28 left-28 text-6xl select-none">
+          {post && <Vote_modal post={post}/>}
+          <i onClick={() => scroll_to_comment()} class="fa-solid fa-comment dark:text-[#a0d8fa] text-[#007bff] hover:brightness-90 cursor-pointer"></i>
+          <p className="text-2xl text-center">{comment_count}</p>
+        </div>
+      }
+      <div className="P_container lg:w-[60%] w-90%">
         <h1 className="P_title">{post && post.title}</h1>
         <div className="P_user">
           <div className="P_user_avatar dark:text-[#007BFF]">{post && post.author && post.author[0].toUpperCase()}</div>
@@ -78,8 +91,14 @@ export default function Post() {
             </div>
           </div>
         </div>
+        {is_mobile && <div className="flex select-none items-center">
+          {post && <Vote_modal post={post} is_mobile={is_mobile}/>}
+          <i onClick={() => scroll_to_comment()} class="fa-solid fa-comment text-[#a0d8fa] lg:text-6xl mr-3 lg:mr-0 text-xl hover:brightness-90 cursor-pointer"></i>
+          <p className="text-2xl text-center">{comment_count}</p>
+        </div>
+        }
         <div dangerouslySetInnerHTML={{ __html: post && post.content }}></div>
-        <Comment_modal set_comment_count={set_comment_count} post_id={post_id}/>
+        <Comment_modal bg={theme === "dark" ? "bg-[#0e335b]" : "bg-[#a3dcff]"} set_comment_count={set_comment_count} post_id={post_id}/>
       </div>
     </div>
 

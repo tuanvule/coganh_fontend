@@ -26,7 +26,7 @@ nav {
 .task_title {
     width: 100%;
     display: flex;
-    color: #ccc;
+    /* color: #ccc; */
     font-size: 17px;
     padding: 0 10px;
 }
@@ -57,9 +57,9 @@ nav {
     border-radius: 2px;
 }
 
-.task_item:nth-child(even) {
+/* .task_item:nth-child(even) {
     background-color: #333;
-}
+} */
 
 .task_status {
     flex: 1;

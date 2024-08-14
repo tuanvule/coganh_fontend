@@ -930,7 +930,7 @@ export default function CreateBoardSimulation(props) {
     }, [])
 
     return (
-        <div className="show_simulation overflow-hidden">
+        <div className="show_simulation overflow-hidden lg:scale-100 md:scale-50 md:-translate-y-1/2">
             <div className="display_block">
                 <canvas className="VI_canvas" width={400} height={400} />
                 <div className="grid_layer">

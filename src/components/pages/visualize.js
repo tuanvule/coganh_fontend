@@ -17,20 +17,34 @@ export default function Visualize() {
   const { id } = useParams()
   const [data, set_data] = useState({})
   const [controller, set_controller] = useState({})
+  let portrait = window.matchMedia("(orientation: portrait)");
+  const [is_Portrait, set_is_Portrait] = useState(portrait.matches)
+  
+  portrait.onchange = function(e) {
+      if(e.matches) {
+        set_is_Portrait(true)
+      } else {
+        set_is_Portrait(false)
+      }
+  }
+
+
   useEffect(() => {
-    fetch("http://192.168.1.249:5000/get_visualize/" + id)
+    fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_visualize/" + id)
       .then(res => res.json())
       .then(data => set_data(data))
       .catch(err => console.log(err))
   }, [state])
+
+  function handle_change_speed(e) {
+    controller.speed = Number(e.target.value)
+  }
 
   // useEffect(() => {
   //   if (data.type === "tree" && controller) controller.start()
   // }, [controller])
 
   useEffect(() => {
-
-
 
     const { action, name, type } = data
 
@@ -84,7 +98,6 @@ export default function Visualize() {
     //     break;
     // }
 
-
     duration_bar.onchange = (e) => {
       if (simulation_type === "tree") {
         controller.animation_index = Math.round((controller.action.length - 1) * (e.target.value / 100))
@@ -95,10 +108,6 @@ export default function Visualize() {
       controller.play_one_frame(controller.animation_index)
       // controller.play_animation()
       // duration_bar.value = (controller.animation_index / (controller.action.length - 1)) * 100
-    }
-
-    visualize_speed.onchange = () => {
-      controller.speed = Number(visualize_speed.value)
     }
 
     if (data.name === "vay") {
@@ -143,22 +152,21 @@ export default function Visualize() {
       if (controller.animation_index > 0) {
         controller.animation_index -= 1
         await controller.play_one_frame(controller.animation_index)
-        duration_bar.value = (controller.animation_index / (simulation[(simulation_type === "tree" ? "action" : "run_task")].length - 1)) * 100
+        duration_bar.value = (controller.animation_index / (controller[(simulation_type === "tree" ? "action" : "run_task")].length - 1)) * 100
       }
     }
 
     next_action.onclick = async () => {
       console.log(controller.animation_index)
       controller.Pause()
-      if (controller.animation_index < simulation[(simulation_type === "tree" ? "action" : "run_task")].length - 1) {
+      if (controller.animation_index < controller[(simulation_type === "tree" ? "action" : "run_task")].length - 1) {
         if (simulation_type === "tree" || controller.moves.length !== 0 || controller.all_move.your_pos.length !== 0 || controller.opp_pos.length !== 0) controller.animation_index += 1
         await controller.play_one_frame(controller.animation_index)
-        duration_bar.value = (controller.animation_index / (simulation[(simulation_type === "tree" ? "action" : "run_task")].length - 1)) * 100
+        duration_bar.value = (controller.animation_index / (controller[(simulation_type === "tree" ? "action" : "run_task")].length - 1)) * 100
       }
     }
 
     play_btn.onclick = () => {
-      // controller.Play()
       controller.isPaused = false
       controller.play_animation(controller.animation_index)
     }
@@ -243,7 +251,8 @@ export default function Visualize() {
       }
     } else if (simulation_type === "tree") {
       console.log(controller)
-      controller.start()
+      // controller.set_is_reset(Math.random())
+      // controller.start()
     }
 
     run_btn.onclick = () => {
@@ -261,6 +270,7 @@ export default function Visualize() {
         controller.play_animation()
         controller.Play()
       } else if (simulation_type === "tree") {
+        // controller.start("minimax")
         controller.run_algorithm("minimax")
         controller.isPaused = false
         controller.play_visualize()
@@ -293,35 +303,45 @@ export default function Visualize() {
       content.scrollTop = this.window.innerHeight / 2 + 800;
     }
 
-    content.onmousedown = (e) => {
+    function startDrag(e) {
       isDragging = true;
-      startX = e.clientX;
-      startY = e.clientY;
+      startX = e.clientX || e.touches[0].clientX;
+      startY = e.clientY || e.touches[0].clientY;
       scrollLeft = content.scrollLeft;
       scrollTop = content.scrollTop;
       content.style.cursor = 'grabbing'; // Thay đổi con trỏ chuột
-      //   e.preventDefault(); // Ngăn chặn sự kiện mặc định
+      // e.preventDefault(); // Ngăn chặn sự kiện mặc định
     }
-
-    content.onmouseup = () => {
+    
+    // Function to handle stopping the drag
+    function stopDrag(e) {
       isDragging = false;
       content.style.cursor = 'default'; // Khôi phục con trỏ chuột
+      // e.preventDefault();
     }
-
-    content.onmouseleave = () => {
-      isDragging = false;
-      content.style.cursor = 'default'; // Khôi phục con trỏ chuột
-    }
-
-    content.onmousemove = (e) => {
+    
+    // Function to handle the drag movement
+    function dragMove(e) {
       if (!isDragging) return;
-      const x = e.clientX;
-      const y = e.clientY;
+      const x = e.clientX || e.touches[0].clientX;
+      const y = e.clientY || e.touches[0].clientY;
       const walkX = (x - startX);
       const walkY = (y - startY);
       content.scrollLeft = scrollLeft - walkX;
       content.scrollTop = scrollTop - walkY;
+      // e.preventDefault();
     }
+    
+    // Mouse events
+    content.onmousedown = startDrag;
+    content.onmouseup = stopDrag;
+    content.onmouseleave = stopDrag;
+    content.onmousemove = dragMove;
+    
+    // Touch events
+    content.ontouchstart = startDrag;
+    content.ontouchend = stopDrag;
+    content.ontouchmove = dragMove;
 
     O_C_btn.onclick = () => {
       setting_bar.classList.toggle("appear")
@@ -342,13 +362,30 @@ export default function Visualize() {
     setting_bar.onmousemove = () => {
       isDragging = false
     }
-    console.log(controller)
+
+    action_block.ontouchstart = () => {
+      isDragging = false
+    }
+
+    play_animation_controller.ontouchstart = () => {
+      isDragging = false
+    }
+
+    setting_bar.ontouchstart = () => {
+      isDragging = false
+    }
   }, [controller, state])
 
+ 
   return (
     <div className="fake_window w-screen h-screen overflow-hidden">
       <Navbar back_link="/visualize_page" mode="light"/>
-      {console.log("render")}
+      { is_Portrait && <div className="fixed top-0 left-0 right-0 bottom-0 z-[1000000000000000] bg-slate-500 text-white lg:hidden sm:grid place-content-center text-4xl">
+        <div className="rotate-90 text-center">
+          <p>Xoay Điện thoại để có trải nghiệm tốt nhất</p>
+          <i class="fa-solid fa-rotate"></i>  
+        </div>
+      </div>}
       <div className="fake_body">
         <img
           style={{ position: "fixed" }}
@@ -365,9 +402,9 @@ export default function Visualize() {
           hidden
         />
         <audio className="fire_sound" src={fire_sound} />
-        <label htmlFor="checkbox" className="r_btn O_C_btn">
+        <label htmlFor="checkbox" className="r_btn O_C_btn lg:scale-100 sm:scale-75 sm:-translate-x-3 sm:-translate-y-2">
           <i style={{ fontSize: 34 }} className="fa-solid fa-gear" />
-          <div className="setting_bar">
+          <div className="setting_bar sm:-translate-y-4 lg:scale-100 sm:scale-75">
             <div className="setting_block">
               {data.type === "board" &&
                 <div className="VI_setting_item sboard">
@@ -475,6 +512,7 @@ export default function Visualize() {
                     <input type="text" className="node_name" placeholder="Name" />
                     <input type="number" className="node_value" placeholder="Value" />
                   </div>
+                  <div className="VI_save_btn">save</div>
                 </div>
                 <div className="VI_setting_item minimax_turn">
                   <div className="item_title">Thứ tự minimax</div>
@@ -486,9 +524,9 @@ export default function Visualize() {
           </div>
         </label>
         {/* <input type="checkbox" name="" id="open_code_cb" style="position: fixed;" hidden> */}
-        <label htmlFor="open_code_cb" className="r_btn open_code_btn">
+        <label htmlFor="open_code_cb" className="r_btn open_code_btn lg:scale-100 sm:scale-75">
           <i className="fa-solid fa-code" />
-          <div className="action_block">
+          <div className="action_block lg:scale-100 sm:scale-75">
             <div className="code_list">
               {/* {{controller.codes | safe}} */}
               <pre className="bg-white bg-opacity-0 border-0 p-0">
@@ -528,11 +566,11 @@ export default function Visualize() {
             </div>
           </div>
           <input type="range" className="duration_bar" name="" id="" />
-          <select value={1} className="visualize_speed">
+          <select onChange={handle_change_speed} className="visualize_speed">
             <option value={0.25}>0.25x</option>
             <option value={0.5}>0.5x</option>
             <option value={0.75}>0.75x</option>
-            <option value={1}>1x</option>
+            <option selected value={1}>1x</option>
             <option value={2}>2x</option>
             <option value={4}>4x</option>
             <option value={10}>10x</option>

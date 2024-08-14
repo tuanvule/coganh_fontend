@@ -54,8 +54,8 @@ module.exports = {
         open_code: 'open_code .5s ease-in-out',
         moveIn: 'moveIn 0.5s ease-in-out',
         moveNotification: 'moveNotification 2s ease-in',
-        moveSigninModalToLeft: 'moveSigninModalToLeft .6s ease-in-out',
-        moveSignupModalToLeft: 'moveSignupModalToLeft .6s ease-in-out',
+        moveSigninModalToLeft: 'moveSigninModalToLeft .6s ease-in-out forwards',
+        moveSignupModalToLeft: 'moveSignupModalToLeft .6s ease-in-out forwards',
         enlarge: 'enlarge .3s ease-in-out',
         informationAppears: 'informationAppears .25s ease-in-out'
       },

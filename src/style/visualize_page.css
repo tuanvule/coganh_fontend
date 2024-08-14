@@ -1,6 +1,6 @@
 
 .VP_container {
-    padding: 80px 20% 0;
+    /* padding: 80px 0 0; */
     /* padding: 0 ; */
 }
 
@@ -17,18 +17,18 @@
 }
 
 .visualize_list {
-    display: flex;
+    /* display: flex; */
     width: 100%;
-    margin: 0;
+    /* margin: 0; */
 }
 
 .visualize_item {
-    width: 300px;
-    height: 300px;
+    /* width: 30%;
+    height: 30%; */
     border: 1px solid #ccc;
     border-radius: 5px;
-    overflow: hidden;
-    margin: 0 20px 0 0;
+    /* overflow: hidden; */
+    /* margin: 0 20px 0 0; */
 }
 
 .visualize_item a {

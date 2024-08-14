@@ -20,7 +20,8 @@ import Home from './components/pages/home';
 import Login from './components/pages/login';
 import Post from './components/pages/post';
 import Training from './components/pages/mainPage/training';
-import Create_content from "./components/pages/create_content"
+import Create_task from "./components/modal/create_content_modal/create_task";
+import Create_post from "./components/modal/create_content_modal/create_post";
 import Check_admin_modal from "./components/modal/check_admin_modal"
 import User from "./components/pages/mainPage/user";
 import { useContext } from 'react';
@@ -33,7 +34,7 @@ import "./style/animation.css"
 function App() {
   const { user ,setUser } = useContext(AppContext)
 
-  const [theme, setTheme] = useState('dark')
+  const [theme, setTheme] = useState('light')
   
   return (
     <div className={`${theme}`}>
@@ -44,7 +45,8 @@ function App() {
           <Route path="training/:id" element={<Training/>}/>
           <Route path="login" element={<Login/>}/>
           <Route path="create_bot" element={<Create_bot/>}/>
-          <Route path="create_content" element={<Create_content/>}/>
+          <Route path="create_post" element={<Create_post/>}/>
+          <Route path="create_task" element={<Create_task/>}/>
           <Route path="task_list" element={<Task_list/>}/>
           <Route path="post_page" element={<Post_page/>}/>
           <Route path="visualize/:id" element={<Visualize/>}/>
