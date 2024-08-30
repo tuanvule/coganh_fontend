@@ -81,9 +81,10 @@ nav {
 }
 
 #content {
-    position: absolute;
-    display: grid;
-    place-content: center;
+    /* position: absolute; */
+    /* top: 0; */
+    /* display: grid;
+    place-content: center; */
     /* z-index: 1000; */
     /* height: 100%;
     width: 100%; */
@@ -94,6 +95,7 @@ nav {
     margin-top: 40px;
     /* width: 100vw;
     height: 100vh; */
+    /* background-color: black; */
     display: flex;
 }
 
@@ -102,8 +104,8 @@ nav {
     margin: 20px 10px 20px 20px;
     border-radius: 10px;
     /* border: 1px solid var(--primary-color); */
-    display: flex;
-    align-items: center;
+    /* display: flex; */
+    /* align-items: center; */
     overflow: hidden;
 }
 

@@ -17,7 +17,7 @@ export default React.memo(function Navbar({ type = {}, back_link = "/menu", mode
 
   useEffect(() => {
     if(user.id) {
-      fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/get_user_notification/${user.id}`)
+      fetch(`http://192.168.1.249:8080/get_user_notification/${user.id}`)
       .then(res => res.json())
       .then(data => set_notifications(data))
       .catch(err => console.log(err))
@@ -25,7 +25,7 @@ export default React.memo(function Navbar({ type = {}, back_link = "/menu", mode
   }, [reset_notifications])
 
   function delete_notification(data) {
-    fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/delete_notification/${user.id}`, {
+    fetch(`http://192.168.1.249:8080/delete_notification/${user.id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,14 +39,14 @@ export default React.memo(function Navbar({ type = {}, back_link = "/menu", mode
 
   function all_delete_notification() {
     if(notifications.length === 0) return
-    fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/delete_all_notification/${user.id}`)
+    fetch(`http://192.168.1.249:8080/delete_all_notification/${user.id}`)
       .then(res => res.json())
       .then(() => set_notifications([]))
       .catch(err => console.log(err))
   }
   
   return (
-    <div className={`fixed top-0 z-[10000000] left-0 right-0 flex items-center justify-between px-4 h-16 border-b border-[#007BFF] ${mode === "dark" && theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-black"}`}>
+    <div className={`fixed top-0 z-[10000000] left-0 right-0 flex items-center justify-between px-4 h-[8%] border-b border-[#007BFF] ${mode === "dark" && theme === "dark" ? "bg-gray-800 text-white" : "bg-[#e6f6ff] text-black"}`}>
       <div class="left_block">
         <img className="h-7 cursor-pointer select-none" src={coganh_logo} onClick={() => history("/menu")}/>
         {/* <div onClick={() => history("/menu")} class="logo cursor-pointer select-none">Co ganh</div> */}
@@ -55,11 +55,17 @@ export default React.memo(function Navbar({ type = {}, back_link = "/menu", mode
 
       <div class="right_block">
         {theme === 'dark' ? (
-          <div onClick={() => setTheme('light')} className="h-8 w-8 mr-4 mt-1 hover:brightness-75 cursor-pointer bg-[#007BFF] rounded-full flex items-center justify-center"><i class="fa-solid fa-circle fa-lg text-white"></i></div>
+          <div onClick={() => {
+            localStorage.setItem("theme", "light")
+            setTheme('light')
+          }} className="h-8 w-8 mr-4 mt-1 hover:brightness-75 cursor-pointer bg-[#007BFF] rounded-full flex items-center justify-center"><i class="fa-solid fa-circle fa-lg text-white"></i></div>
         )
         :
         (
-          <div onClick={() => setTheme('dark')} className="h-8 w-8 mr-4 mt-1 hover:brightness-75 cursor-pointer bg-[#1e1926] rounded-full flex items-center justify-center"><i class="fa-solid fa-moon fa-xl text-[#6cb0f9]"></i></div> 
+          <div onClick={() => {
+            localStorage.setItem("theme", "dark")
+            setTheme('dark')
+          }} className="h-8 w-8 mr-4 mt-1 hover:brightness-75 cursor-pointer bg-[#1e1926] rounded-full flex items-center justify-center"><i class="fa-solid fa-moon fa-xl text-[#6cb0f9]"></i></div> 
         )
         }
         { user.username && <>

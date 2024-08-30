@@ -22,20 +22,23 @@ import Post from './components/pages/post';
 import Training from './components/pages/mainPage/training';
 import Create_task from "./components/modal/create_content_modal/create_task";
 import Create_post from "./components/modal/create_content_modal/create_post";
+import Create_gamemode from "./components/modal/create_content_modal/create_gamemode";
 import Check_admin_modal from "./components/modal/check_admin_modal"
 import User from "./components/pages/mainPage/user";
+import Gamemode from "./components/modal/gamemode";
 import { useContext } from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
 
 import "./style/index.css"
 import "./style/animation.css"
+import "./style/App.css"
 
 function App() {
   const { user ,setUser } = useContext(AppContext)
 
-  const [theme, setTheme] = useState('light')
-  
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || 'dark')
+
   return (
     <div className={`${theme}`}>
       <AppProvider theme={theme} setTheme={setTheme}>
@@ -46,6 +49,7 @@ function App() {
           <Route path="login" element={<Login/>}/>
           <Route path="create_bot" element={<Create_bot/>}/>
           <Route path="create_post" element={<Create_post/>}/>
+          <Route path="create_gamemode" element={<Create_gamemode/>}/>
           <Route path="create_task" element={<Create_task/>}/>
           <Route path="task_list" element={<Task_list/>}/>
           <Route path="post_page" element={<Post_page/>}/>
@@ -57,6 +61,7 @@ function App() {
           <Route path="user/:id" element={<User/>} />
           <Route path="signin" element={<Signin_page />} />
           <Route path="ADMIN" element={<Check_admin_modal />} />
+          <Route path="gamemode" element={<Gamemode />} />
         </Routes>
       </AppProvider>
     </div>

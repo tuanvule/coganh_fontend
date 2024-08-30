@@ -174,7 +174,7 @@ export default function Create_content() {
               formData.append('totalChunks', totalChunks);
       
               try {
-                const response = await fetch('https://coganh-cloud-tixakavkna-as.a.run.app/upload_chunk', {
+                const response = await fetch('http://192.168.1.249:8080/upload_chunk', {
                   method: 'POST',
                   body: formData
                 });
@@ -246,7 +246,7 @@ export default function Create_content() {
             if (!check_valid_task(tags, inOupValue)) return
             let status = true
             if(is_update) {
-                fetch("https://coganh-cloud-tixakavkna-as.a.run.app/update_task", {
+                fetch("http://192.168.1.249:8080/update_task", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -282,7 +282,7 @@ export default function Create_content() {
                         return
                     })
             } else {
-                fetch("https://coganh-cloud-tixakavkna-as.a.run.app/upload_task", {
+                fetch("http://192.168.1.249:8080/upload_task", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -493,7 +493,7 @@ export default function Create_content() {
     }, [editor, state])
 
     return (
-        <div className='dark:text-black dark:bg-white text-center'>
+        <div className='dark:text-black dark:bg-[#e6f6ff] text-center'>
             <Navbar mode="light" back_link="/task_list" />
             {is_require_login && <Login_require set_is_require_login={set_is_require_login} />}
             <div style={{ display: "none" }} className="CC_overflow">

@@ -33,7 +33,7 @@
     margin: 0 40px 0 5px;
     width: 20%;
     height: 100%;
-    background-color: #242527;
+    /* background-color: #242527; */
     padding: 10px 10px;
     border-radius: 5px;
 }
@@ -152,14 +152,13 @@
 
 .info_elo-fluc--pre {
     opacity: 0;
-    animation: disappear_opa 1s forwards;
+    /* animation: disappear_opa 1s forwards; */
 }
 
 .info_elo-fluc--arrow {
     margin: 10px 0;
     opacity: 0;
     animation: disappear_opa 1s forwards;
-    animation-delay: 1s;
 }
 
 .info_elo-fluc--new {
@@ -198,8 +197,8 @@
     height: 30px;
     border-radius: 50%;
     margin-right: 15px;
-    background-color: #fff;
-    color: #007BFF;
+    /* background-color: #fff;
+    color: #007BFF; */
     font-size: 24px;
     font-weight: bold;
 }
@@ -218,7 +217,7 @@
     text-align: center;
     padding: 10px 0;
     border-radius: 10px;
-    background-color: #000;
+    /* background-color: #000; */
     height: 80%;
     width: 100%;
 }
@@ -237,7 +236,7 @@
 }
 
 .fight_screen-loading {
-    color: #fff;
+    /* color: #fff; */
     position: relative;
     width: 100%;
     height: 100%;
@@ -284,7 +283,7 @@
     margin: 0 5px 0 0;
     width: 20%;
     height: 100%;
-    background-color: #242527;
+    /* background-color: #242527; */
     padding: 10px 10px;
     border-radius: 5px;
 }
@@ -328,10 +327,10 @@
     user-select: none;
     border-radius: 10px;
 }
-
+/* 
 .player:hover {
     background-color: #363535;
-}
+} */
 
 .player-avatar {
     font-family: Arial, Helvetica, sans-serif;
@@ -362,7 +361,7 @@
     /* text-align: center; */
     display: flex;
     justify-content: center;
-    background-color: #191B26;
+    /* background-color: #191B26; */
     border-radius: 5px;
     cursor: pointer;
     user-select: none;

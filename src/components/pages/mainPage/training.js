@@ -37,7 +37,7 @@ export default function Training() {
     }, [task])
     // useEffect(() => {
     //     if(!task_name) {
-    //         fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/get_task_by_id/${task_id}`)
+    //         fetch(`http://192.168.1.249:8080/get_task_by_id/${task_id}`)
     //         .then(res => res.json())
     //         .then(data => {
     //             // console.log(data)
@@ -84,7 +84,7 @@ export default function Training() {
 
     useEffect(() => {
         console.log("Asd")
-        fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_task/" + task_id)
+        fetch("http://192.168.1.249:8080/get_task/" + task_id)
             .then(res => res.json())
             .then(data => {
                 console.log(data)
@@ -209,7 +209,7 @@ export default function Training() {
             })
             let formatter = new Intl.DateTimeFormat([], options);
 
-            fetch("https://coganh-cloud-tixakavkna-as.a.run.app/run_task", {
+            fetch("http://192.168.1.249:8080/run_task", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -264,7 +264,7 @@ export default function Training() {
                 return
             }
             let formatter = new Intl.DateTimeFormat([], options);
-            fetch("https://coganh-cloud-tixakavkna-as.a.run.app/submit_code", {
+            fetch("http://192.168.1.249:8080/submit_code", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -28,7 +28,7 @@ export default function Vote_modal({post, is_mobile}) {
             return
         }
         if(!is_upvote) {
-            fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/up_vote?post_id=${post.id}&username=${user.username}&u_id=${user.id}`)
+            fetch(`http://192.168.1.249:8080/up_vote?post_id=${post.id}&username=${user.username}&u_id=${user.id}`)
             .then(res => res.json())
             .then(msg => {
                 console.log(msg)
@@ -42,7 +42,7 @@ export default function Vote_modal({post, is_mobile}) {
             })
             .catch(err => console.log(err))
         } else {
-            fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/up_vote_reverse?post_id=${post.id}&username=${user.username}&u_id=${user.id}`)
+            fetch(`http://192.168.1.249:8080/up_vote_reverse?post_id=${post.id}&username=${user.username}&u_id=${user.id}`)
             .then(res => res.json())
             .then(msg => {
                 console.log(msg)
@@ -59,7 +59,7 @@ export default function Vote_modal({post, is_mobile}) {
             return
         }
         if(!is_downvote) {
-            fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/down_vote?post_id=${post.id}&username=${user.username}&u_id=${user.id}`)
+            fetch(`http://192.168.1.249:8080/down_vote?post_id=${post.id}&username=${user.username}&u_id=${user.id}`)
             .then(res => res.json())
             .then(msg => {
                 console.log(msg)
@@ -73,7 +73,7 @@ export default function Vote_modal({post, is_mobile}) {
             })
             .catch(err => console.log(err))
         } else {
-            fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/down_vote_reverse?post_id=${post.id}&username=${user.username}&u_id=${user.id}`)
+            fetch(`http://192.168.1.249:8080/down_vote_reverse?post_id=${post.id}&username=${user.username}&u_id=${user.id}`)
             .then(res => res.json())
             .then(msg => {
                 console.log(msg)

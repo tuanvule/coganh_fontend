@@ -17,9 +17,9 @@ export default function View_code({bot_code, enable_edit = false, pos, bot = {ow
         if(!VC_save_btn.current) return
         console.log(code)
         VC_save_btn.current.onclick = () => {
-            VC_save_btn.current.classList.add("bg-[white]")
-            VC_save_btn.current.classList.add("text-black")
-            fetch("https://coganh-cloud-tixakavkna-as.a.run.app/save_bot", {
+            VC_save_btn.current.classList.add("dark:bg-[white]")
+            VC_save_btn.current.classList.add("dark:text-black")
+            fetch("http://192.168.1.249:8080/save_bot", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

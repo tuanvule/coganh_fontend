@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-export default function CKEditorComponent({set_editor}) {
+export default function CKEditorComponent({set_editor, placeholder}) {
     const CKEDITOR_ref = useRef()
     const create_editor = useCallback((orderDetails) => {
         CKEDITOR_ref.current.innerHTML = `<div id="editor"></div>`
@@ -41,7 +41,7 @@ export default function CKEditorComponent({set_editor}) {
                     { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' }
                 ]
             },
-            placeholder: 'Tạo post của bạn tại đây',
+            placeholder: placeholder || 'Tạo post của bạn tại đây',
             fontFamily: {
                 options: [
                     'default',

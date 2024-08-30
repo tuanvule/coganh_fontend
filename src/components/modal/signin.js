@@ -33,7 +33,7 @@ export default function Signin(props) {
     // const inputAvataRef = useRef()
     // const fileUpload = useRef()
     useEffect(() => {
-        fetch('https://coganh-cloud-tixakavkna-as.a.run.app/get_all_user', {
+        fetch('http://192.168.1.249:8080/get_all_user', {
             method: "GET",
         })
         .then((response) => response.json())
@@ -141,7 +141,7 @@ export default function Signin(props) {
                 ...value,
             })
 
-            fetch('https://coganh-cloud-tixakavkna-as.a.run.app/handle_signin', {
+            fetch('http://192.168.1.249:8080/handle_signin', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -157,49 +157,6 @@ export default function Signin(props) {
                 })
                 history("/menu")
             })
-            
-//             db.collection("bot").add({
-//                 "code": `# NOTE: tool
-// # valid_move(x, y, board): trả về các nước đi hợp lệ của một quân cờ - ((x, y), ...)
-// # distance(x1, y1, x2, y2): trả về số nước đi ít nhất từ (x1, y1) đến (x2, y2) - n
-
-// # NOTE: player
-// # player.your_pos: vị trí tất cả quân cờ của bản thân - [(x, y), ...]
-// # player.opp_pos: vị trí tất cả quân cờ của đối thủ - [(x, y), ...]
-// # player.your_side: màu quân cờ của bản thân - 1:🔵
-// # player.board: bàn cờ - -1:🔴 / 1:🔵 / 0:∅
-
-// # Remember that player.board[y][x] is the tile at (x, y) when printing
-// def main(player):
-//     move = [[-1,0],[0,-1],[0,1],[1,0]]
-//     for x,y in player.your_pos:
-//         for mx,my in move:
-//             if 0 <= x+mx <= 4 and 0 <= y+my <= 4 and player.board[y+my][x+mx] == 0:
-//                 return {"selected_pos": (x,y), "new_pos": (x+mx, y+my)}`,
-//                 "owner": value.username,
-//                 "fightable": false,
-//                 "fight_history": [],
-//                 "bot_name": value.username,
-//                 "elo": 0,
-//                 "bot_id": new Date().getUTCMilliseconds(),
-//                 "is_public": false,
-//                 "level": 0
-//             })
-
-//             db.collection("user").add({
-//                 ...value,
-//                 notifications: []
-//             })
-//             .then(docRef => {
-//                 localStorage.setItem("username", value.username);
-//                 localStorage.setItem("id", docRef.id);
-//                 setUser({
-//                     ...value,
-//                     id: docRef.id,
-//                 })
-//                 history("/menu")
-//             })
-//             .catch(error => console.error("Error adding document: ", error))
         }
     }
 
@@ -216,29 +173,29 @@ export default function Signin(props) {
     }
 
   return (
-    <form ref={formRef} method="GET" className={`card-white lg:animate-[moveSignupModalToLeft_.6s_ease-in-out] flex flex-col items-center lg:w-[40%] lg:h-[90%] my-auto mg:ml-auto lg:mr-20 mx-auto w-[90%] h-[60%] bg-gradient-to-r from-sky-500 to-indigo-500 rounded-xl text-white`}>
-      <h1 className=" mb-8 mt-8 text-4xl">Đăng ký</h1>
-      <div className="form-group">
+    <form ref={formRef} method="GET" className={`card-white lg:animate-[moveSignupModalToLeft_.6s_ease-in-out] flex flex-col items-center lg:w-[40%] lg:h-[90%] my-auto mg:ml-auto lg:mr-20 mx-auto w-[90%] h-[70%] bg-gradient-to-r from-sky-500 to-indigo-500 rounded-xl text-white`}>
+      <h1 className=" lg:my-8 my-6 text-4xl">Đăng ký</h1>
+      <div className="form-group w-[80%]">
           <h4 className=" text-xl">Name</h4>
           <div className="relative">
               <i className="fa-solid fa-circle-user absolute top-1/2 transform -translate-y-1/2 text-xl"></i>
-              <input ref={inputNameRef} onChange={handleChangeInput} name="username" placeholder="Enter your account's name" className=" placeholder:text-gray-300 w-[330px] bg-transparent pl-8 pr-2 py-2 border-b border-white outline-none" type="text" />
+              <input ref={inputNameRef} onChange={handleChangeInput} name="username" placeholder="Enter your account's name" className=" placeholder:text-gray-300 w-full bg-transparent pl-8 pr-2 py-2 border-b border-white outline-none" type="text" />
           </div>
             <p className={` ${errorLineVisible.name} text-red-600`}></p>
       </div>
-      <div className="mt-4 form-group">
+      <div className="mt-4 form-group w-[80%]">
           <h4 className=" text-xl">Password</h4>
           <div className="relative">
               <i className="fa-solid fa-lock absolute top-1/2 transform -translate-y-1/2 text-xl"></i>
-              <input ref={inputPasswordRef} onChange={handleChangeInput} name="password" placeholder="Enter your account's password" className=" placeholder:text-gray-300 w-[330px] bg-transparent pl-8 pr-2 py-2 border-b border-white outline-none" type="text" />
+              <input ref={inputPasswordRef} onChange={handleChangeInput} name="password" placeholder="Enter your account's password" className=" placeholder:text-gray-300 w-full bg-transparent pl-8 pr-2 py-2 border-b border-white outline-none" type="text" />
           </div>
             <p className={` ${errorLineVisible.password} text-red-600`}></p>
       </div>
-      <div className="mt-4 form-group">
+      <div className="mt-4 form-group w-[80%]">
           <h4 className=" text-xl">comfirm password</h4>
           <div className="relative">
               <i className="fa-solid fa-lock absolute top-1/2 transform -translate-y-1/2 text-xl"></i>
-              <input ref={inputConfirmPasswordRef} onChange={handleChangeInput} name="confirmPassword" placeholder="Confirm password" className=" placeholder:text-gray-300 w-[330px] bg-transparent pl-8 pr-2 py-2 border-b border-white outline-none" type="text" />
+              <input ref={inputConfirmPasswordRef} onChange={handleChangeInput} name="confirmPassword" placeholder="Confirm password" className=" placeholder:text-gray-300 w-full bg-transparent pl-8 pr-2 py-2 border-b border-white outline-none" type="text" />
           </div>
           <p className={` ${errorLineVisible.confirmPassword} text-red-600`}></p>
       </div>

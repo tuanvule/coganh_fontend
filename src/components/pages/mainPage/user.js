@@ -5,6 +5,7 @@ import User_bot from '../../modal/user_modal/user_bot'
 import User_post from '../../modal/user_modal/user_posts'
 import User_training from '../../modal/user_modal/user_training'
 import { useParams } from 'react-router-dom'
+import User_gamemode from '../../modal/user_modal/user_gamemode'
 
 export default function User() {
     const { user, history } = useContext(AppContext)
@@ -16,15 +17,20 @@ export default function User() {
     const [is_owner, set_is_owner] = useState(true)
     const [is_require_owner, set_is_require_owner] = useState(false)
     const [is_open_sidebar, set_is_open_sidebar] = useState(true)
+    const [is_reset_gamemode, set_is_reset_gamemode] = useState(0)
+    const [gamemode_chunk_index, set_gamemode_chunk_index] = useState(0)
+    const [gamemodes, set_gamemodes] = useState([])
+    const [fetch_gamemodes, set_fetch_gamemodes] = useState(false)
     // console.log(JSON.parse(localStorage.getItem("data")))
 
     useEffect(() => {
         if(id) {
-            fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_all_user_data/" + id)
+            fetch("http://192.168.1.249:8080/get_all_user_data/" + id)
             .then(res => res.json())
             .then(data => {set_data({raw_data: data, chunked_data: handle_chunk(data)}); {
                 set_is_owner(data.username === user.username)
                 set_username(data.username)
+                set_fetch_gamemodes(true)
             }})
         }
     }, [id])
@@ -73,6 +79,16 @@ export default function User() {
     //     console.log(JSON.stringify(data))
     // }
 
+    useEffect(() => {
+        if (!fetch_gamemodes) return
+        fetch(`http://192.168.1.249:8080/get_user_gamemode?page=${gamemode_chunk_index}&size=9`)
+            .then(res => res.json())
+            .then(data => {
+                set_gamemodes(data)
+            })
+            .catch(err => console.log(err))
+    }, [is_reset_gamemode, fetch_gamemodes, gamemode_chunk_index])
+
 
     return (
         <div className="w-full h-screen flex dark:bg-[#111c2c] bg-[#e6f6ff]">
@@ -104,6 +120,10 @@ export default function User() {
                         <i class="fa-solid fa-graduation-cap mr-5"></i>
                         Training
                     </li>
+                    <li data-name="gamemodes" className={`U_nav_item text-xl px-5 py-5 hover:bg-blue-600 hover:bg-opacity-50 rounded-md cursor-pointer select-none bg-opacity-80 ${page === "gamemodes" ? "bg-blue-700" : ""}`}>
+                        <i class="fa-solid fa-graduation-cap mr-5"></i>
+                        Gamemodes
+                    </li>
                 </ul>
                 <div onClick={() => history("/menu")} className="U_back_btn text-xl mt-auto mb-10 mx-auto bg-[#007BFF] text-white px-10 py-2 rounded-sm hover:brightness-90 cursor-pointer select-none">back to menu</div>
             </div>
@@ -112,6 +132,7 @@ export default function User() {
                 {page === "bot" && <User_bot bots={data.chunked_data.bots} raw_bots={data.raw_data.bots} is_owner={is_owner} set_is_require_owner={set_is_require_owner}/>}
                 {page === "post" && <User_post username={username} posts={data.chunked_data.posts} is_owner={is_owner} set_is_require_owner={set_is_require_owner}/>}
                 {page === "training" && <User_training tasks={data.chunked_data.tasks} raw_tasks={data.raw_data.tasks} your_tasks={data.chunked_data.your_tasks} is_owner={is_owner} set_is_require_owner={set_is_require_owner}/>}
+                {page === "gamemodes" && <User_gamemode u_id={id} is_owner={is_owner}/>}
             </div>
             {is_require_owner && 
             <div className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-20 z-[100000000]">

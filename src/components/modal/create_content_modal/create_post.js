@@ -99,7 +99,7 @@ export default function Create_post() {
         formData.append('totalChunks', totalChunks);
 
         try {
-          const response = await fetch('https://coganh-cloud-tixakavkna-as.a.run.app/upload_chunk', {
+          const response = await fetch('http://192.168.1.249:8080/upload_chunk', {
             method: 'POST',
             body: formData
           });
@@ -137,7 +137,7 @@ export default function Create_post() {
       if(is_update) {
         // console.log(text)
         // return
-        fetch('https://coganh-cloud-tixakavkna-as.a.run.app/update_post', {
+        fetch('http://192.168.1.249:8080/update_post', {
           method: 'POST',
           headers: {
             "Content-Type": "application/json",
@@ -154,7 +154,7 @@ export default function Create_post() {
           })
         });
       } else {
-        fetch('https://coganh-cloud-tixakavkna-as.a.run.app/upload_post', {
+        fetch('http://192.168.1.249:8080/upload_post', {
           method: 'POST',
           headers: {
             "Content-Type": "application/json",
@@ -238,7 +238,7 @@ export default function Create_post() {
   }, [editor])
 
   return (
-    <div className='dark:text-black dark:bg-white text-center'>
+    <div className='dark:text-black dark:bg-[#e6f6ff] text-center'>
       <Navbar mode="light" back_link="/post_page" />
       {is_require_login && <Login_require set_is_require_login={set_is_require_login} />}
       <div style={{ display: "none" }} className="CC_overflow">

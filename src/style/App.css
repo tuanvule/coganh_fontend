@@ -183,3 +183,20 @@ input#comment:checked ~ .mini__video .video {
 input#comment:checked ~ .comment__model{
     left: 55%;
 } */
+
+.gamemode_item-nav {
+    display: none;
+}
+
+.gamemode_item:hover > .gamemode_item-nav {
+    display: flex;
+}
+
+.drop_area_lighlight {
+    border-color: #007BFF;
+}
+
+.drop_area_lighlight_final {
+    border-color: #007BFF;
+    background-color: rgb(203 213 225);
+}

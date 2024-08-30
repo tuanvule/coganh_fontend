@@ -1,38 +1,29 @@
-// import React, { memo, useContext, useEffect, useRef, useState } from 'react'
-// import { AppContext } from '../../context/appContext'
+import React, { memo, useContext, useEffect, useRef, useState } from 'react'
+import { AppContext } from '../../context/appContext'
 
-// function SideBar(props) {
-//   const { history, user, setPage, page } = useContext(AppContext)
-//   const [creators, setCreators] = useState([])
+function SideBar({ page, set_page }) {
+    const { history, user } = useContext(AppContext)
+    const [creators, setCreators] = useState([])
 
-//   useEffect(() => {
-//     fetch('https://vccp-be.vercel.app/creator/getCreator?type=SC', {
-//       method: "GET",
-//     })
-//       .then(res => res.json())
-//       .then(data => setCreators(data))
-//       .catch(err => console.log(err))
-//   }, [user])
+    return (
+        <div className="fixed left-0 scrollbar w-10 h-full overflow-y-auto lg:min-w-[100px] mt-24">
+            <ul className=" mt-4 dark:text-gray-200 p-0 m-0 flex flex-col items-center dark:bg-[#111c2c] bg-[#e6f6ff]">
+                <li onClick={() => set_page("help_post")} className={`mb-4 flex flex-col justify-center items-center pointing_event_br-95 w-20 h-20 rounded-lg cursor-pointer bg-inherit ${page === 'help_post' ? 'dark:bg-slate-500 bg-slate-20' : ""} dark:hover:bg-slate-500 hover:bg-slate-200 text-xl font-medium`}>
+                    <i class="fa-solid fa-circle-question"></i>
+                    <p className="text-sm font-bold">Help</p>
+                </li>
+                <li onClick={() => set_page("user_post")} className={`mb-4 flex flex-col justify-center items-center pointing_event_br-95 w-20 h-20 rounded-lg cursor-pointer bg-inherit ${page === 'user_post' ? 'dark:bg-slate-500 bg-slate-20' : ""} dark:hover:bg-slate-500 hover:bg-slate-200 text-xl font-medium`}>
+                    <i class="fa-solid fa-newspaper"></i>
+                    <p className="text-sm font-bold">Blog</p>
+                </li>
+                <li onClick={() => set_page("gamemode_post")} className={`mb-4 flex flex-col justify-center items-center pointing_event_br-95 w-20 h-20 rounded-lg cursor-pointer bg-inherit ${page === 'gamemode_post' ? 'dark:bg-slate-500 bg-slate-20' : ""} dark:hover:bg-slate-500 hover:bg-slate-200 text-xl font-medium`}>
+                    <i class="fa-solid fa-chess-board"></i>
+                    <p className="text-xs font-bold">Game</p>
+                </li>
+            </ul>
+            <p className=" text-gray-500 font-semibold ml-3 mb-3"></p>
+        </div>
+    )
+}
 
-//   return (
-//     <div className="scrollbar w-80 h-full overflow-y-auto lg:min-w-[300px]">
-//       <ul className=" mt-4 dark:text-gray-200">
-//         <li onClick={() => setPage({route:'home'})} className={`px-3 py-3 rounded-lg cursor-pointer ${page.route === 'home' ? 'text-[#8C52FF]' : null} hover:text-[#8C52FF] text-xl font-medium`}>
-//           <i className="mr-3 fa-solid fa-house"></i>
-//           Trang chủ
-//         </li>
-//         <li onClick={() => setPage({route:'following'})} className={`px-3 py-3 rounded-lg cursor-pointer ${page.route === 'following' ? 'text-[#8C52FF]' : null} hover:text-[#8C52FF] text-xl font-medium`}>
-//           <i className="mr-3 fa-solid fa-face-kiss-wink-heart"></i>
-//           Creator
-//         </li>
-//         <li onClick={() => setPage({route:'hot'})} className={`px-3 py-3 rounded-lg cursor-pointer ${page.route === 'hot' ? 'text-[#8C52FF]' : null} hover:text-[#8C52FF] text-xl font-medium`}>
-//           <i className="mr-3 fa-solid fa-fire-flame-curved"></i>
-//           Hot
-//         </li>
-//       </ul>
-//       <p className=" text-gray-500 font-semibold ml-3 mb-3"></p>
-//     </div>
-//   )
-// }
-
-// export default memo(SideBar)
+export default memo(SideBar)

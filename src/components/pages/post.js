@@ -15,6 +15,8 @@ export default function Post() {
   const [comment_count, set_comment_count] = useState(0)
   const [is_mobile, set_is_mobile] = useState((window.innerWidth < 1025))
 
+  console.log(state)
+
   useEffect(() => {
     window.onresize = () => {
       set_is_mobile((window.innerWidth < 1025))
@@ -25,7 +27,7 @@ export default function Post() {
     if (state) {
       set_post(state)
     } else {
-      fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_post_by_id/" + post_id)
+      fetch("http://192.168.1.249:8080/get_post_by_id/" + post_id)
         .then(res => res.json())
         .then(data => {
           set_post(data)
@@ -65,7 +67,7 @@ export default function Post() {
     navigator.clipboard.writeText(window.location);
     alert("copy to clipboard")
   }
-  
+  console.log(post)
 
   return (
     <div className="relative w-full h-full flex justify-center">
@@ -98,6 +100,16 @@ export default function Post() {
         </div>
         }
         <div dangerouslySetInnerHTML={{ __html: post && post.content }}></div>
+        {post.type === "create_game_mode" && 
+        <div className="flex">
+          <div onClick={() => history(`/human_bot?title=${post.title}&upload_time=${post.upload_time}`, {state: {}})}
+           className="bg-[#007bff] mr-4 w-fit text-2xl px-6 py-2 rounded mt-6 pointing_event_br-95">
+            Chơi thử
+          </div>  
+          <div onClick={() => history(`/create_bot?title=${post.title}&upload_time=${post.upload_time}`)} className="bg-[#007bff] w-fit text-2xl px-6 py-2 rounded mt-6 pointing_event_br-95">
+            Viết bot
+          </div>  
+        </div>}
         <Comment_modal bg={theme === "dark" ? "bg-[#0e335b]" : "bg-[#a3dcff]"} set_comment_count={set_comment_count} post_id={post_id}/>
       </div>
     </div>

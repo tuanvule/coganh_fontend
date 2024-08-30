@@ -19,6 +19,8 @@ export default function Visualize() {
   const [controller, set_controller] = useState({})
   let portrait = window.matchMedia("(orientation: portrait)");
   const [is_Portrait, set_is_Portrait] = useState(portrait.matches)
+  const [is_d, set_is_d] = useState(false)
+  const is_mobie = (window.innerWidth <= 600)
   
   portrait.onchange = function(e) {
       if(e.matches) {
@@ -30,7 +32,7 @@ export default function Visualize() {
 
 
   useEffect(() => {
-    fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_visualize/" + id)
+    fetch("http://192.168.1.249:8080/get_visualize/" + id)
       .then(res => res.json())
       .then(data => set_data(data))
       .catch(err => console.log(err))
@@ -285,7 +287,7 @@ export default function Visualize() {
     const content = document.querySelector('.fake_window');
 
     content.scrollLeft = 1500 - window.innerWidth / 2;
-    content.scrollTop = window.innerHeight / 2 + 800;
+    content.scrollTop = window.innerHeight / 2 + (is_mobie ? 600 : 800);
 
 
     // window.addEventListener('load', (event) => {
@@ -294,17 +296,18 @@ export default function Visualize() {
 
     window.onbeforeunload = function() {
       content.scrollLeft = 1500 - this.window.innerWidth / 2;
-      content.scrollTop = this.window.innerHeight / 2 + 800;
+      content.scrollTop = this.window.innerHeight / 2 + (is_mobie ? 600 : 800);
     }
 
     // Also set scroll position to top on page load
     window.onload = function () {
       content.scrollLeft = 1500 - this.window.innerWidth / 2;
-      content.scrollTop = this.window.innerHeight / 2 + 800;
+      content.scrollTop = this.window.innerHeight / 2 + (is_mobie ? 600 : 800);
     }
 
     function startDrag(e) {
       isDragging = true;
+      set_is_d(isDragging)
       startX = e.clientX || e.touches[0].clientX;
       startY = e.clientY || e.touches[0].clientY;
       scrollLeft = content.scrollLeft;
@@ -316,6 +319,7 @@ export default function Visualize() {
     // Function to handle stopping the drag
     function stopDrag(e) {
       isDragging = false;
+      set_is_d(isDragging)
       content.style.cursor = 'default'; // Khôi phục con trỏ chuột
       // e.preventDefault();
     }
@@ -329,6 +333,10 @@ export default function Visualize() {
       const walkY = (y - startY);
       content.scrollLeft = scrollLeft - walkX;
       content.scrollTop = scrollTop - walkY;
+      // document.querySelector(".tester").innerHTML = `
+      //   ${content.scrollLeft} \n
+      //   ${content.scrollTop}
+      // `
       // e.preventDefault();
     }
     
@@ -578,7 +586,8 @@ export default function Visualize() {
         </div>
 
         {/* </div> */}
-        <div id="content">
+        <div id="content" className="grid place-content-center h-full">
+          
           <div className="VI_container">
             {/* {"{"}% if controller.type == "board" %{"}"} */}
             {data.type && (data.type === "board" ?
@@ -588,6 +597,15 @@ export default function Visualize() {
               <CreateTreeSimulation controller={(c) => set_controller(c)} />
             )}
           </div>
+          {/* <div className="tester fixed top-1/2 left-1/2 z-[100000000000] w-[1000px] h-[1000px] bg-black text-white">
+            {`${is_d}`}
+            <br/>
+            {`${window.innerHeight}`}
+            <br/>
+            {`${data.type}`}
+            <br/>
+            {`${document.querySelector(".VI_container") && JSON.stringify(document.querySelector(".VI_container").getBoundingClientRect())}`}
+          </div> */}
         </div>
       </div>
     </div>

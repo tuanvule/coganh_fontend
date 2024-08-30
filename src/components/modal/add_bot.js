@@ -1,14 +1,14 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { AppContext } from '../../context/appContext'
 
-export default function Add_bot({set_new_bot, set_code, set_selected_bot, set_is_open_add_bot}) {
+export default function Add_bot({set_new_bot, set_code, set_selected_bot, set_is_open_add_bot, gamemode}) {
     const { user } = useContext(AppContext)
     const btn_Ref = useRef(null)
     const [bot_name, set_bot_name] = useState(user.username + (new Date).getMilliseconds())
 
     useEffect(() => {
         btn_Ref.current.onclick = () => {
-            fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/create_bot?owner=${user.username}&bot_name=${bot_name}`)
+            fetch(`http://192.168.1.249:8080/create_bot?owner=${user.username}&bot_name=${bot_name}&gamemode=${gamemode}`)
             .then(res => res.json())
             .then(data => {
                 set_new_bot((new Date).getMilliseconds())

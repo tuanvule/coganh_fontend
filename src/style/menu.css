@@ -118,7 +118,7 @@
 
 .main_img {
     height: 100%;
-    filter: brightness(95%);
+    /* filter: brightness(95%); */
     border-radius: 10px;
 }
 

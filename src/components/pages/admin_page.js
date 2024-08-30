@@ -4,6 +4,7 @@ import User_list from '../modal/admin_modal/user_list'
 import Post_list from '../modal/admin_modal/post_list'
 import Task_list from '../modal/admin_modal/task_list'
 import { useLocation } from 'react-router-dom'
+import Gamemode_list from '../modal/admin_modal/gamemode_list'
 
 export default function ADMIN_page() {
     const { user, history } = useContext(AppContext)
@@ -12,14 +13,18 @@ export default function ADMIN_page() {
     const [is_reset_user, set_is_reset_user] = useState(0)
     const [is_reset_post, set_is_reset_post] = useState(0)
     const [is_reset_task, set_is_reset_task] = useState(0)
+    const [is_reset_gamemode, set_is_reset_gamemode] = useState(0)
     const [user_chunk_index, set_user_chunk_index] = useState(0)
     const [post_chunk_index, set_post_chunk_index] = useState(0)
     const [task_chunk_index, set_task_chunk_index] = useState(0)
+    const [gamemode_chunk_index, set_gamemode_chunk_index] = useState(0)
     const [users, set_users] = useState([])
     const [posts, set_posts] = useState([])
     const [tasks, set_tasks] = useState([])
+    const [gamemodes, set_gamemodes] = useState([])
     const [fetch_posts, set_fetch_posts] = useState(false)
     const [fetch_tasks, set_fetch_tasks] = useState(false)
+    const [fetch_gamemodes, set_fetch_gamemodes] = useState(false)
 
     useEffect(() => {
         document.querySelectorAll(".U_nav_item").forEach(item => {
@@ -30,7 +35,7 @@ export default function ADMIN_page() {
     }, [])
 
     useEffect(() => {
-        fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/get_all_user`)
+        fetch(`http://192.168.1.249:8080/get_all_user`)
             .then(res => res.json())
             .then(data => {
                 let d = []
@@ -46,7 +51,7 @@ export default function ADMIN_page() {
 
     useEffect(() => {
         if (!fetch_posts) return
-        fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/get_all_post?page=${post_chunk_index}&size=9`)
+        fetch(`http://192.168.1.249:8080/get_all_post?page=${post_chunk_index}&size=9`)
             .then(res => res.json())
             .then(data => {
                 set_posts(data)
@@ -57,13 +62,24 @@ export default function ADMIN_page() {
 
     useEffect(() => {
         if (!fetch_tasks) return
-        fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/get_all_task?page=${task_chunk_index}&size=30`)
+        fetch(`http://192.168.1.249:8080/get_all_task?page=${task_chunk_index}&size=30`)
             .then(res => res.json())
             .then(data => {
                 set_tasks(data)
+                set_fetch_gamemodes(true)
             })
             .catch(err => console.log(err))
     }, [is_reset_task, fetch_tasks, task_chunk_index])
+
+    useEffect(() => {
+        if (!fetch_gamemodes) return
+        fetch(`http://192.168.1.249:8080/get_gamemode?page=${gamemode_chunk_index}&size=9`)
+            .then(res => res.json())
+            .then(data => {
+                set_gamemodes(data)
+            })
+            .catch(err => console.log(err))
+    }, [is_reset_gamemode, fetch_gamemodes, gamemode_chunk_index])
 
     // localStorage.setItem("data", JSON.stringify(data))
 
@@ -90,6 +106,10 @@ export default function ADMIN_page() {
                         <i class="fa-solid fa-graduation-cap mr-5"></i>
                         Tasks
                     </li>
+                    <li data-name="gamemodes" className={`U_nav_item text-xl px-5 py-5 hover:bg-blue-600 hover:bg-opacity-50 rounded-md cursor-pointer select-none bg-opacity-80 ${page === "gamemodes" ? "bg-blue-700" : ""}`}>
+                        <i class="fa-solid fa-graduation-cap mr-5"></i>
+                        Gamemodes
+                    </li>
                 </ul>
                 <div onClick={() => history("/menu")} className="U_back_btn text-xl mt-auto mb-10 mx-auto bg-[#007BFF] px-10 py-2 rounded-sm hover:brightness-90 cursor-pointer select-none">back to menu</div>
             </div>
@@ -97,6 +117,7 @@ export default function ADMIN_page() {
                 {page === "users" && <User_list users={users[user_chunk_index]} set_is_reset_user={set_is_reset_user} set_user_chunk_index={set_user_chunk_index} />}
                 {page === "posts" && <Post_list posts={posts} is_reset_post={is_reset_post} set_is_reset_post={set_is_reset_post} set_post_chunk_index={set_post_chunk_index} />}
                 {page === "tasks" && <Task_list tasks={tasks} is_reset_task={is_reset_task} set_is_reset_task={set_is_reset_task} set_task_chunk_index={set_task_chunk_index} />}
+                {page === "gamemodes" && <Gamemode_list gamemodes={gamemodes} is_reset_gamemode={is_reset_gamemode} set_is_reset_gamemode={set_is_reset_gamemode} set_gamemode_chunk_index={set_gamemode_chunk_index} />}
             </div>
         </div>
     )

@@ -40,7 +40,7 @@ export default function Login(props) {
 
         console.log(password, name)
 
-        fetch('https://coganh-cloud-tixakavkna-as.a.run.app/handle_login', {
+        fetch('http://192.168.1.249:8080/handle_login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -63,19 +63,19 @@ export default function Login(props) {
 
   return (
     <div className={`lg:card-purple lg:animate-[moveSigninModalToLeft_.6s_ease-in-out_forwards] flex flex-col items-center lg:w-[40%] lg:h-[90%] my-auto mg:ml-auto lg:mr-20 mx-auto w-[90%] h-[60%] bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg  text-white`}>
-        <h1 className=" mb-8 mt-20 text-4xl">Đăng nhập</h1>
-        <div className="text-xl">
-            <h4>Name</h4>
+        <h1 className=" mb-8 lg:mt-20 mt-6 text-4xl">Đăng nhập</h1>
+        <div className="w-[80%]">
+            <h4 className='text-xl'>Name</h4>
             <div className="relative">
                 <i className="fa-solid fa-circle-user absolute top-1/2 transform -translate-y-1/2 text-xl"></i>
-                <input onChange={inputChange} ref={inputNameRef} placeholder="Enter your account's password" className="placeholder:text-gray-300 w-[330px] bg-transparent pl-8 pr-2 py-2 border-b border-white outline-none" type="text" />
+                <input onChange={inputChange} ref={inputNameRef} placeholder="Enter your account's password" className="placeholder:text-gray-300 bg-transparent pl-8 pr-2 py-2 border-b border-white outline-none w-full" type="text" />
             </div>
         </div>
-        <div className="mt-8">
+        <div className="mt-8 w-[80%]">
             <h4 className='text-xl'>Password</h4>
             <div className="relative">
                 <i className="fa-solid fa-lock absolute top-1/2 transform -translate-y-1/2 text-xl"></i>
-                <input onChange={inputChange} ref={inputPasswordRef} placeholder="Enter your account's name" className="placeholder:text-gray-300 w-[330px] bg-transparent pl-8 pr-2 py-2 border-b border-white outline-none" type="text" />
+                <input onChange={inputChange} ref={inputPasswordRef} placeholder="Enter your account's name" className="placeholder:text-gray-300 bg-transparent pl-8 pr-2 py-2 border-b border-white outline-none w-full" type="text" />
             </div>
         </div>
 

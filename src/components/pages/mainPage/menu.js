@@ -8,6 +8,7 @@ import chessboard1 from "../../../static/img/chessboard1.png"
 import bot_bot from "../../../static/img/bot_bot.png"
 import visualize from "../../../static/img/visualize.png"
 import post_page from "../../../static/img/post_page.png"
+import form_img from "../../../static/img/form.png"
 
 import "../../../style/style.css"
 import "../../../style/menu.css"
@@ -108,7 +109,7 @@ export default function Menu() {
             <img
               src={chessboard1}
               alt=""
-              className="main_img"
+              className="main_img dark:brightness-95 "
             />
             <a
               className="main_image_link text-blue-800 decoration-solid"
@@ -125,7 +126,7 @@ export default function Menu() {
             </div>
             <div className="non_code dark:bg-[#0e335b] bg-[#52b1ff]">
               <h2 className="text-2xl font-bold">Play chess</h2>
-              <a className="btn dark:bg-[#111c2c] bg-[#007BFF]" onClick={() => history("/human_bot")}>
+              <a className="btn dark:bg-[#111c2c] bg-[#007BFF]" onClick={() => history("/gamemode", {state: {mode: "human_bot"}})}>
                 Human vs Bot
               </a>
             </div>
@@ -179,6 +180,39 @@ export default function Menu() {
           <div className="sign_btn">OK</div>
         </div>
         {/* <a className="btn" href="/training', id="") }}">Thử thách</a> */}
+      </div>
+
+      <div className="contact lg:w-3/5 w-[90%] mx-auto mt-10 flex flex-col lg:flex-row justify-center">
+        <div className="lg:w-[49%] w-full text-center text-3xl mb-4">
+          <p>Bạn thấy thế nào về Coganh</p>
+          <div className="w-full my-4">
+            <img className=" object-cover" src={form_img}/>
+          </div>
+          <p>Hãy đánh giá tại đây</p>
+        </div>
+        <div className="w-[2%]"></div>
+        <div className="lg:w-[49%] w-full pl-6 py-4 flex flex-col dark:bg-slate-700 bg-slate-300 rounded-lg">
+          <p className="text-2xl font-bold">Thành viên</p>
+          <ul className="p-0 m-0">
+            <li>lê Tuấn Vũ</li>
+            <li>Thông Minh Quân</li>
+            <li>Nguyễn Quang Huy</li>
+            <li>Nguyễn Thành Tài</li>
+            <li>Phạm Vũ Minh Phương</li>
+            <li>Đinh Huỳnh Vinh Quang</li>
+          </ul>
+          <p className="text-2xl font-bold mt-4">Cố vẫn</p>
+          <p>Nguyễn thị Bích Hảo</p>
+          <p className="text-2xl font-bold mt-4">Đơn vị</p>
+          <p>THPT Nguyễn Hữu Huân</p>
+          <p>NHH IT club</p>
+          
+          <div className="mt-auto">
+            -----------------------------
+            <p>Contact: itclub.nhh@gmail.com</p>
+            <p>Fanpage: facebook.com/itclub.nhh</p>
+          </div>
+        </div>
       </div>
     </div>
   )

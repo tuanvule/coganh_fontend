@@ -9,7 +9,7 @@ export default function Task_list({tasks, set_is_reset_task, set_task_chunk_inde
   // function handle_delete(id) {
   //   let is_delete = window.confirm("bạn có chắc muốn xóa")
   //   if (is_delete) {
-  //     fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/delete_task/${id}`)
+  //     fetch(`http://192.168.1.249:8080/delete_task/${id}`)
   //       .then(res => res.json())
   //       .then(data => {
   //         set_is_reset_task(Math.random())
@@ -19,7 +19,7 @@ export default function Task_list({tasks, set_is_reset_task, set_task_chunk_inde
   // }
 
   // function handle_accept(id) {
-  //   fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/accept_task/${id}`)
+  //   fetch(`http://192.168.1.249:8080/accept_task/${id}`)
   //     .then(res => res.json())
   //     .then(data => {
   //       set_is_reset_task(Math.random())
@@ -28,7 +28,7 @@ export default function Task_list({tasks, set_is_reset_task, set_task_chunk_inde
   // }
 
   function handle_send_notification(u_id, content) {
-    fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/send_notification/${u_id}`, {
+    fetch(`http://192.168.1.249:8080/send_notification/${u_id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -50,7 +50,7 @@ export default function Task_list({tasks, set_is_reset_task, set_task_chunk_inde
     let is_delete = window.confirm("bạn có chắc muốn xóa")
     if (is_delete) {
       let notification = prompt("nhập lý do muốn xóa")
-      fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/delete_task/${id}`)
+      fetch(`http://192.168.1.249:8080/delete_task/${id}`)
         .then(res => res.json())
         .then(data => {
           if(author_id) {
@@ -63,7 +63,7 @@ export default function Task_list({tasks, set_is_reset_task, set_task_chunk_inde
   }
 
   function handle_accept(id, author_id, task_title) {
-    fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/accept_task/${id}`)
+    fetch(`http://192.168.1.249:8080/accept_task/${id}`)
       .then(res => res.json())
       .then(data => {
         if(author_id) {
@@ -82,7 +82,7 @@ export default function Task_list({tasks, set_is_reset_task, set_task_chunk_inde
   }
 
   useEffect(() => {
-    fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/get_unpublic_tasks?page=${UPT_chunk_index}&size=9`)
+    fetch(`http://192.168.1.249:8080/get_unpublic_tasks?page=${UPT_chunk_index}&size=9`)
     .then(res => res.json())
     .then(data => {
       set_un_public_tasks(data)

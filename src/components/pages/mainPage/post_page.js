@@ -4,16 +4,21 @@ import "../../../style/post_page.css"
 import { AppContext } from '../../../context/appContext'
 import Navbar from '../../primary/navbar'
 import logo from "../../../static/img/logo.png"
+import Sidebar from '../../primary/sidebar'
+import Help_post from '../../modal/post_modal/help_post'
+import User_post from '../../modal/post_modal/user_post'
+import Gamemode_post from '../../modal/post_modal/gamemode_post'
 
 export default function Post_page() {
   const [posts, set_posts] = useState([])
   const [post_chunk_index, set_post_chunk_index] = useState(0)
   const { history } = useContext(AppContext)
+  const [page, set_page] = useState("help_post")
 
   const is_mobile = (window.innerWidth <= 600)
 
   useEffect(() => {
-    fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/get_posts?page=${post_chunk_index}&size=10`)
+    fetch(`http://192.168.1.249:8080/get_posts?page=${post_chunk_index}&size=10`)
     .then(res => res.json())
     .then(data => {
       set_posts(data)
@@ -48,8 +53,13 @@ export default function Post_page() {
   return (
     <div className=" h-full w-full flex justify-center">
       <Navbar type={{create_post: true}} back_link="/menu"/>
+      <Sidebar page={page} set_page={set_page}/>
       <div className="w-[90%] md:w[80%] lg:w-[55%] mt-28">
-        <div className="code_guide">
+        {page === "help_post" && <Help_post/>}
+        {page === "user_post" && <User_post/>}
+        {page === "gamemode_post" && <Gamemode_post/>}
+
+        {/* <div className="code_guide">
           <img
             style={{ width: 80, height: 80 }}
             src="https://jungle-laborer-6ce.notion.site/icons/mathematics_green.svg?mode=dark"
@@ -91,13 +101,13 @@ export default function Post_page() {
                     <div className={`upload_time dark:text-gray-300 text-base`}>{post.upload_time}</div>
                   </div>
                   <a
-                    onClick={() => history("/post/" + post.post_id, {state: post})}
+                    onClick={() => history("/post/" + post.id, {state: post})}
                     className="review_title dark:text-gray-200"
                   >{post.title}</a>
                   <div className="review_decription">{post.description}</div>
                 </div>
                 <div
-                  onClick={() => history("/post/" + post.post_id, {state: post})}
+                  onClick={() => history("/post/" + post.id, {state: post})}
                   className="review_img bg-white place-content-center lg:grid md:grid hidden"
                 >
                   <img className="h-auto" src={post.image_url[0]} alt="" />
@@ -126,13 +136,13 @@ export default function Post_page() {
                   <div className={`upload_time dark:text-gray-300 text-base`}>{post.upload_time}</div>
                 </div>
               <a
-                  onClick={() => history("/post/" + post.post_id, { state: post })}
+                  onClick={() => history("/post/" + post.id, { state: post })}
                   className="review_title dark:text-gray-200"
                 >{post.title}</a>
                 <div className="review_decription">{post.description}</div>
               </div>
               <div
-                onClick={() => history("/post/" + post.post_id, { state: post })}
+                onClick={() => history("/post/" + post.id, { state: post })}
                 className="review_img bg-white place-content-center lg:grid md:grid hidden"
               >
                 <img className="h-auto object-contain" src={post.image_url[0] || logo} alt="" />
@@ -141,7 +151,7 @@ export default function Post_page() {
             </div>
             )}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
 

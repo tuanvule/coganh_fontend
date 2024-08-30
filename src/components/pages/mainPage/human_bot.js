@@ -9,12 +9,22 @@ import capture_audio from "../../../static/capture.mp3"
 import move_audio from "../../../static/move-self.mp3"
 import fireSound_audio from "../../../static/fireSound.mp3"
 import fire_webp from "../../../static/img/fire.webp"
+import logo from "../../../static/img/logo.png"
 
 import CreateRateModel from "../../modal/rate_model"
 
 import "../../../style/human_bot.css"
 import "../../../style/rate_model.css"
 import { AppContext } from '../../../context/appContext'
+import Intervention from '../../../uti/intervention'
+import breakRule from '../../../uti/break_rule'
+import { useLocation, useParams, useSearchParams } from 'react-router-dom'
+import chess_rule from "../../../uti/chess_rule"
+
+const {ganh_chet, vay} = chess_rule
+
+const $ = document.querySelector.bind(document)
+const $$ = document.querySelectorAll.bind(document)
 
 export default function Human_Bot() {
     const { user, history } = useContext(AppContext)
@@ -25,15 +35,42 @@ export default function Human_Bot() {
     const [ reload, set_reload ] = useState()
     const [ is_open_rate_modal, set_is_open_rate_modal ] = useState({})
     const [ rate, set_rate ] = useState()
-    const isMoblie = (window.innerWidth <= 600)
+    const [ user_bots, set_user_bots] = useState([])
+    const [ selected_user_bot, set_selected_user_bot] = useState()
+    const [ is_open_bot_list, set_is_open_bot_list] = useState(false)
+    const isMobile = (window.innerWidth <= 600)
+    let radius = 16
+
+    let {state} = useLocation()
+    // let game_info = state
+    const [searchParams] = useSearchParams();
+    let title = searchParams.get("title")
+    let upload_time = searchParams.get("upload_time")
+
+    const [game_info, set_game_info] = useState(state)
 
     useEffect(() => {
-        console.log("human_bot")
-        const $ = document.querySelector.bind(document)
-        const $$ = document.querySelectorAll.bind(document)
+        if(!(game_info && game_info.title)) {
+            console.log(title, upload_time)
+            fetch(`http://192.168.1.249:8080/get_gamemode_by_post?title=${title}&upload_time=${upload_time}`)
+            .then(res => res.json())
+            .then(data => {
+                set_game_info(data)
+            })
+            .catch(err => console.log(err))
+        }
+    }, [])
 
-        const isMobile = (window.innerWidth <= 500)
-
+    useEffect(() => {
+        if(selected_user_bot) {
+            const bot_info_name = $(`.bot_info_name_${isMobile ? "mobile" : "pc"}`)
+            const bot_avatar_img = $(`.bot_avatar_${isMobile ? "mobile" : "pc"} img`)
+            bot_avatar_img.src = logo
+            bot_info_name.innerHTML = selected_user_bot.bot_name
+        }
+    }, [selected_user_bot])
+    useEffect(() => {
+        // console.log(game_info)
         let board = $(".board")
         let boardValue = board.getBoundingClientRect()
         let chessGrapX = boardValue.width / 4
@@ -41,7 +78,6 @@ export default function Human_Bot() {
         let ready = true
         let d1 = [[1, 0], [0, 1], [0, -1], [-1, 0]]
         let d2 = [[1, 0], [0, 1], [0, -1], [-1, 0], [-1, -1], [-1, 1], [1, 1], [1, -1]]
-        let radius = 16
         let canvas = $("canvas")
         canvas.style.left = board.offsetLeft - radius - 5 + "px"
         canvas.style.top = board.offsetTop - radius - 5 + "px"
@@ -77,52 +113,122 @@ export default function Human_Bot() {
 
         const gridHTML = `
 <div class="HB_grid dark:bg-white bg-slate-200">
-<div class="HB_row1"></div>
-<div class="HB_row2"></div>            
-<div class="HB_row3"></div>
-<div class="HB_row4"></div>
+    <div class="HB_row1"></div>
+    <div class="HB_row2"></div>            
+    <div class="HB_row3"></div>
+    <div class="HB_row4"></div>
 </div>
 <div class="HB_grid dark:bg-white bg-slate-200">
-<div class="HB_row1"></div>
-<div class="HB_row2"></div>            
-<div class="HB_row3"></div>
-<div class="HB_row4"></div>
+    <div class="HB_row1"></div>
+    <div class="HB_row2"></div>            
+    <div class="HB_row3"></div>
+    <div class="HB_row4"></div>
 </div>
 <div class="HB_grid dark:bg-white bg-slate-200">
-<div class="HB_row1"></div>
-<div class="HB_row2"></div>            
-<div class="HB_row3"></div>
-<div class="HB_row4"></div>
+    <div class="HB_row1"></div>
+    <div class="HB_row2"></div>            
+    <div class="HB_row3"></div>
+    <div class="HB_row4"></div>
 </div>
 <div class="HB_grid dark:bg-white bg-slate-200">
-<div class="HB_row1"></div>
-<div class="HB_row2"></div>            
-<div class="HB_row3"></div>
-<div class="HB_row4"></div>
+    <div class="HB_row1"></div>
+    <div class="HB_row2"></div>            
+    <div class="HB_row3"></div>
+    <div class="HB_row4"></div>
 </div>
+<div class="HB_rowx"></div>
+<div class="HB_rowy"></div>
 `
 
-        let grid = [
-            [-1, -1, -1, -1, -1],
-            [-1, 0, 0, 0, -1],
-            [1, 0, 0, 0, -1],
-            [1, 0, 0, 0, 1],
-            [1, 1, 1, 1, 1]
-        ]
+        // let grid = 
+
+        // let gameState.positions = 
+        let gamemode_bot = {}
+
+        var gameState = {
+            current_turn: 1,
+            board: [
+                [-1, -1, -1, -1, -1],
+                [-1, 0, 0, 0, -1],
+                [1, 0, 0, 0, -1],
+                [1, 0, 0, 0, 1],
+                [1, 1, 1, 1, 1]
+            ],
+            custom_board: [
+                ["","","","",""],
+                ["","","","",""],
+                ["","","","",""],
+                ["","","","",""],
+                ["","","","",""],
+            ],
+            outside_display: [],
+            positions: [
+                [[0, 2], [0, 3], [2, 4], [4, 3], [0, 4], [1, 4], [3, 4], [4, 4]],
+                [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [0, 1], [4, 1], [4, 2]]
+            ],
+            move_counter: 0,
+            result: null
+        }
+
+        let global_var = {}
+
+        let local_var = {
+            data: null
+        }
 
         let curBoard = [
-            [-1, -1, -1, -1, -1],
-            [-1, 0, 0, 0, -1],
-            [1, 0, 0, 0, -1],
-            [1, 0, 0, 0, 1],
-            [1, 1, 1, 1, 1]
-        ]
+        [-1, -1, -1, -1, -1],
+        [-1, 0, 0, 0, -1],
+        [1, 0, 0, 0, -1],
+        [1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1]]
+        let intervention = new Intervention(gameState)
 
-        let chessPosition = [
-            [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [0, 1], [4, 1], [4, 2]],
-            [[0, 2], [0, 3], [2, 4], [4, 3], [0, 4], [1, 4], [3, 4], [4, 4]]
-        ]
+        function reset_display_item_outside() {
+            const display_outBoard = $(".display_outBoard")
+            display_outBoard.innerHTML = ""
 
+            gameState.outside_display.forEach(item => {
+                const {pos, value} = item
+                const [x,y] = pos
+                display_outBoard.innerHTML += `
+                    <div data-choosable="false" class="absolute select-none opacity-60 pointer-events-none grid place-content-center text-xl text-white" style="top:${y/4*100}%; left:${x/4*100}%;">${value}</div>
+                `
+            })
+        
+        }
+
+        function check_is_display_outside(x,y) {
+            if(Number.isInteger(x+y) && x >= 0 && x <=4 && y >= 0 && y <= 4) {
+                return false
+            }
+            return true
+        }
+
+        if(game_info && game_info.title) {
+            // let func = JSON.parse(game_info.break_rule_js).code
+            
+            // let breakRule = new Function('return ' + func )()
+            // console.log(game_info)
+            // const functionString = JSON.parse(game_info.break_rule_js).code;
+            // eval(functionString);
+
+            breakRule(gameState, intervention, global_var, local_var)
+            let result = intervention.view_command()
+            console.log("first", local_var)
+
+            let a = result.filter(item => item.action === "set_value" && !check_is_display_outside(item.pos[0],item.pos[1])).forEach(({pos: [x,y], value}) => gameState.custom_board[y][x] = value)
+            result.filter(item => item.action === "set_value" && check_is_display_outside).forEach((item) => gameState.outside_display.push(item))
+
+            reset_display_item_outside()
+
+            intervention.action()
+            game_info.bots.forEach(bot => {
+                gamemode_bot[bot.name] = bot.code
+                gamemode_bot[bot.name + "_avatar"] = bot.avatar
+            })
+        }
+        
         const type = [
             [1, 0, 1, 0, 1],
             [0, 1, 0, 1, 0],
@@ -131,25 +237,42 @@ export default function Human_Bot() {
             [1, 0, 1, 0, 1]
         ]
 
+        function reset_custom_board() {
+            let custom_board = $(".custom_board")
+            custom_board.innerHTML = ""
+            for (let i = 0; i < gameState.custom_board.length; i++) {
+                for (let j = 0; j < gameState.custom_board[i].length; j++) {
+                    custom_board.innerHTML += `
+                        <div data-choosable="false" data-posx="${j}" data-posy="${i}" class="custom_icon select-none opacity-60 pointer-events-none grid place-content-center" style="top:${chessGrapY * i - 33}px; left:${chessGrapX * j - 30}px;">${gameState.custom_board[i][j]}</div>
+                    `
+                }
+            }
+        }
+
         function resetBoard() {
+            let custom_board = $(".custom_board")
             board = $(".board")
             boardValue = board.getBoundingClientRect()
             chessGrapX = boardValue.width / 4
             chessGrapY = boardValue.height / 4
             canvas = $("canvas")
-            canvas.style.left = board.offsetLeft - radius - 5 + "px"
-            canvas.style.top = board.offsetTop - radius - 5 + "px"
+            canvas.style.left = boardValue.x - radius - 5 + "px"
+            canvas.style.top = boardValue.y - radius - 5 + "px"
             canvas.width = boardValue.width + 2 * radius + 10
             canvas.height = boardValue.height + 2 * radius + 10
             cv2 = canvas.getContext("2d")
             board.innerHTML = gridHTML
+            custom_board.innerHTML = ""
             dem = 0
-            for (let i = 0; i < grid.length; i++) {
-                for (let j = 0; j < grid[i].length; j++) {
-                    board.innerHTML += `<div data-choosable="false" data-posx="${j}" data-posy="${i}" class="box" style="top:${chessGrapY * i - 40 * rs}px; left:${chessGrapX * j - 40 * rs}px;"></div>`
-                    if (grid[i][j] === -1) {
+            for (let i = 0; i < gameState.board.length; i++) {
+                for (let j = 0; j < gameState.board[i].length; j++) {
+                    custom_board.innerHTML += `
+                        <div data-choosable="false" data-posx="${j}" data-posy="${i}" class="custom_icon select-none opacity-60 pointer-events-none grid place-content-center" style="top:${chessGrapY * i - 33}px; left:${chessGrapX * j - 30 }px">${gameState.custom_board[i][j]}</div>
+                    `
+                    board.innerHTML += `<div data-choosable="false" data-posx="${j}" data-posy="${i}" class="box z-[1000]" style="top:${chessGrapY * i - 40 * rs}px; left:${chessGrapX * j - 40 * rs}px;"></div>`
+                    if (gameState.board[i][j] === -1) {
                         board.innerHTML += `<div data-so="${dem}" data-posx="${j}" data-posy="${i}" style="background-color: red; top:${chessGrapY * i - 30 * rs}px; left:${chessGrapX * j - 30 * rs}px;" class="chess HB_enemy"></div>`
-                    } else if (grid[i][j] === 1) {
+                    } else if (gameState.board[i][j] === 1) {
                         board.innerHTML += `<div data-so="${dem}" data-posx="${j}" data-posy="${i}" style="background-color: blue; top:${chessGrapY * i - 30 * rs}px; left:${chessGrapX * j - 30 * rs}px;" class="chess player"></div>`
                     }
                     dem++
@@ -179,9 +302,18 @@ export default function Human_Bot() {
                 item.classList.add("selected")
                 // bot_html = item
                 fight_btn.classList.add("active")
-
             }
         })
+
+        function get_user_bot() {
+            fetch(`http://192.168.1.249:8080/get_your_bots?username=${user.username}&gamemode=${game_info ? game_info.gamemode : "normal"}`)
+            .then(res => res.json())
+            .then(data => {
+                set_selected_user_bot(data[0])
+                set_user_bots(data)
+            })
+            .catch(err => console.log(err))
+        }
 
         fight_btn.onclick = () => {
             if (!choosen_bot) return
@@ -193,11 +325,14 @@ export default function Human_Bot() {
                 case "level3": bot = level3; break
                 case "level4": bot = level4; break
                 case "Master": bot = Master; break
-                default: bot = Master; break
+                default: bot = $(".bot_item.selected img").src; break
             }
             bot_avatar_img.src = bot
             bot_info_name.innerHTML = choosen_bot
             overflow.style.display = "none"
+            if(choosen_bot === "you") {
+                get_user_bot()
+            }
             set_bot(choosen_bot)
         }
 
@@ -215,7 +350,6 @@ export default function Human_Bot() {
         rate_btn.onclick = () => {
             // rate.classList.toggle("RM_appear")
             if(rate_btn.classList.contains("active")) {
-                console.log({is_open: rate_btn.classList.contains("active"), is_loading: true})
                 rate_btn.classList.remove("active")
                 set_is_open_rate_modal({is_open: false, is_loading: true})
                 return
@@ -224,7 +358,7 @@ export default function Human_Bot() {
                 rate_btn.classList.add("active")
             }
             rateModel = true
-            fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_rate", {
+            fetch("http://192.168.1.249:8080/get_rate", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -233,7 +367,6 @@ export default function Human_Bot() {
             })
                 .then(res => res.json())
                 .then(data => {
-                    console.log(data)
                     const img_list = JSON.parse(data.img_url)
                     let rating = []
                     img_list.splice(1,img_list.length).forEach((url, i) => {
@@ -256,6 +389,7 @@ export default function Human_Bot() {
         let boxes = $$(".box")
 
         function getPos(e) {
+            console.log(ready)
             if (!ready) return
 
             const eX = Number(e.dataset.posx)
@@ -268,10 +402,11 @@ export default function Human_Bot() {
                 d1.forEach(pos => {
                     let newPosX = eX + pos[0]
                     let newPosY = eY + pos[1]
-                    if (newPosX >= 0 && newPosX < 5 && newPosY >= 0 && newPosY < 5 && grid[newPosY][newPosX] === 0) {
+                    if (newPosX >= 0 && newPosX < 5 && newPosY >= 0 && newPosY < 5 && gameState.board[newPosY][newPosX] === 0) {
                         let box = Array.from(boxes).filter(e => Number(e.dataset.posx) === newPosX && Number(e.dataset.posy) === newPosY)
                         box.forEach(e => {
                             e.dataset.choosable = "true"
+                            e.style.zIndex = "1000"
                         })
                     }
                 })
@@ -279,10 +414,11 @@ export default function Human_Bot() {
                 d2.forEach(pos => {
                     let newPosX = eX + pos[0]
                     let newPosY = eY + pos[1]
-                    if (newPosX >= 0 && newPosX < 5 && newPosY >= 0 && newPosY < 5 && grid[newPosY][newPosX] === 0) {
+                    if (newPosX >= 0 && newPosX < 5 && newPosY >= 0 && newPosY < 5 && gameState.board[newPosY][newPosX] === 0) {
                         let box = Array.from(boxes).filter(e => Number(e.dataset.posx) === newPosX && Number(e.dataset.posy) === newPosY)
                         box.forEach(e => {
                             e.dataset.choosable = "true"
+                            e.style.zIndex = "1000"
                         })
                     }
                 })
@@ -298,109 +434,173 @@ export default function Human_Bot() {
             return e[0] === this[0] && e[1] === this[1]
         }
 
-        function changeBoard(newBoard, removeDict, selected_pos, new_pos) {
+        async function delete_chess(j,i) {
             const chesses = $$(".chess")
+            // console.log(Array.from(chesses).map(e => [Number(e.dataset.posx), Number(e.dataset.posy)]))
+            const changedChess = Array.from(chesses).find(e => {
+                return Number(e.dataset.posx) === j && Number(e.dataset.posy) === i
+            })
+            if(changedChess) {
+                // console.log("changedChess: ",changedChess)
+                gameState.positions.forEach((es,index) => es.forEach((e, indx)=> {
+                    if(es.findIndex(findI, [j,i]) !== -1) {
+                        gameState.positions[index].splice(es.findIndex(findI, [j,i]),1)
+                    }
+                }))
+                // captureSound.play()
+                // fireSound.play()
+                // const fire = document.createElement("img")
+                // fire.setAttribute("src", fire_webp)
+                // fire.setAttribute("style", `top:${chessGrapY*i - 30 * rs}px; left:${chessGrapX*j - 30 * rs}px;`)
+                // fire.setAttribute("class", "fire")
+                // let newFire = board.appendChild(fire)
+                // newFire.onanimationend = (e) => {
+                //     console.log("remove")
+                // }
+                changedChess.remove()
+            }
+        }
+
+        async function add_chess([j,i], chess_type) {
+            board = $(".board")
+            board.innerHTML += `<div data-so="${dem}" data-posx="${j}" data-posy="${i}" style="background-color: ${chess_type === "red" ? "red" : "blue"}; top:${chessGrapY * i - 30 * rs}px; left:${chessGrapX * j - 30 * rs}px;" class="chess ${chess_type === "red" ? "HB_enemy" : "player"}"></div>`
+            dem++
+            boxes = $$(".box")
+            boxes.forEach((e) => {
+                e.onclick = () => {
+                    if (e.dataset.choosable === "true" && selectedChess) {
+                        isReady(false)
+                        swap(selectedChess, e)
+                        clearBox()
+                        getBotmove()
+                    }
+                }
+                e.ontouchend = () => {
+                    if (e.dataset.choosable === "true" && selectedChess) {
+                        isReady(false)
+                        swap(selectedChess, e)
+                        clearBox()
+                        getBotmove()
+                    }
+                }
+            })
+            handle_event()
+        }
+
+        async function handle_action(intervention) {
+            // console.log(JSON.parse(JSON.stringify(gameState.custom_board)))
+            gameState.custom_board = [
+                ["","","","",""],
+                ["","","","",""],
+                ["","","","",""],
+                ["","","","",""],
+                ["","","","",""],
+            ]
+            gameState.outside_display = []
+            let intervention_result = intervention.view_command()
+            console.log(intervention_result)
+            
+            for(let item of intervention_result) {
+                let { action, pos: [x,y] } = item
+                switch(action) {
+                    case "remove_blue" :
+                        await delete_chess(Number(x),Number(y))
+                        break
+                    case "remove_red" :
+                        await delete_chess(Number(x),Number(y))
+                        break
+                    case "insert_blue" :
+                        console.log("insert_blue-----------")
+                        await add_chess([x,y], "blue")
+                        break
+                    case "insert_red" :
+                        await add_chess([x,y], "red")
+                        break
+                    case "set_value" :
+                        // console.log(x,y,item.value)
+                        if(!check_is_display_outside(x,y)) {
+                            gameState.custom_board[y][x] = item.value ? item.value : ""
+                        } else {
+                            gameState.outside_display.push({
+                                ...item
+                            })
+                        }
+                        break
+                    default:
+                        break
+                }
+            }
+
+            // intervention_result.forEach((item) => {
+            //     let { action, pos: [x,y] } = item
+
+            //     switch(action) {
+            //         case "remove_blue" :
+            //             delete_chess(Number(x),Number(y))
+            //             break
+            //         case "remove_red" :
+            //             delete_chess(Number(x),Number(y))
+            //             break
+            //         case "insert_blue" :
+            //             add_chess([x,y], "blue")
+            //             break
+            //         case "insert_red" :
+            //             add_chess([x,y], "red")
+            //             break
+            //         case "set_value" :
+            //             // console.log(x,y,item.value)
+            //             if(!check_is_display_outside(x,y)) {
+            //                 gameState.custom_board[y][x] = item.value ? item.value : ""
+            //             } else {
+            //                 gameState.outside_display.push({
+            //                     ...item
+            //                 })
+            //             }
+            //             break
+            //         default:
+            //             break
+            //     }
+            // })
+            console.log(JSON.parse(JSON.stringify(gameState.custom_board)))
+            
+        }
+
+        function changeBoard(newBoard, removeDict, selected_pos, new_pos) {
             for(let i = 0; i < 5; i++) {
                 for(let j = 0; j < 5; j++) {
                     if(curBoard[i][j] !== newBoard[i][j] && Object.keys(removeDict).length !== 0) {
-                        if(curBoard[i][j] !== 0 && newBoard[i][j] === 0) {
-                            const changedChess = Array.from(chesses).find(e => {
-                                return Number(e.dataset.posx) === j && Number(e.dataset.posy) === i
-                            })
-                            if(changedChess) {
-                                console.log("changedChess: ",changedChess)
-                                chessPosition.forEach((es,index) => es.forEach((e, indx)=> {
-                                    if(es.findIndex(findI, [j,i]) !== -1) {
-                                        chessPosition[index].splice(es.findIndex(findI, [j,i]),1)
-                                    }
-                                }))
-                                captureSound.play()
-                                fireSound.play()
-                                const fire = document.createElement("img")
-                                fire.setAttribute("src", fire_webp)
-                                fire.setAttribute("style", `top:${chessGrapY*i - 30 * rs}px; left:${chessGrapX*j - 30 * rs}px;`)
-                                fire.setAttribute("class", "fire")
-                                let newFire = board.appendChild(fire)
-                                newFire.onanimationend = (e) => {
-                                    console.log("remove")
-                                    changedChess.remove()
-                                }
-                            }
+                        if((curBoard[i][j] !== 0 && newBoard[i][j] === 0)) {
+                            delete_chess(j,i)
                         }
                     }
                     curBoard[i][j] = newBoard[i][j];
                 }
             }
+            reset_custom_board()
+            reset_display_item_outside()
             
-            img_data.img.push([selected_pos[0],selected_pos[1],new_pos[0],new_pos[1], removeDict])
+            img_data.img.push([selected_pos[0],selected_pos[1],new_pos[0],new_pos[1], intervention.view_command()])
+
+            intervention.action()
         
-            if(chessPosition[0].length === 0) {
+            if(gameState.positions[1].length === 0) {
                 gameStatus.innerHTML = "You Win"
                 gameStatus.style.backgroundColor = "green"
                 gameStatus.style.display = "block"
                 gameStatus.style.opacity = "1";
                 rate_btn.style.display = "block"
-            } else if(chessPosition[1].length === 0) {
+            } else if(gameState.positions[0].length === 0) {
                 gameStatus.innerHTML = "You lost"
                 gameStatus.style.backgroundColor = "red"
                 gameStatus.style.opacity = "1";
                 rate_btn.style.display = "block"
-            } else if(chessPosition[0].length === 1 && chessPosition[1].length === 1) {
+            } else if(gameState.positions[0].length === 1 && gameState.positions[1].length === 1) {
                 gameStatus.innerHTML = "draw"
                 gameStatus.style.backgroundColor = "#ccc"
                 gameStatus.style.display = "block"
                 gameStatus.style.opacity = "1";
                 rate_btn.style.display = "block"
             }
-        }
-
-        function ganh_chet(move, opp_pos, side, opp_side) {
-            let valid_remove = [];
-            let at_8intction = (move[0] + move[1]) % 2 === 0;
-
-            for (let [x0, y0] of opp_pos) {
-                let dx = x0 - move[0];
-                let dy = y0 - move[1];
-                if (dx >= -1 && dx <= 1 && dy >= -1 && dy <= 1 && (dx === 0 || dy === 0 || at_8intction)) {
-                    if ((move[0] - dx >= 0 && move[0] - dx <= 4 && move[1] - dy >= 0 && move[1] - dy <= 4 && grid[move[1] - dy][move[0] - dx] === opp_side) ||
-                        (x0 + dx >= 0 && x0 + dx <= 4 && y0 + dy >= 0 && y0 + dy <= 4 && grid[y0 + dy][x0 + dx] === side)) {
-                        valid_remove.push([x0, y0]);
-                    }
-                }
-            }
-
-            for (let [x, y] of valid_remove) {
-                grid[y][x] = 0;
-                opp_pos = opp_pos.filter(([px, py]) => px !== x || py !== y);
-            }
-
-            return valid_remove;
-        }
-
-        function vay(opp_pos) {
-            for (let pos of opp_pos) {
-                let move_list
-                if ((pos[0] + pos[1]) % 2 === 0) {
-                    move_list = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [-1, 1], [1, -1]];
-                } else {
-                    move_list = [[1, 0], [-1, 0], [0, 1], [0, -1]];
-                }
-                for (let move of move_list) {
-                    let new_valid_x = pos[0] + move[0];
-                    let new_valid_y = pos[1] + move[1];
-                    if (new_valid_x >= 0 && new_valid_x <= 4 && new_valid_y >= 0 && new_valid_y <= 4 && grid[new_valid_y][new_valid_x] === 0) {
-                        console.log(new_valid_x, new_valid_y)
-                        return [];
-                    }
-                }
-            }
-
-            let valid_remove = opp_pos.slice();
-            for (let [x, y] of opp_pos) {
-                grid[y][x] = 0;
-            }
-            opp_pos = [];
-            return valid_remove;
         }
 
         function isReady(bol) {
@@ -420,38 +620,52 @@ export default function Human_Bot() {
             const chessY = Number(y)
             const boxX = Number(newX)
             const boxY = Number(newY)
-            let path = grid[chessY][chessX]
-            grid[chessY][chessX] = grid[boxY][boxX]
-            grid[boxY][boxX] = path
+            let path = gameState.board[chessY][chessX]
+            gameState.board[chessY][chessX] = gameState.board[boxY][boxX]
+            gameState.board[boxY][boxX] = path
         }
 
-        function swap(chess, box, newPos, selected_pos) {
+        function handle_canvas(chess,color) {
+            let r = [2,1.5,2,2.5,2]
+            cv2.beginPath()
+            cv2.arc(chess.dataset.posx * (boardValue.width / 4) + radius + 5, chess.dataset.posy * (boardValue.height / 4) + radius + 5, radius, 0, 2 * Math.PI);
+            cv2.lineWidth = 5;
+            cv2.fillStyle = color
+            cv2.fill()
+            cv2.strokeStyle = color;
+            cv2.stroke();
+        }
+
+        async function swap(chess, box, newPos, selected_pos) {
             let valid_remove
             cv2.clearRect(0, 0, canvas.width, canvas.height);
             moveSound.play()
-            let r = [2,1.5,2,2.5,2]
             let preBoard = curBoard.map(row => row.map(item => item))
             let removeDict = {};
+            gameState.move_counter += 1
+            const chesses = $$(".chess")
             if(box) {
-                cv2.beginPath();
-                cv2.arc(chess.dataset.posx * (boardValue.width / 4) + radius + 2.5 * r[chess.dataset.posx], chess.dataset.posy * (boardValue.height / 4) + radius + 2.5 * r[chess.dataset.posx], radius, 0, 2 * Math.PI);
-                cv2.lineWidth = 5;
-                cv2.fillStyle = "#577DFF"
-                cv2.fill()
-                cv2.strokeStyle = "#577DFF";
-                cv2.stroke();
+                handle_canvas(chess, "rgba(87, 125, 255, 0.6)")
+
                 chess.style.left = box.offsetLeft + 10 * rs + "px"
                 chess.style.top = box.offsetTop + 10 * rs + "px"
         
                 newPos = [Number(box.dataset.posx), Number(box.dataset.posy)]
                 selected_pos = [Number(chess.dataset.posx),Number(chess.dataset.posy)]
+
+                gameState.move = {
+                    selected_pos: selected_pos,
+                    new_pos: newPos,
+                }
                 
-                let opp_pos = chessPosition[0]
+                let opp_pos = gameState.positions[1]
                 changePos(chess.dataset.posx,chess.dataset.posy, box.dataset.posx, box.dataset.posy)
-                valid_remove = [...ganh_chet([Number(box.dataset.posx), Number(box.dataset.posy)], opp_pos, 1, -1), ...vay(opp_pos)]
+                valid_remove = [...ganh_chet(gameState,[Number(box.dataset.posx), Number(box.dataset.posy)], opp_pos, 1, -1), ...vay(gameState, opp_pos)]
+                if(valid_remove.length > 0) valid_remove.forEach(item => intervention.remove_red(...item))
+                
                 move_list.push({
-                    your_pos: [...chessPosition[1]],
-                    opp_pos: [...chessPosition[0]],
+                    your_pos: [...gameState.positions[0]],
+                    opp_pos: [...gameState.positions[1]],
                     board: preBoard,
                     side: 1,
                     remove: valid_remove,
@@ -460,31 +674,39 @@ export default function Human_Bot() {
                         new_pos: newPos,
                     }
                 })
+
                 valid_remove.forEach(i => {
                     removeDict[i.join(',')] = "remove_red";
                 });
                 
-                chessPosition[1][chessPosition[1].findIndex(findI, [Number(chess.dataset.posx), Number(chess.dataset.posy)])] = [Number(box.dataset.posx), Number(box.dataset.posy)]
+                gameState.positions[0][gameState.positions[0].findIndex(findI, [Number(chess.dataset.posx), Number(chess.dataset.posy)])] = [Number(box.dataset.posx), Number(box.dataset.posy)]
                 chess.dataset.posx = box.dataset.posx
                 chess.dataset.posy = box.dataset.posy
+
+                if(game_info && game_info.title) {
+                    breakRule(gameState, intervention, global_var, local_var)
+                }
+                await handle_action(intervention)
+
+                gameState.current_turn = -1
             } else {
-                cv2.beginPath();
-                cv2.arc(chess.dataset.posx * (boardValue.width / 4) + radius + 2.5 * r[chess.dataset.posx], chess.dataset.posy * (boardValue.height / 4) + radius + 2.5 * r[chess.dataset.posx], radius, 0, 2 * Math.PI);
-                cv2.lineWidth = 5;
-                cv2.fillStyle = "#FC6666"
-                cv2.fill()
-                cv2.strokeStyle = "#FC6666";
-                cv2.stroke();
+                handle_canvas(chess, "rgba(252, 102, 102, 0.6)")
+
+                gameState.move = {
+                    selected_pos: selected_pos,
+                    new_pos: newPos,
+                }
                 
-                let opp_pos = chessPosition[1]
-                console.log({selected_pos,newPos})
+                let opp_pos = gameState.positions[0]
                 changePos(selected_pos[0], selected_pos[1], newPos[0], newPos[1])
-                valid_remove = [...ganh_chet([newPos[0], newPos[1]], opp_pos, -1, 1), ...vay(opp_pos)]
-                console.log({selected_pos,newPos})
+                valid_remove = [...ganh_chet(gameState, [newPos[0], newPos[1]], opp_pos, -1, 1), ...vay(gameState, opp_pos)]
+                if(valid_remove.length > 0) valid_remove.forEach(item => intervention.remove_blue(...item))
+
+                // console.log(JSON.parse(JSON.stringify(gameState.board)))
         
                 move_list.push({
-                    your_pos: [...chessPosition[1]],
-                    opp_pos: [...chessPosition[0]],
+                    your_pos: [...gameState.positions[0]],
+                    opp_pos: [...gameState.positions[1]],
                     board: preBoard,
                     side: -1,
                     remove: valid_remove,
@@ -497,46 +719,50 @@ export default function Human_Bot() {
                     removeDict[i.join(',')] = "remove_blue";
                 });
         
-                chessPosition[0][chessPosition[0].findIndex(findI, [selected_pos[0], selected_pos[1]])] = [newPos[0], newPos[1]]
+                gameState.positions[1][gameState.positions[1].findIndex(findI, [selected_pos[0], selected_pos[1]])] = [newPos[0], newPos[1]]
                 chess.style.left = newPos[0] * chessGrapX - 30 * rs + "px"
                 chess.style.top = newPos[1] * chessGrapX - 30 * rs + "px"
                 chess.dataset.posx  = `${newPos[0]}`
                 chess.dataset.posy = `${newPos[1]}`
+
+                if(game_info && game_info.title) {
+                    breakRule(gameState, intervention, global_var, local_var)
+                }
+                await handle_action(intervention)
+
                 isReady(true)
+                gameState.current_turn = 1
             }
-            changeBoard(grid, removeDict, selected_pos, newPos)
+            changeBoard(gameState.board, removeDict, selected_pos, newPos)
         }
 
         function clearBox() {
             boxes.forEach(box => {
                 box.dataset.choosable = "false"
+                box.style.zIndex = "0"
             })
         }
 
         function getBotmove() {
-            console.log('asd')
             setTimeout(() => {
-                if (chessPosition[0].length <= 0 || chessPosition[1].length <= 0) return
+                if (gameState.positions[1].length <= 0 || gameState.positions[0].length <= 0) return
                 chessEnemy = $$(".chess.HB_enemy")
                 let data = {
                     your_pos: [],
                     your_side: -1,
                     opp_pos: [],
-                    board: grid,
+                    board: gameState.board,
+                    global_var: global_var
                 }
 
-                console.log(JSON.parse(JSON.stringify(data)))
-
-                grid.forEach((row, i) => {
+                gameState.board.forEach((row, i) => {
                     row.forEach((__, j) => {
-                        if (grid[i][j] === 1) data.your_pos.push([j, i])
-                        if (grid[i][j] === -1) data.opp_pos.push([j, i])
+                        if (gameState.board[i][j] === 1) data.your_pos.push([j, i])
+                        if (gameState.board[i][j] === -1) data.opp_pos.push([j, i])
                     })
                 })
 
-                console.log(JSON.parse(JSON.stringify(data)))
-
-                fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_pos_of_playing_chess", {
+                fetch("http://192.168.1.249:8080/get_pos_of_playing_chess", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -544,16 +770,24 @@ export default function Human_Bot() {
                     body: JSON.stringify({
                         data: data,
                         choosen_bot: choosen_bot,
+                        type: choosen_bot === "you" ? "you" : "bot",
+                        user_bot_code: choosen_bot === "you" ? selected_user_bot.code : "",
+                        enemy_code: gamemode_bot[choosen_bot],
+                        gamemode: game_info && game_info.title ? game_info.title : "normal",
+                        game_data: {
+                            gameState,
+                            global_var,
+                            local_var
+                        }
                     }),
                 })
                     .then(res => res.json(data))
                     .then(resData => {
                         const { selected_pos, new_pos } = resData
-                        console.log("selected_pos:  ", { selected_pos, new_pos })
+                        // console.log("selected_pos:  ", { selected_pos, new_pos })
                         const selectedChess = Array.from(chessEnemy).find(e => {
                             return Number(e.dataset.posx) === selected_pos[0] && Number(e.dataset.posy) === selected_pos[1]
                         })
-                        console.log("resData: ", resData)
                         swap(selectedChess, null, new_pos, selected_pos)
                     })
             }, 1000)
@@ -578,12 +812,15 @@ export default function Human_Bot() {
             }
         })
 
-        const chess = $$(".chess.player")
-
-        chess.forEach(e => {
-            e.onclick = () => { getPos(e); cv2.clearRect(0, 0, canvas.width, canvas.height) }
-            e.ontouchend = () => { getPos(e); cv2.clearRect(0, 0, canvas.width, canvas.height); console.log("touch") }
-        });
+        function handle_event() {
+            const chess = $$(".chess.player")
+    
+            chess.forEach(e => {
+                e.onclick = () => { getPos(e); cv2.clearRect(0, 0, canvas.width, canvas.height); console.log("click")}
+                e.ontouchend = () => { getPos(e); cv2.clearRect(0, 0, canvas.width, canvas.height); }
+            });
+        }
+        handle_event()
 
         window.onresize = function (event) {
             if (window.outerWidth <= 600) {
@@ -595,7 +832,6 @@ export default function Human_Bot() {
             }
             resetBoard()
             boxes = $$(".box")
-            console.log("resize")
             boxes.forEach((e) => {
                 e.onclick = () => {
                     if (e.dataset.choosable === "true" && selectedChess) {
@@ -615,16 +851,10 @@ export default function Human_Bot() {
                 }
             })
 
-            const chess = $$(".chess.player")
-
-            chess.forEach(e => {
-                e.onclick = () => { getPos(e); cv2.clearRect(0, 0, canvas.width, canvas.height) }
-                e.ontouchend = () => { getPos(e); cv2.clearRect(0, 0, canvas.width, canvas.height); console.log("touch") }
-            });
+            handle_event()
         }
 
         window.onload= (event) => {
-            console.log(event)
             if (window.outerWidth <= 500) {
                 rs = 0.5
                 radius = 8
@@ -634,7 +864,6 @@ export default function Human_Bot() {
             }
             resetBoard()
             boxes = $$(".box")
-            console.log("reload")
             boxes.forEach((e) => {
                 e.onclick = () => {
                     if (e.dataset.choosable === "true" && selectedChess) {
@@ -654,51 +883,91 @@ export default function Human_Bot() {
                 }
             })
 
-            const chess = $$(".chess.player")
-
-            chess.forEach(e => {
-                e.onclick = () => { getPos(e); cv2.clearRect(0, 0, canvas.width, canvas.height) }
-                e.ontouchend = () => { getPos(e); cv2.clearRect(0, 0, canvas.width, canvas.height); console.log("touch") }
-            });
+            handle_event()
         }
-    }, [username, reload])
+    }, [game_info, username, reload, selected_user_bot])
 
     return (
-        <div className={`h-screen relative flex ${isMoblie && "flex-col"} justify-around items-center overflow-hidden`}>
+        <div className={`h-screen relative flex ${isMobile && "flex-col"} justify-around items-center overflow-hidden`}>
             <div className="game_state pc">
-                <div className="game_turn game_turn-bot">
-                    <div className="bot_avatar_pc">
+                <div className="game_turn game_turn-bot relative">
+                    <div className="bot_avatar_pc min-w-20">
                         <img src={Master} alt="" />
                     </div>
-                    <div className="game_turn_info bot_info_pc unavalable">
-                        <div className="bot_info_name_pc">Master</div>
+                    <div className="game_turn_info bot_info_pc dark:bg-[#ff00004d] bg-red-500 dark:text-[red] text-white unavalable w-48">
+                        <div className="bot_info_name_pc overflow-hidden whitespace-nowrap text-ellipsis w-full">Master</div>
                     </div>
+                    {user.id &&
+                        <>
+                        {user_bots.length > 0 && <i onClick={() => set_is_open_bot_list(!is_open_bot_list)} class="absolute bottom-0 right-0 fa-solid fa-repeat ml-auto mr-2 text-3xl cursor-pointer select-none hover:text-slate-300"></i>}
+                        {is_open_bot_list &&
+                            <ul className="absolute w-full h-64 dark:bg-slate-700 bg-slate-300 right-0 top-full p-2 rounded-md cursor-pointer select-none overflow-y-scroll">
+                            {user_bots.length > 0 && user_bots.map(bot =>
+                                <li onClick={() => set_selected_user_bot(bot)} className={`flex items-center dark:hover:bg-slate-800 hover:bg-slate-200 px-2 py-1 rounded-md ${bot.bot_name === selected_user_bot.bot_name ? "dark:bg-slate-900 bg-slate-100" : ""}`}>
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-3xl bg-white text-[#007BFF] font-bold pb-2">{bot.bot_name[0]}</div>
+                                <div className="ml-2">
+                                <div className="">
+                                    {bot.bot_name}
+                                </div>
+                                <div className="">{bot.elo}</div>
+                                </div>
+                            </li>
+                            )}
+
+                            </ul>
+                        }
+                        </>
+                    }
                 </div>
                 <div className="game_turn game_turn-player">
-                    <div className="player_avatar">{(username && username[0].toUpperCase()) || "C"}</div>
-                    <div className="game_turn_info player_info_pc">
-                        <div className="player_info_name">{username || "Coganh"}</div>
+                    <div className="player_avatar min-w-20">{(username && username[0].toUpperCase()) || "C"}</div>
+                    <div className="game_turn_info player_info_pc dark:bg-[#007bff4d] bg-blue-500 dark:text-[#007BFF] text-white">
+                        <div className="player_info_name overflow-hidden whitespace-nowrap text-ellipsis w-full">{username || "Coganh"}</div>
                     </div>
                 </div>
             </div>
-            <div className="game_turn game_turn-bot mobile_active">
-                <div className="bot_avatar_mobile">
+            <div className="game_turn game_turn-bot mobile_active relative">
+                <div className="bot_avatar_mobile ">
                     <img src={Master} alt="" />
                 </div>
-                <div className="game_turn_info bot_info_mobile unavalable">
+                <div className="game_turn_info bot_info_mobile dark:bg-[#ff00004d] bg-red-500 dark:text-[red] text-white unavalable w-48">
                     {/* <div class="bot_title">DEFEATED</div> */}
                     <div className="bot_info_name_mobile">Master</div>
                 </div>
+                {user.id &&
+                        <>
+                        {user_bots.length > 0 && <i onClick={() => set_is_open_bot_list(!is_open_bot_list)} class="absolute bottom-0 right-0 fa-solid fa-repeat ml-auto mr-2 text-xl cursor-pointer select-none hover:text-slate-300"></i>}
+                        {is_open_bot_list &&
+                            <ul className="absolute w-full h-96 dark:bg-slate-700 bg-slate-300 right-0 top-full p-2 rounded-md cursor-pointer select-none overflow-y-scroll z-[100000]">
+                            {user_bots.length > 0 && user_bots.map(bot =>
+                                <li onClick={() => set_selected_user_bot(bot)} className={`flex items-center dark:hover:bg-slate-800 hover:bg-slate-200 px-2 py-1 rounded-md ${bot.bot_name === selected_user_bot.bot_name ? "dark:bg-slate-900 bg-slate-100" : ""}`}>
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-3xl bg-white text-[#007BFF] font-bold pb-2">{bot.bot_name[0]}</div>
+                                <div className="ml-2">
+                                <div className="text-base">
+                                    {bot.bot_name}
+                                </div>
+                                <div className="">{bot.elo}</div>
+                                </div>
+                            </li>
+                            )}
+
+                            </ul>
+                        }
+                        </>
+                    }
             </div>
-            <div className="board" />
+            <div className="relative">
+                <div style={{width: `100%`, height: `100%`}} class="custom_board absolute top-0 z-[10000] pointer-events-none grid grid-cols-5 grid-flow-row text-5xl select-none"></div>
+                <div style={{width: `100%`, height: `100%`}} class="display_outBoard absolute top-0 z-[10000] pointer-events-none grid grid-cols-5 grid-flow-row text-5xl select-none"></div>
+                <div className="board"/>
+                <canvas className="z-[10000]"/>
+            </div>
             <div className="game_turn game_turn-player mobile_active">
                 <div className="player_avatar">{(username && username[0].toUpperCase()) || "C"}</div>
-                <div className="game_turn_info player_info_mobile">
+                <div className="game_turn_info player_info_mobile dark:bg-[#007bff4d] bg-blue-500 dark:text-[#007BFF] text-white">
                     <div className="player_info_name">{username || "Coganh"}</div>
                 </div>
             </div>
-            <canvas />
-            {console.log(is_open_rate_modal.is_open)}
             { is_open_rate_modal.is_open && <CreateRateModel data={rate} is_loading={is_open_rate_modal.is_loading}/>}
             <input
                 type="checkbox"
@@ -713,40 +982,58 @@ export default function Human_Bot() {
                     <i className="fa-solid fa-angles-down arrow_down" />
                 </label>
                 <div className="HB_game_status text-white dark:bg-[#007BFF] bg-[#2997ff]">Game on...</div>
-                <a onClick={() => history("/menu")} className={` dark:bg-[#111c2c] bg-[#0062d9] ${isMoblie ? "HB_menu_btn" : "fixed top-5 left-5 HB_menu_btn"}`}>
+                <a onClick={() => history("/menu")} className={` dark:bg-[#111c2c] bg-[#0062d9] ${isMobile ? "HB_menu_btn" : "fixed top-5 left-5 HB_menu_btn"}`}>
                     Menu
                 </a>
                 <div className="rate_btn hidden dark:bg-[#111c2c] bg-[#0062d9] text-white">Xem đánh giá</div>
                 <div className="play_again_btn dark:bg-[#111c2c] bg-[#0062d9] text-white">Play again</div>
             </div>
             <div className="overflow">
-                <div className="choose_bot_model dark:bg-[#242527] bg-[#a3dcff] lg:scale-100 sm:scale-50">
+                <div className="choose_bot_model dark:bg-[#242527] bg-[#a3dcff] lg:scale-100 sm:scale-50 z-[10000]">
                     <div className="choose_bot_model-title">Chọn bot</div>
                     <div className="bot_list">
+                        {game_info && game_info.title && game_info.bots.length > 0 ? game_info.bots.map(bot =>
+                            <div data-level={bot.name} className="bot_item h-auto level4">
+                                <img className="" src={bot.avatar} alt="" />
+                                <div className="bot_item_title level4">{bot.name}</div>
+                            </div>
+                        )
+                        :
+                        <>
+                            <div className="bot_list_block">
+                                <div data-level="level1" className="bot_item h-auto level1">
+                                    <img className="" src={level1} alt="" />
+                                    <div className="bot_item_title level1">level 1</div>
+                                </div>
+                                <div data-level="level2" className="bot_item h-auto level2">
+                                    <img className="" src={level2} alt="" />
+                                    <div className="bot_item_title level2">level 2</div>
+                                </div>
+                                <div data-level="level3" className="bot_item h-auto level3">
+                                    <img className="" src={level3} alt="" />
+                                    <div className="bot_item_title level3">level 3</div>
+                                </div>
+                            </div>
+                            <div className="bot_list_block">
+                                <div data-level="level4" className="bot_item h-auto level4">
+                                    <img className="" src={level4} alt="" />
+                                    <div className="bot_item_title level4">level 4</div>
+                                </div>
+                                <div data-level="Master" className="bot_item h-auto Master">
+                                    <img className="" src={Master} alt="" />
+                                    <div className="bot_item_title Master">MASTER</div>
+                                </div>
+                            </div>
+                        </>
+                        }
+                        {user.id &&
                         <div className="bot_list_block">
-                            <div data-level="level1" className="bot_item h-auto level1">
-                                <img className="" src={level1} alt="" />
-                                <div className="bot_item_title level1">level 1</div>
-                            </div>
-                            <div data-level="level2" className="bot_item h-auto level2">
-                                <img className="" src={level2} alt="" />
-                                <div className="bot_item_title level2">level 2</div>
-                            </div>
-                            <div data-level="level3" className="bot_item h-auto level3">
-                                <img className="" src={level3} alt="" />
-                                <div className="bot_item_title level3">level 3</div>
+                            <div data-level="you" className="bot_item h-auto level3">
+                                <img className="" src={logo} alt="" />
+                                <div className="bot_item_title level3">Your Bot</div>
                             </div>
                         </div>
-                        <div className="bot_list_block">
-                            <div data-level="level4" className="bot_item h-auto level4">
-                                <img className="" src={level4} alt="" />
-                                <div className="bot_item_title level4">level 4</div>
-                            </div>
-                            <div data-level="Master" className="bot_item h-auto Master">
-                                <img className="" src={Master} alt="" />
-                                <div className="bot_item_title Master">MASTER</div>
-                            </div>
-                        </div>
+                        }
                     </div>
                     <div className="fight_btn border dark:border-[#ccc] border-[#333]">Thách đấu</div>
                 </div>

@@ -9,6 +9,7 @@ import Master from "../../../static/img/Master.png"
 import your_bot from "../../../static/img/your_bot.png"
 import demo_video from "../../../static/upload_video/demo.mp4"
 import chessboard_debug from "../../../static/img/chessboard.png"
+import simple_model_code from "../../../static/img/simple_model_code.png"
 
 import AceEditor from "react-ace";
 
@@ -20,6 +21,8 @@ import Add_bot from '../../modal/add_bot'
 import Remove_bot from '../../modal/remove_bot'
 import Login_require from '../../modal/requirements/login_require'
 import Loading from '../../modal/loading'
+import { useLocation, useSearchParams } from 'react-router-dom'
+import Gamemode_item from '../../modal/gamemode_modal/gamemode_item'
 
 const bots_list = {
     level1: level1,
@@ -37,30 +40,48 @@ export default function Create_bot() {
     const [code, set_code] = useState("")
     const [new_bot, set_new_bot] = useState(username)
     const [bots, set_bots] = useState([])
-    const [selected_bot, set_selected_bot] = useState({bot_name: username})
+    const [selected_bot, set_selected_bot] = useState({ bot_name: username })
     const [src, set_src] = useState(demo_video)
     const [is_VD_check, set_is_VD_check] = useState(true)
     const [is_DB_check, set_is_DB_check] = useState(true)
     const [is_open_add_bot, set_is_open_add_bot] = useState(false)
     const [is_open_remove_bot, set_is_open_remove_bot] = useState(false)
-    const [is_require_login, set_is_require_login ] = useState(false)
+    const [is_require_login, set_is_require_login] = useState(false)
     const [is_loading_videp, set_is_loading_video] = useState(false)
 
+    const { state } = useLocation()
+
+    const [searchParams] = useSearchParams();
+    let title = searchParams.get("title")
+    let upload_time = searchParams.get("upload_time")
+    const [game_info, set_game_info] = useState(state)
+
     useEffect(() => {
-        if(username) {
-            fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_user_bot/" + user.username)
+        if(title && upload_time) {
+            fetch(`http://192.168.1.249:8080/get_gamemode_by_post?title=${title}&upload_time=${upload_time}`)
             .then(res => res.json())
             .then(data => {
-                // console.log(data)
-                if (data[0]) {
-                    // console.log(!selected_bot)
-                    if(code.length < 5 || !selected_bot) {
-                        set_code(data[0].code)
-                        set_selected_bot(data[0])
-                    }
-                    set_bots(data)
-                } else {
-                    set_code(`# NOTE: tool
+                set_game_info(data)
+            })
+            .catch(err => console.log(err))
+        }
+    }, [])
+
+    useEffect(() => {
+        if (username) {
+            fetch(`http://192.168.1.249:8080/get_user_bot?username=${user.username}&gamemode=${game_info ? game_info.gamemode : "normal"}`)
+                .then(res => res.json())
+                .then(data => {
+                    // console.log(data)
+                    if (data[0]) {
+                        // console.log(!selected_bot)
+                        if (code.length < 5 || !selected_bot) {
+                            set_code(data[0].code)
+                            set_selected_bot(data[0])
+                        }
+                        set_bots(data)
+                    } else {
+                        set_code(`# NOTE: tool
 # valid_move(x, y, board): trả về các nước đi hợp lệ của một quân cờ - ((x, y), ...)
 # distance(x1, y1, x2, y2): trả về số nước đi ít nhất từ (x1, y1) đến (x2, y2) - n
 
@@ -77,11 +98,11 @@ def main(player):
         for mx,my in move:
             if 0 <= x+mx <= 4 and 0 <= y+my <= 4 and player.board[y+my][x+mx] == 0:
                 return {"selected_pos": (x,y), "new_pos": (x+mx, y+my)}`)
-                }
-            })
-            .catch(err => console.error(err))
+                    }
+                })
+                .catch(err => console.error(err))
         }
-    }, [username, new_bot])
+    }, [username, new_bot, game_info])
 
     useEffect(() => {
         const $ = document.querySelector.bind(document)
@@ -166,7 +187,7 @@ def main(player):
             `
     </div>
     <div class="loser">
-        <div class="loser_avatar"><img src="../../../public/img/bot4.png" alt=""></div>
+        <div class="loser_avatar ${state && "object-cover"}"><img src="../../../public/img/bot4.png" alt=""></div>
         <div class="loser_info">
             <div class="loser_title">DEFEATED</div>
             <div class="loser_info_name">{loser_name}</div>
@@ -178,11 +199,26 @@ def main(player):
 
         // const CB_bot_item = $$(".CB_bot_item")
         let choosen_bot
+
+        let gamemode_bot = {}
+
+        if(game_info) {
+            game_info.bots.forEach(bot => {
+                gamemode_bot[bot.name] = bot.code
+                gamemode_bot[bot.name + "_avatar"] = bot.avatar
+            })
+            console.log(gamemode_bot)
+        }
+
+
         var request_data = {
             code: "",
             bot: "",
             username: user.username,
-            your_bot_name: selected_bot?.bot_name || user.username
+            your_bot_name: selected_bot?.bot_name || user.username,
+            bot_id: selected_bot.id,
+            gamemode: game_info ? game_info.title : "normal",
+            break_rule: game_info ? JSON.parse(game_info.break_rule).code : ""
         }
 
         const CB_bot_items = $$(".CB_bot_item")
@@ -200,7 +236,7 @@ def main(player):
                 CB_bot_items.forEach(e => e.classList.remove("CB_selected"))
                 choosen_bot = item.dataset.level
                 item.classList.add("CB_selected")
-                request_data.bot = choosen_bot
+                request_data.bot = game_info ? gamemode_bot[choosen_bot] : choosen_bot
                 bot_html = item
                 runBtn.classList.add("CB_active")
             }
@@ -216,30 +252,16 @@ def main(player):
         let rate = []
 
         var audio = $(".CB_bot_display-video--result");
-        console.log(audio)
         audio.volume = 0.1;
 
-        // var editor = ace.edit("CB_coding_module-coding_block");
-
-        // editor.setOptions({
-        //     mode: "ace/mode/python",
-        //     selectionStyle: "text",
-        //     theme: "ace/theme/dracula",
-        //     autoScrollEditorIntoView: true,
-        //     enableBasicAutocompletion: true,
-        //     enableLiveAutocompletion: true,
-        // });
-
         saveBtn.onclick = () => {
-            console.log(username)
-            if(!username) {
+            if (!username) {
                 set_is_require_login(true)
                 return
             }
             saveBtn.dataset.saved = "true"
-            console.log({sername: user.username,
-                bot_name: request_data.your_bot_name})
-            fetch("https://coganh-cloud-tixakavkna-as.a.run.app/save_bot", {
+
+            fetch("http://192.168.1.249:8080/save_bot", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -247,7 +269,8 @@ def main(player):
                 body: JSON.stringify({
                     code: code.replaceAll('\r', ''),
                     username: user.username,
-                    bot_name: request_data.your_bot_name
+                    bot_name: request_data.your_bot_name,
+                    bot_id: request_data.bot_id
                 }),
             })
                 .then(res => res.json())
@@ -261,17 +284,18 @@ def main(player):
         }
 
         runBtn.onclick = () => {
-            if(!username) {
+            if (!username) {
                 set_is_require_login(true)
                 return
             }
             if (!choosen_bot) return
-            console.log(choosen_bot)
             rate = []
             run()
         }
 
         function run() {
+            // return
+
             if (!isEnableDebug.checked && !isEnableVideo.checked) {
                 return
             }
@@ -306,8 +330,8 @@ def main(player):
                 loadingNavVideoCI.style.display = "none"
                 loadingNavVideoFI.style.display = "none"
             }
-
-            fetch("https://coganh-cloud-tixakavkna-as.a.run.app/debug_bot", {
+            
+            fetch("http://192.168.1.249:8080/debug_bot", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -378,7 +402,7 @@ def main(player):
             video.style.display = "none"
             loadingNavVideoLD.style.display = "block"
             loadingNavVideoCI.style.display = "none"
-            fetch("https://coganh-cloud-tixakavkna-as.a.run.app/run_bot", {
+            fetch("http://192.168.1.249:8080/run_bot", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -398,7 +422,6 @@ def main(player):
             `
                         terminal.innerHTML += `${a}`
                     } else {
-                        console.log(a)
                         terminal.innerHTML += `${a}`
                     }
                 })
@@ -428,14 +451,12 @@ def main(player):
         }
 
         function change_rate(i) {
-            console.log(rate)
             if (i < 0) {
                 rate_selected_pos.innerHTML = "(x1,y2)"
                 rate_new_pos.innerHTML = "(x2,y2)"
                 rate_level.innerHTML = "đánh giá"
                 rate_level.classList.remove("excellent", "bad", "good")
                 rate_level.classList.add("normal")
-                console.log("I: ", i)
                 return
             }
 
@@ -464,9 +485,6 @@ def main(player):
                 item.style.display = "none"
             })
             bot.querySelector(type).style.display = "flex"
-            // fight_result_item.forEach(item => {
-            //     item.style.display = "none"
-            // })
         }
 
         const utility_nav_block = $(".utility_nav-block")
@@ -488,7 +506,6 @@ def main(player):
                     currentUtiMode = mode
                     if (gameResult) {
                         uniBlock.forEach(ele => ele.style.display = "none")
-                        console.log(gameResult)
                         const { max_move_win, status } = gameResult
                         if (status === "win") {
                             toggle_bot_result(bot_html, ".fight_result_win")
@@ -509,7 +526,7 @@ def main(player):
                     ${win_loose_items[1].replace("{loser_name}", choosen_bot).replace("DEFEATED", "DRAW")}
                     `
                         }
-                        $(".loser_avatar img").src = bots_list[(choosen_bot === selected_bot.bot_name ? "your_bot" : choosen_bot)]
+                        $(".loser_avatar img").src = game_info ? gamemode_bot[choosen_bot+"_avatar"] : bots_list[(choosen_bot === selected_bot.bot_name ? "your_bot" : choosen_bot)]
                         const moveCount = $(".info_move-count")
                         moveCount.innerHTML = `moves: ${max_move_win}`
                         result.style.display = "flex"
@@ -566,7 +583,7 @@ def main(player):
         }
 
         debugtBtn.onclick = (e) => {
-            changeAnimation(debugtBtn, animation.clientWidth - (videoBtn.clientWidth * 3) - 3 + "px", e.target.clientWidth + "px", "debug", bDAnimationChild)
+            changeAnimation(debugtBtn, animation.clientWidth - (videoBtn.clientWidth * 3) - 15 + "px", e.target.clientWidth + "px", "debug", bDAnimationChild)
         }
 
         helpBtn.onclick = (e) => {
@@ -650,9 +667,9 @@ def main(player):
 
     return (
         <div className="h-screen bg-[#111c2c] text-white">
-            { is_require_login && <Login_require set_is_require_login={set_is_require_login}/>}
-            { is_open_add_bot &&  <Add_bot set_new_bot={set_new_bot} set_is_open_add_bot={set_is_open_add_bot} set_code={set_code} set_selected_bot={set_selected_bot}/>}
-            { is_open_remove_bot && <Remove_bot set_selected_bot={set_selected_bot} set_new_bot={set_new_bot} selected_bot={selected_bot} set_is_open_remove_bot={set_is_open_remove_bot}/>}
+            {is_require_login && <Login_require set_is_require_login={set_is_require_login} />}
+            {is_open_add_bot && <Add_bot set_new_bot={set_new_bot} set_is_open_add_bot={set_is_open_add_bot} set_code={set_code} set_selected_bot={set_selected_bot} gamemode={game_info ? game_info.gamemode : "normal"}/>}
+            {is_open_remove_bot && <Remove_bot set_selected_bot={set_selected_bot} set_new_bot={set_new_bot} selected_bot={selected_bot} set_is_open_remove_bot={set_is_open_remove_bot} />}
             <div
                 className="cover"
                 style={{
@@ -669,29 +686,31 @@ def main(player):
             <div className="guide" />
             <div className="CB_container md:max-w-full h-screen">
                 <div className="CB_container_element CB_bot_display bg-[#262626]">
-                    <div className="CB_bot_display_nav">
+                    <div className="CB_bot_display_nav flex">
                         <div className="CB_bot_display_nav-block">
                             <div className="CB_bot_display_nav-block--item video">
                                 VIDEO
-                                <div className="loading_nav_video">
+                                <div className="loading_nav_video pointer-events-none">
                                     <div className="loader" />
                                     <i className="fa-solid fa-circle-check check_icon" />
                                     <i className="fa-solid fa-circle-xmark fail_icon" />
                                 </div>
                             </div>
-                            <div className="CB_bot_display_nav-block--item debug">
+                            <div hidden={game_info} className="CB_bot_display_nav-block--item debug">
                                 DEBUG
-                                <div className="loading_nav_image">
+                                <div className="loading_nav_image pointer-events-none">
                                     <div className="loader" />
                                     <i className="fa-solid fa-circle-check check_icon" />
                                     <i className="fa-solid fa-circle-xmark fail_icon" />
                                 </div>
                             </div>
                             <div className="CB_bot_display_nav-block--item help">HELP</div>
+
                             <div className="animation">
                                 <div className="children" />
                             </div>
                         </div>
+                        <div onClick={() => history("/gamemode", {state: {mode: "create_bot"}})} className="text-lg ml-auto mr-1 mt-1 px-2 bg-blue-600 rounded-sm pointing_event_br-90">GAMEMODE</div>
                     </div>
                     <div className="CB_bot_display-video--background">
                         <video
@@ -716,7 +735,6 @@ def main(player):
                                 <i className="fa-solid fa-angle-up arrow_left" />
                                 <i className="fa-solid fa-angle-down arrow_right" />
                             </div>
-                            {/* <i className="fa-solid fa-angle-left arrow_left"></i> */}
                             <div className="debug_img_main">
                                 <ul className="p-0 debug_img_list m-0">
                                     <li className="debug_img_item default">
@@ -725,7 +743,6 @@ def main(player):
                                 </ul>
                                 <div className="counter">0</div>
                             </div>
-                            {/* <i className="fa-solid fa-angle-right arrow_right"></i> */}
                             <div className="debug_info">
                                 <div className="debug_info-state">
                                     <div className="debug_info-selected_pos">(x1,y1)</div>
@@ -795,22 +812,22 @@ def main(player):
                             <div className="help_title">Mô phỏng thuật toán</div>
                             <ul className="p-0 help_list">
                                 <li className="help_item help_blog">
-                                    <a onClick={() => history("/visualize/"+"SctXzAxW6TtcMSPwPm1N", { state: "SctXzAxW6TtcMSPwPm1N" })}>
+                                    <a onClick={() => history("/visualize/" + "SctXzAxW6TtcMSPwPm1N", { state: "SctXzAxW6TtcMSPwPm1N" })}>
                                         minimax
                                     </a>
                                 </li>
                                 <li className="help_item help_blog">
-                                    <a onClick={() => history("/visualize/"+"aLzIcTxFR2EfRXVFov07", { state: "aLzIcTxFR2EfRXVFov07" })}>
+                                    <a onClick={() => history("/visualize/" + "aLzIcTxFR2EfRXVFov07", { state: "aLzIcTxFR2EfRXVFov07" })}>
                                         Kiểm tra nước đi
                                     </a>
                                 </li>
                                 <li className="help_item help_blog">
-                                    <a onClick={() => history("/visualize/"+"OYRJNv4Jqez9dKZjLW27", { state: "OYRJNv4Jqez9dKZjLW27" })}>
+                                    <a onClick={() => history("/visualize/" + "OYRJNv4Jqez9dKZjLW27", { state: "OYRJNv4Jqez9dKZjLW27" })}>
                                         Kiểm tra gánh chẹt
                                     </a>
                                 </li>
                                 <li className="help_item help_blog">
-                                    <a onClick={() => history("/visualize/"+"1OyReHWrH3zgV5IfcZPk", { state: "1OyReHWrH3zgV5IfcZPk" })}>
+                                    <a onClick={() => history("/visualize/" + "1OyReHWrH3zgV5IfcZPk", { state: "1OyReHWrH3zgV5IfcZPk" })}>
                                         Kiểm tra vây
                                     </a>
                                 </li>
@@ -819,9 +836,9 @@ def main(player):
                         </div>
                     </div>
                     <div className="utility">
-                        <div className="utility_nav">
+                        <div className="utility_nav mb-2">
                             <div className="utility_nav-block">
-                                <div className="utility_nav-block--item rule">RULE</div>
+                                <div className="utility_nav-block--item rule">GUIDE</div>
                                 <div className="utility_nav-block--item terminal">TERMINAL</div>
                                 <div className="utility_nav-block--item result">RESULT</div>
                                 <div className="animation">
@@ -830,41 +847,54 @@ def main(player):
                             </div>
                         </div>
                         <div className="utility_block">
-                            <div className="utility_block-element rule">
-                                <div className="input">
-                                    <div className="text-2xl text-gray-300 mb-4 mt-1">input</div>
-                                    <div className="p-0">
-                                        Player.your_pos: vị trí tất cả quân cờ của bản thân (x, y){" "}
-                                        <br />
-                                        Player.opp_pos: vị trí tất cả quân cờ của đối thủ (x, y) <br />
-                                        Player.your_side: màu cờ của bản thân (-1:🔴 / 1:🔵) <br />
-                                        Player.board: bàn cờ (-1:🔴 / 1:🔵 / 0:∅) <br />
-                                        <br />
-                                        -điều kiện:
-                                        <br />
-                                        0 ≤ x, y ≤ 4 <br />
-                                        Player.your_side in (-1, 1) <br />
-                                        {"{"}j for i in Player.board for j in i{"}"} == {"{"}0, 1, -1
-                                        {"}"}
-                                    </div>
-                                </div>
-                                <div className="output">
-                                    <div className="text-2xl text-gray-300 mb-4 mt-1">output</div>
-                                    <div className="p-0">
-                                        selected_pos: vị trí của quân cờ được chọn new_pos: vị trí sau
-                                        khi di chuyển của quân cờ đó
-                                    </div>
-                                </div>
+                            <div className="utility_block-element rule flex-col min-h-full">
+                                {!game_info ? 
+                                    <>
+                                    <p className="text-xl mb-1 font-bold">Hàm thực thi chính của chương trình:</p>
+                                    {/* <img className="h-20" src={simple_model_code}/> */}
+                                    <pre className="text-white px-5 rounded bg-[#282A36] place-content-start">
+                                {`def main(player):
+...
+return {"selected_pos": (x,y), "new_pos": (new_x, new_y)`}
+                                    </pre>
+                                    <p className="text-xl mb-1 font-bold">Input → <span className="text-green-400">class</span> player</p>
+                                    <img className="w-72" src="https://jungle-laborer-6ce.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F86ffeb84-ebf4-4fb1-8814-4568f2f4d905%2F37392cac-b0d3-4752-a6f7-937dee5bbdbc%2FUntitled.png?table=block&id=0c0dbd6e-46e7-4857-bad5-b4de0a5fa904&spaceId=86ffeb84-ebf4-4fb1-8814-4568f2f4d905&width=670&userId=&cache=v2" />
+                                    <br />
+                                    <blockquote>●       player.your_pos: vị trí tất cả quân cờ của bản thân [(x, y), . . .]</blockquote>
+                                    <blockquote>●       player.opp_pos: vị trí tất cả quân cờ của đối thủ [(x, y), . . .]</blockquote>
+                                    <blockquote>●       player.your_side: màu quân cờ của bản thân (1:🔵)</blockquote>
+                                    <blockquote>●       player.board: bàn cờ (-1:🔴 / 1:🔵 / 0:∅)</blockquote>
+                                    <br />
+                                    <p className="text-xl mb-1 font-bold">Ràng buộc</p>
+                                    <blockquote>●       0 ≤ x, y ≤ 4</blockquote>
+                                    <blockquote>●       player.your_side = 1</blockquote>
+                                    <blockquote>●       {`{j for i in player.board for j in i} = {0, 1, -1}`}</blockquote>
+                                    <br />
+                                    <p className="text-xl mb-1 font-bold">Khởi đầu ván đấu:</p>
+                                    <pre className="text-white flex px-5 rounded bg-[#282A36] place-content-start">
+                                    {`player.your_pos = [(0,2), (0,3), (4,3), (0,4), (1,4), (2,4), (3,4), (4,4)] 
+player.opp_pos = [(0,0), (1,0), (2,0), (3,0), (4,0), (0,1), (4,1), (4,2)]
+player.your_side = 1
+player.board [[-1,-1,-1,-1,-1],
+                [-1, 0, 0, 0,-1],
+                [ 1, 0, 0, 0,-1],
+                [ 1, 0, 0, 0, 1],
+                [ 1, 1, 1, 1, 1]]`}
+                                    </pre>
+                                    <br />
+                                    <p className="text-xl mb-1 font-bold">Output → <span className="text-green-400">dictionary</span></p>
+                                    <blockquote>●       selected_pos: vị trí của quân cờ được chọn → tuple(x, y)</blockquote>
+                                    <blockquote>●       new_pos: vị trí sau khi di chuyển của quân cờ đó → tuple(x, y)</blockquote>
+                                    <blockquote>Ví dụ: <span className="bg-yellow-900 px-2">{`{"selected_pos": (1, 0), "new_pos": (1, 1)}`}</span></blockquote>
+                                    </>
+
+                                :
+                                <Gamemode_item gamemode={game_info}/>
+                                }
                             </div>
                             <div className="utility_block-element terminal">&gt;&gt;&gt; </div>
                             <div className="utility_block-element result">
                                 <div className="mode_solo">
-                                    {/* <div className="status">Winner</div>
-                      <div className="info">
-                          <div className="info_move-count">moves: 100</div>
-                          <div className="player">you: <hr> <div style="width: 40px; height: 40px; border-radius: 50%; background-color: blue;"></div></div>
-                          <div className="enemy">bot: <hr> <div style="width: 40px; height: 40px; border-radius: 50%; background-color: red;"></div></div>
-                      </div> */}
                                     <div className="win_loose_block">
                                         <div className="winer">
                                             <div className="winer_avatar">T</div>
@@ -876,7 +906,7 @@ def main(player):
                                         </div>
                                         <div className="loser">
                                             <div className="loser_avatar">
-                                                <img src="../../../public/img/level4.png" alt="" />
+                                                <img className={`${game_info && "object-cover"}`} src="../../../public/img/level4.png" alt="" />
                                             </div>
                                             <div className="loser_info">
                                                 <div className="loser_title">DEFEATED</div>
@@ -896,27 +926,7 @@ def main(player):
                         <a onClick={() => history("/menu")} className="CB_coding_module-nav--backBtn">
                             <i className="fa-solid fa-arrow-right-from-bracket" />
                         </a>
-                        <div className="debug_mode_selector">
-                            <div>Debug turn</div>
-                            <select className="selector">
-                                {/* <option value="default" className="option">default</option> */}
-                                <option value={2} className="option">
-                                    2
-                                </option>
-                                <option value={4} className="option">
-                                    4
-                                </option>
-                                <option value={6} className="option">
-                                    6
-                                </option>
-                                <option value={8} className="option">
-                                    8
-                                </option>
-                                <option value={10} className="option">
-                                    10
-                                </option>
-                            </select>
-                        </div>
+                        {/*  */}
                         <div className="CB_coding_module-nav--saveBtn CB_active" data-saved="false">
                             Save
                         </div>
@@ -927,22 +937,44 @@ def main(player):
                             <div className="CB_coding_module-nav--loading" />
                         </div>
                         <div className="CB_coding_module-nav--CB_runBtn cb_btn">Run</div>
-                        <div className="CB_coding_module-nav--setting">
+                        {console.log(game_info)}
+                        <div hidden={Boolean(game_info)} className="CB_coding_module-nav--setting">
                             <label htmlFor="check">
                                 <i className="fa-solid fa-gear setting_icon" />
                             </label>
                             <input type="checkbox" name="check" id="check" hidden />
-                            <ul className="p-0 setting_list">
+                            <ul className="p-0 CB_setting_list flex-col items-center justify-center">
                                 <label htmlFor="debug" className="setting_item">
                                     Enable debug
                                     <input
                                         type="checkbox"
                                         name="debug"
                                         id="debug"
-                                        checked={is_DB_check}
+                                        checked={is_DB_check && !game_info}
                                         onChange={() => set_is_DB_check(!is_DB_check)}
                                     />
                                 </label>
+                                <div className="debug_mode_selector">
+                                    <div className="text-sm mr-2">Debug turn</div>
+                                    <select className="selector bg-slate-700">
+                                        {/* <option value="default" className="option">default</option> */}
+                                        <option value={2} className="option">
+                                            2
+                                        </option>
+                                        <option value={4} className="option">
+                                            4
+                                        </option>
+                                        <option value={6} className="option">
+                                            6
+                                        </option>
+                                        <option value={8} className="option">
+                                            8
+                                        </option>
+                                        <option value={10} className="option">
+                                            10
+                                        </option>
+                                    </select>
+                                </div>
                                 <label htmlFor="video" className="setting_item">
                                     Enable video
                                     <input
@@ -964,17 +996,17 @@ def main(player):
                             display: "flex",
                             flexDirection: "column"
                         }}
-                    >   
+                    >
                         <div className="bg-[#282A36] p-0 m-0 flex px-2 py-[2px]">
                             <span className="mr-1">bot:</span>
-                            <select onChange={(e) => select_bot(e.target.value, bots.find(bot => bot.bot_name === e.target.value))} value={selected_bot ? selected_bot.bot_name: "Null"} className="your_bot_list bg-[#1d1e28]">
-                                {bots[0] && bots.map((bot, i) => 
+                            <select onChange={(e) => select_bot(e.target.value, bots.find(bot => bot.bot_name === e.target.value))} value={selected_bot ? selected_bot.bot_name : "Null"} className="your_bot_list bg-[#1d1e28]">
+                                {bots[0] && bots.map((bot, i) =>
                                     <option key={i} value={bot.bot_name} data-code={bot.code} className={`your_bot_item ${i === 0 ? "bg-gray-700" : "bg-gray-800"} px-2 rounded-sm relative ml-1 select-none hover:bg-gray-700 cursor-pointer`}>
                                         {bot.bot_name}
                                     </option>
                                 )}
                             </select>
-                            {user.username ? 
+                            {user.username ?
                                 <>
                                     <div onClick={() => set_is_open_add_bot(!is_open_add_bot)} className="add_bot bg-gray-700 ml-2 text-sm px-1 rounded-sm cursor-pointer hover:brightness-90">
                                         Add bot
@@ -983,7 +1015,7 @@ def main(player):
                                         remove bot
                                     </div>
                                 </>
-                            :
+                                :
                                 <div className=" bg-gray-700 ml-2 text-sm px-1 rounded-sm cursor-pointer hover:brightness-90">
                                     Bạn phải đăng nhập để sử dụng chức năng này
                                 </div>
@@ -1012,167 +1044,185 @@ def main(player):
                             <div className="left">⮜</div>
                             <div className="right">⮞</div>
                         </div>
-                        {/* <div className="guide_box">
-              <div className="guide_box--content">hellohellohellohellellohellohellohelloellohellohellohellohellohellohelloello</div>
-              <div className="guide_box--arrow"></div>
-          </div> */}
                         <div className="CB_coding_module-bot_list">
                             <div className="choose_bot_module">
                                 <div className="choose_bot_module-title">BOT</div>
                                 <div className="CB_bot_list">
-                                    <div data-level="level1" className="CB_bot_item level1">
-                                        <img className="max-w-12" src={level1} alt="" />
-                                        <div className="CB_bot_item_title level1">level 1</div>
-                                        <div className="fight_result">
-                                            <div className="fight_result_item fight_result_draw">
-                                                <i className="fa-solid fa-handshake-simple" />
-                                            </div>
-                                            <div className="fight_result_item fight_result_loader">
-                                                <div className="fight_result_loading" />
-                                            </div>
-                                            <div className="fight_result_item fight_result_win" />
-                                            <div className="fight_result_item fight_result_lost">
-                                                <i className="fa-solid fa-skull" />
-                                            </div>
-                                        </div>
-                                        <div className="CB_bot_item_info">
-                                            <div className="introduce">
-                                                Robot của vị tướng lĩnh này sẽ luôn luôn nhả quân cho bạn.
-                                            </div>
-                                            <div className="hint">
-                                                <p style={{ color: "red" }}>
-                                                    <i className="fa-solid fa-angles-down" />
-                                                    lời khuyên
-                                                    <i className="fa-solid fa-angles-down" />
-                                                </p>{" "}
-                                                Có vẻ robot của bạn cần học cách gánh/ chẹt
+                                    {game_info ? game_info.bots.map(bot => 
+                                        <div data-level={bot.name} className="CB_bot_item level1 overflow-hidden">
+                                            <img className="w-full object-cover" src={bot.avatar} alt="" />
+                                            <div className="CB_bot_item_title level1">{bot.name}</div>
+                                            <div className="fight_result">
+                                                <div className="fight_result_item fight_result_draw">
+                                                    <i className="fa-solid fa-handshake-simple" />
+                                                </div>
+                                                <div className="fight_result_item fight_result_loader">
+                                                    <div className="fight_result_loading" />
+                                                </div>
+                                                <div className="fight_result_item fight_result_win" />
+                                                <div className="fight_result_item fight_result_lost">
+                                                    <i className="fa-solid fa-skull" />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div data-level="level2" className="CB_bot_item level2">
-                                        <img className="max-w-12" src={level2} alt="" />
-                                        <div className="CB_bot_item_title level2">level 2</div>
-                                        <div className="fight_result">
-                                            <div className="fight_result_item fight_result_draw">
-                                                <i className="fa-solid fa-handshake-simple" />
+                                    )
+                                    :
+                                    <>
+                                        <div data-level="level1" className="CB_bot_item level1">
+                                            <img className="max-w-12" src={level1} alt="" />
+                                            <div className="CB_bot_item_title level1">level 1</div>
+                                            <div className="fight_result">
+                                                <div className="fight_result_item fight_result_draw">
+                                                    <i className="fa-solid fa-handshake-simple" />
+                                                </div>
+                                                <div className="fight_result_item fight_result_loader">
+                                                    <div className="fight_result_loading" />
+                                                </div>
+                                                <div className="fight_result_item fight_result_win" />
+                                                <div className="fight_result_item fight_result_lost">
+                                                    <i className="fa-solid fa-skull" />
+                                                </div>
                                             </div>
-                                            <div className="fight_result_item fight_result_loader">
-                                                <div className="fight_result_loading" />
-                                            </div>
-                                            <div className="fight_result_item fight_result_win" />
-                                            <div className="fight_result_item fight_result_lost">
-                                                <i className="fa-solid fa-skull" />
-                                            </div>
-                                        </div>
-                                        <div className="CB_bot_item_info">
-                                            <div className="introduce">
-                                                Robot của vị tướng lĩnh này sẽ luôn tiến quân vào những vị
-                                                trí chiến lược.
-                                            </div>
-                                            <div className="hint">
-                                                <p style={{ color: "red" }}>
-                                                    <i className="fa-solid fa-angles-down" />
-                                                    lời khuyên
-                                                    <i className="fa-solid fa-angles-down" />
-                                                </p>
-                                                Robot của bạn cần một chiến thuật vây bắt hợp lý hơn.
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div data-level="level3" className="CB_bot_item level3">
-                                        <img className="max-w-12" src={level3} alt="" />
-                                        <div className="CB_bot_item_title level3">level 3</div>
-                                        <div className="fight_result">
-                                            <div className="fight_result_item fight_result_draw">
-                                                <i className="fa-solid fa-handshake-simple" />
-                                            </div>
-                                            <div className="fight_result_item fight_result_loader">
-                                                <div className="fight_result_loading" />
-                                            </div>
-                                            <div className="fight_result_item fight_result_win" />
-                                            <div className="fight_result_item fight_result_lost">
-                                                <i className="fa-solid fa-skull" />
+                                            <div className="CB_bot_item_info">
+                                                <div className="introduce">
+                                                    Robot của vị tướng lĩnh này sẽ luôn luôn nhả quân cho bạn.
+                                                </div>
+                                                <div className="hint">
+                                                    <p style={{ color: "red" }}>
+                                                        <i className="fa-solid fa-angles-down" />
+                                                        lời khuyên
+                                                        <i className="fa-solid fa-angles-down" />
+                                                    </p>{" "}
+                                                    Có vẻ robot của bạn cần học cách gánh/ chẹt
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="CB_bot_item_info">
-                                            <div className="introduce">
-                                                Robot của vị tướng lĩnh này luôn dồn quân tại đáy và sẽ tiêu
-                                                diệt những quân cờ lại gần.
+                                        <div data-level="level2" className="CB_bot_item level2">
+                                            <img className="max-w-12" src={level2} alt="" />
+                                            <div className="CB_bot_item_title level2">level 2</div>
+                                            <div className="fight_result">
+                                                <div className="fight_result_item fight_result_draw">
+                                                    <i className="fa-solid fa-handshake-simple" />
+                                                </div>
+                                                <div className="fight_result_item fight_result_loader">
+                                                    <div className="fight_result_loading" />
+                                                </div>
+                                                <div className="fight_result_item fight_result_win" />
+                                                <div className="fight_result_item fight_result_lost">
+                                                    <i className="fa-solid fa-skull" />
+                                                </div>
                                             </div>
-                                            <div className="hint">
-                                                <p style={{ color: "red" }}>
-                                                    <i className="fa-solid fa-angles-down" />
-                                                    lời khuyên
-                                                    <i className="fa-solid fa-angles-down" />
-                                                </p>
-                                                Đừng quên việc phòng thủ khi vây quân.
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div data-level="level3" className="CB_bot_item level3">
-                                        <img className="max-w-12" src={level4} alt="" />
-                                        <div className="CB_bot_item_title level3">level 4</div>
-                                        <div className="fight_result">
-                                            <div className="fight_result_item fight_result_draw">
-                                                <i className="fa-solid fa-handshake-simple" />
-                                            </div>
-                                            <div className="fight_result_item fight_result_loader">
-                                                <div className="fight_result_loading" />
-                                            </div>
-                                            <div className="fight_result_item fight_result_win" />
-                                            <div className="fight_result_item fight_result_lost">
-                                                <i className="fa-solid fa-skull" />
-                                            </div>
-                                        </div>
-                                        <div className="CB_bot_item_info">
-                                            <div className="introduce">
-                                                Robot của người lãnh đạo này sẽ ăn quân ngay khi có cơ hội.
-                                            </div>
-                                            <div className="hint">
-                                                <p style={{ color: "red" }}>
-                                                    <i className="fa-solid fa-angles-down" />
-                                                    lời khuyên
-                                                    <i className="fa-solid fa-angles-down" />
-                                                </p>
-                                                Robot của bạn cần một thế cờ có tính chiến thuật hơn.
+                                            <div className="CB_bot_item_info">
+                                                <div className="introduce">
+                                                    Robot của vị tướng lĩnh này sẽ luôn tiến quân vào những vị
+                                                    trí chiến lược.
+                                                </div>
+                                                <div className="hint">
+                                                    <p style={{ color: "red" }}>
+                                                        <i className="fa-solid fa-angles-down" />
+                                                        lời khuyên
+                                                        <i className="fa-solid fa-angles-down" />
+                                                    </p>
+                                                    Robot của bạn cần một chiến thuật vây bắt hợp lý hơn.
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div data-level="Master" className="CB_bot_item Master">
-                                        <img className="max-w-12" src={Master} alt="" />
-                                        <div className="CB_bot_item_title Master">MASTER</div>
-                                        <div className="fight_result">
-                                            <div className="fight_result_item fight_result_draw">
-                                                <i className="fa-solid fa-handshake-simple" />
+                                        <div data-level="level3" className="CB_bot_item level3">
+                                            <img className="max-w-12" src={level3} alt="" />
+                                            <div className="CB_bot_item_title level3">level 3</div>
+                                            <div className="fight_result">
+                                                <div className="fight_result_item fight_result_draw">
+                                                    <i className="fa-solid fa-handshake-simple" />
+                                                </div>
+                                                <div className="fight_result_item fight_result_loader">
+                                                    <div className="fight_result_loading" />
+                                                </div>
+                                                <div className="fight_result_item fight_result_win" />
+                                                <div className="fight_result_item fight_result_lost">
+                                                    <i className="fa-solid fa-skull" />
+                                                </div>
                                             </div>
-                                            <div className="fight_result_item fight_result_loader">
-                                                <div className="fight_result_loading" />
-                                            </div>
-                                            <div className="fight_result_item fight_result_win" />
-                                            <div className="fight_result_item fight_result_lost">
-                                                <i className="fa-solid fa-skull" />
+                                            <div className="CB_bot_item_info">
+                                                <div className="introduce">
+                                                    Robot của vị tướng lĩnh này luôn dồn quân tại đáy và sẽ tiêu
+                                                    diệt những quân cờ lại gần.
+                                                </div>
+                                                <div className="hint">
+                                                    <p style={{ color: "red" }}>
+                                                        <i className="fa-solid fa-angles-down" />
+                                                        lời khuyên
+                                                        <i className="fa-solid fa-angles-down" />
+                                                    </p>
+                                                    Đừng quên việc phòng thủ khi vây quân.
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="CB_bot_item_info" style={{ right: "-60%" }}>
-                                            <div className="introduce">
-                                                Robot của người này là bất bại.
+                                        <div data-level="level3" className="CB_bot_item level3">
+                                            <img className="max-w-12" src={level4} alt="" />
+                                            <div className="CB_bot_item_title level3">level 4</div>
+                                            <div className="fight_result">
+                                                <div className="fight_result_item fight_result_draw">
+                                                    <i className="fa-solid fa-handshake-simple" />
+                                                </div>
+                                                <div className="fight_result_item fight_result_loader">
+                                                    <div className="fight_result_loading" />
+                                                </div>
+                                                <div className="fight_result_item fight_result_win" />
+                                                <div className="fight_result_item fight_result_lost">
+                                                    <i className="fa-solid fa-skull" />
+                                                </div>
                                             </div>
-                                            <div className="hint">
-                                                <p style={{ color: "red" }}>
-                                                    <i className="fa-solid fa-angles-down" />
-                                                    lời khuyên
-                                                    <i className="fa-solid fa-angles-down" />
-                                                </p>
-                                                Cố lên 😏.
+                                            <div className="CB_bot_item_info">
+                                                <div className="introduce">
+                                                    Robot của người lãnh đạo này sẽ ăn quân ngay khi có cơ hội.
+                                                </div>
+                                                <div className="hint">
+                                                    <p style={{ color: "red" }}>
+                                                        <i className="fa-solid fa-angles-down" />
+                                                        lời khuyên
+                                                        <i className="fa-solid fa-angles-down" />
+                                                    </p>
+                                                    Robot của bạn cần một thế cờ có tính chiến thuật hơn.
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                        <div data-level="Master" className="CB_bot_item Master">
+                                            <img className="max-w-12" src={Master} alt="" />
+                                            <div className="CB_bot_item_title Master">MASTER</div>
+                                            <div className="fight_result">
+                                                <div className="fight_result_item fight_result_draw">
+                                                    <i className="fa-solid fa-handshake-simple" />
+                                                </div>
+                                                <div className="fight_result_item fight_result_loader">
+                                                    <div className="fight_result_loading" />
+                                                </div>
+                                                <div className="fight_result_item fight_result_win" />
+                                                <div className="fight_result_item fight_result_lost">
+                                                    <i className="fa-solid fa-skull" />
+                                                </div>
+                                            </div>
+                                            <div className="CB_bot_item_info" style={{ right: "-60%" }}>
+                                                <div className="introduce">
+                                                    Robot của người này là bất bại.
+                                                </div>
+                                                <div className="hint">
+                                                    <p style={{ color: "red" }}>
+                                                        <i className="fa-solid fa-angles-down" />
+                                                        lời khuyên
+                                                        <i className="fa-solid fa-angles-down" />
+                                                    </p>
+                                                    Cố lên 😏.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                    }
                                     <div
                                         data-level={selected_bot?.bot_name || user.username}
                                         className={`CB_bot_item ${selected_bot?.bot_name || user.username}`}
                                     >
                                         <img className="max-w-12" src={your_bot} alt="" />
-                                        <div className="CB_bot_item_title Master">
+                                        <div className="CB_bot_item_title Master max-w-[60px] three_dot">
                                             {selected_bot?.bot_name || user.username}
                                         </div>
                                         <div className="fight_result">
@@ -1207,11 +1257,6 @@ def main(player):
                     </div>
                 </div>
             </div>
-            {/* <div className="username" hidden="">
-                {"{"}
-                {"{"}user.username{"}"}
-                {"}"}
-            </div> */}
         </div>
 
     )

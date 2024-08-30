@@ -70,7 +70,7 @@ export default function User_training({tasks, raw_tasks, your_tasks, is_owner, s
     }
     let is_delete = window.confirm("bạn có chắc muốn xóa")
     if (is_delete) {
-      fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/delete_task/${id}`)
+      fetch(`http://192.168.1.249:8080/delete_task/${id}`)
         .then(res => res.json())
         .then(data => {
           set_is_reset_task(Math.random())
@@ -80,7 +80,7 @@ export default function User_training({tasks, raw_tasks, your_tasks, is_owner, s
   }
 
   useEffect(() => {
-    fetch(`https://coganh-cloud-tixakavkna-as.a.run.app/get_unpublic_user_tasks?username=${user.username}&page=${UPT_chunk_index}&size=9`)
+    fetch(`http://192.168.1.249:8080/get_unpublic_user_tasks?username=${user.username}&page=${UPT_chunk_index}&size=9`)
     .then(res => res.json())
     .then(data => {
       set_un_public_tasks(data)

@@ -7,7 +7,7 @@ import sword_img from "../../../static/img/sword.png"
 import Login_require from '../../modal/requirements/login_require'
 
 export default function Bot_Bot() {
-  const { user, history } = useContext(AppContext)
+  const { user, history, theme } = useContext(AppContext)
 
   const [rank_board, set_rank_board] = useState([])
   const [bots, set_enemy_bots] = useState([])
@@ -18,7 +18,7 @@ export default function Bot_Bot() {
   const [is_require_login, set_is_require_login] = useState(false)
 
   useEffect(() => {
-    fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_rank_board", {
+    fetch("http://192.168.1.249:8080/get_rank_board", {
       method: "GET",
     })
       .then(res => res.json())
@@ -31,7 +31,7 @@ export default function Bot_Bot() {
 
   useEffect(() => {
     if (user.username) {
-      fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_user_bots", {
+      fetch("http://192.168.1.249:8080/get_user_bots", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -63,7 +63,7 @@ export default function Bot_Bot() {
     let newValue = 0
 
     function resetSuggestion() {
-      fetch("https://coganh-cloud-tixakavkna-as.a.run.app/get_user_bots", {
+      fetch("http://192.168.1.249:8080/get_user_bots", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -130,7 +130,7 @@ export default function Bot_Bot() {
             fightBtn.innerHTML = "thách đấu"
             Array.from(players).forEach(p => p.style.backgroundColor = "")
             Array.from(warriors).forEach(p => p.style.backgroundColor = "")
-            player.style.backgroundColor = "#232E3B"
+            player.style.backgroundColor = theme === "dark" ? "#232E3B" : "#2997ff"
             set_selectedPlayer({
               enemy_bot: player.dataset.bot_name,
               enemy: player.dataset.owner,
@@ -180,7 +180,6 @@ export default function Bot_Bot() {
     const err_screen = $(".fight_screen-err")
     const info = $(".info")
     const info_status = $(".info_status")
-    const info_elo_fluc_new = $(".info_elo-fluc--new")
 
     const userElo = $(".BB_user-elo")
 
@@ -192,7 +191,7 @@ export default function Bot_Bot() {
       const eElo = parseInt(enemyElo.innerHTML)
       const rankBoard = $(".rank_board_list")
 
-      fetch("https://coganh-cloud-tixakavkna-as.a.run.app/update_rank_board", {
+      fetch("http://192.168.1.249:8080/update_rank_board", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -239,7 +238,7 @@ export default function Bot_Bot() {
 
     fightBtn.onclick = () => {
       if (!selectedPlayer || fightBtnStatus.onLoading) return;
-      if(!user.username) {
+      if (!user.username) {
         set_is_require_login(true)
         return
       }
@@ -252,7 +251,7 @@ export default function Bot_Bot() {
         minute: 'numeric',
         second: 'numeric',
       }
-  
+
       let formatter = new Intl.DateTimeFormat([], options);
       let stt = {}
       info.style.display = "none"
@@ -262,18 +261,18 @@ export default function Bot_Bot() {
       loading.style.display = "block";
       $(".info_elo-fluc--pre").innerHTML = userElo.innerHTML
       newPoint.innerHTML = ""
-      user_bot.style.backgroundColor = "#121212"
-      enemy.style.backgroundColor = "#121212"
+      user_bot.style.backgroundColor = theme === "dark" ? "#121212" : "#ccc"
+      enemy.style.backgroundColor = theme === "dark" ? "#121212" : "#ccc"
 
       fightBtn.innerHTML = `<div class="loading_btn"></div>`
       fightBtn.style.backgroundColor = "#191B26"
       fightBtnStatus.onLoading = true
-      fetch("https://coganh-cloud-tixakavkna-as.a.run.app/fight_bot", {
+      fetch("http://192.168.1.249:8080/fight_bot", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({...selectedPlayer, time: formatter.format(new Date())}),
+        body: JSON.stringify({ ...selectedPlayer, time: formatter.format(new Date()) }),
       })
         .then(res => res.json())
         .then(data => {
@@ -296,7 +295,7 @@ export default function Bot_Bot() {
               info_status.style.backgroundColor = "#007BFF"
               user_bot.style.backgroundColor = "#007BFF"
               enemy.style.backgroundColor = "red"
-              info_elo_fluc_new.style.color = "#007BFF"
+              newPoint.style.color = "#007BFF"
               if (parseInt(userElo.innerHTML) < parseInt(enemyElo.innerHTML)) {
                 let pre = userElo.innerHTML
                 userElo.innerHTML = parseInt(enemyElo.innerHTML) + 10
@@ -308,7 +307,7 @@ export default function Bot_Bot() {
               info_status.style.backgroundColor = "red"
               user_bot.style.backgroundColor = "red"
               enemy.style.backgroundColor = "#007BFF"
-              info_elo_fluc_new.style.color = "red"
+              newPoint.style.color = "red"
               if (parseInt(userElo.innerHTML) < parseInt(enemyElo.innerHTML)) {
                 let pre = enemyElo.innerHTML
                 enemyElo.innerHTML = parseInt(userElo.innerHTML) + 10
@@ -317,10 +316,10 @@ export default function Bot_Bot() {
                 userElo.innerHTML = parseInt(userElo.innerHTML) - 10
               }
             } else {
-              info_status.style.backgroundColor = "#333"
-              user_bot.style.backgroundColor = "#333"
-              enemy.style.backgroundColor = "#333"
-              info_elo_fluc_new.style.color = "#fff"
+              info_status.style.backgroundColor = theme === "dark" ? "#121212" : "#ccc"
+              user_bot.style.backgroundColor = theme === "dark" ? "#121212" : "#ccc"
+              enemy.style.backgroundColor = theme === "dark" ? "#121212" : "#ccc"
+              newPoint.style.color = theme === "dark" ? "#fff" : "#000"
               console.log(userElo, enemyElo)
               if (parseInt(userElo.innerHTML) <= 0) {
                 userElo.innerHTML = 0
@@ -336,6 +335,7 @@ export default function Bot_Bot() {
             video.style.display = "block"
             video.load()
             fightBtn.innerHTML = "chọn đối thủ để đấu"
+            fightBtn.style.backgroundColor = "#52b1ff"
             fightBtnStatus.onLoading = false
             // set_selectedPlayer(null)
             setTimeout(() => info.style.display = "block", 1000)
@@ -352,38 +352,21 @@ export default function Bot_Bot() {
     }
 
     arrow.onanimationend = () => {
-      let increasing = Math.abs(newValue - dem) / 100
-      let a = setInterval(() => {
-        newPoint.innerHTML = Math.round(dem);
-        if (dem === newValue) clearInterval(a)
-        if (dem < newValue) {
-          dem += increasing
-          if (dem >= newValue) {
-            newPoint.innerHTML = newValue
-            clearInterval(a)
-          }
-        } else if (dem > newValue) {
-          dem -= increasing
-          if (dem <= newValue) {
-            newPoint.innerHTML = newValue
-            clearInterval(a)
-          }
-        }
-      }, 10)
+      newPoint.innerHTML = newValue >= 0 ? `+${newValue}` : `-${newValue}`
     }
 
   }, [rank_board, bots, selectedPlayer, selected_bot])
 
   return (
     <div className="h-screen">
-      {is_require_login && <Login_require set_is_require_login={set_is_require_login}/>}
+      {is_require_login && <Login_require set_is_require_login={set_is_require_login} />}
       <div className="container md:max-w-full">
         <div className="ranking"></div>
-        <div className="side_bar-left">
-          <a onClick={() => history("/menu")} className="BB_menu_btn">
+        <div className="side_bar-left dark:bg-[#242527] bg-[#7ac8ff]">
+          <a onClick={() => history("/menu")} className="BB_menu_btn dark:bg-opacity-0 bg-[#0062d9]">
             Menu
           </a>
-          <ul className="rank_board_list p-0">
+          <ul className="rank_board_list text-white p-0">
             <div className="rank_board_header">Top 5</div>
             {rank_board.map((item, i) =>
               <li key={i} className="warrior" data-bot_name={item.bot_name} data-owner={item.owner} data-elo={item.elo} data-id={item.id}>
@@ -404,26 +387,30 @@ export default function Bot_Bot() {
           <div className="info_header">Kết quả ván đấu</div>
           <div style={{ display: "none" }} className="info">
             <div className="info_status">You Win</div>
-            <div className="info_elo-fluc">
-              <div className="info_elo-fluc--pre">
-                {selected_bot && selected_bot.elo}
+            <div className="text-3xl mt-4">ELO</div>
+            <p className="info_elo-fluc--new text-4xl mt-6"></p>
+            <div className=''>
+              <div className="info_elo-fluc">
+                <div className="info_elo-fluc--pre hidden">
+                  {selected_bot && selected_bot.elo}
+                </div>
+                <div className="info_elo-fluc--arrow text-[0px]">
+                  <i className="fa-solid fa-arrow-down-long" />
+                </div>
+                {/* <div className="info_elo-fluc--new" /> */}
               </div>
-              <div className="info_elo-fluc--arrow">
-                <i className="fa-solid fa-arrow-down-long" />
-              </div>
-              <div className="info_elo-fluc--new" />
             </div>
           </div>
         </div>
         <div className="content">
           <div className="enemy">
-            <div className="enemy_ava">{(selectedPlayer.enemy_bot ? selectedPlayer.enemy_bot[0].toUpperCase() : "X")}</div>
+            <div className="enemy_ava dark:text-[#007BFF] dark:bg-white text-white bg-[#007BFF]">{(selectedPlayer.enemy_bot ? selectedPlayer.enemy_bot[0].toUpperCase() : "X")}</div>
             <div className="enemy_info">
               <div className="enemy-name">{(selectedPlayer.enemy_bot ? selectedPlayer.enemy_bot : "No enemy")}</div>
               <div className="enemy-elo">{(selectedPlayer.elo ? selectedPlayer.elo : 0)}</div>
             </div>
           </div>
-          <div className="fight_screen">
+          <div className="fight_screen dark:bg-[#000] bg-[#52b1ff] text-black dark:text-white">
             <div style={{ display: "none" }} className="fight_screen-err">
               <i className="fa-solid fa-face-dizzy" style={{ fontSize: 50 }} />
               <br />
@@ -452,7 +439,7 @@ export default function Bot_Bot() {
             <video
               data-isreload="false"
               style={{ display: "none" }}
-              className="fight_screen-video"
+              className="fight_screen-video rounded-xl"
               controls
               cache="no-store"
             >
@@ -461,14 +448,14 @@ export default function Bot_Bot() {
             </video>
           </div>
           <div className="BB_user" data-bot_name={selected_bot && selected_bot.bot_name} data-id={selected_bot && selected_bot.id}>
-            <div className="BB_user_ava">{selected_bot && selected_bot.bot_name[0].toUpperCase()}</div>
+            <div className="BB_user_ava dark:text-[#007BFF] dark:bg-white text-white bg-[#007BFF]">{selected_bot && selected_bot.bot_name[0].toUpperCase()}</div>
             <div className="BB_user_info">
               <div className="BB_user-name">{selected_bot && selected_bot.bot_name}</div>
               <div className="BB_user-elo">{selected_bot && selected_bot.elo}</div>
             </div>
           </div>
         </div>
-        <div className="side_bar">
+        <div className="side_bar dark:bg-[#242527] bg-[#7ac8ff]">
           <div className="side_bar-header relative">
             <div className="w-10 h-10 rounded-full flex items-center justify-center text-4xl bg-white text-[#007BFF] font-bold pb-2">{selected_bot && selected_bot.bot_name[0]}</div>
             {/* <img
@@ -482,10 +469,10 @@ export default function Bot_Bot() {
               <div className="user-info--elo">{selected_bot && selected_bot.elo}</div>
             </div>
             <i onClick={() => set_is_open_bot_list(!is_open_bot_list)} class="fa-solid fa-repeat ml-auto mr-2 text-3xl cursor-pointer select-none hover:text-slate-300"></i>
-            { is_open_bot_list && 
-              <ul className="absolute w-full h-96 bg-slate-700 right-0 top-full p-2 rounded-md cursor-pointer select-none overflow-y-scroll">
-                {user_bots.map(bot => 
-                  <li onClick={() => set_selected_bot(bot)} className={`flex items-center hover:bg-slate-800 px-2 py-1 rounded-md ${bot.bot_name === selected_bot.bot_name ? "bg-slate-900" : ""}`}>
+            {is_open_bot_list &&
+              <ul className="absolute w-full h-96 dark:bg-slate-700 bg-slate-300 right-0 top-full p-2 rounded-md cursor-pointer select-none overflow-y-scroll">
+                {user_bots.map(bot =>
+                  <li onClick={() => set_selected_bot(bot)} className={`flex items-center dark:hover:bg-slate-800 hover:bg-slate-200 px-2 py-1 rounded-md ${bot.bot_name === selected_bot.bot_name ? "dark:bg-slate-900 bg-slate-100" : ""}`}>
                     <div className="w-8 h-8 rounded-full flex items-center justify-center text-3xl bg-white text-[#007BFF] font-bold pb-2">{bot.bot_name[0]}</div>
                     <div className="ml-2">
                       <div className="">
@@ -495,7 +482,7 @@ export default function Bot_Bot() {
                     </div>
                   </li>
                 )}
-                
+
               </ul>
             }
           </div>
@@ -510,7 +497,7 @@ export default function Bot_Bot() {
                 </div>
             </li> */}
             {bots && bots.map((bot, i) =>
-              <li key={i} className="player" data-owner={bot.owner} data-bot_name={bot.bot_name} data-elo={bot.elo} data-id={bot.id}>
+              <li key={i} className="player dark:hover:bg-[#363535] hover:bg-[#52b1ff]" data-owner={bot.owner} data-bot_name={bot.bot_name} data-elo={bot.elo} data-id={bot.id}>
                 <div className="player-avatar">
                   <p>{bot.bot_name[0].toUpperCase()}</p>
                 </div>
@@ -521,7 +508,7 @@ export default function Bot_Bot() {
               </li>
             )}
           </ul>
-          <div className="BB_fight_btn">chọn đối thủ để đấu</div>
+          <div className="BB_fight_btn dark:bg-[#191B26] bg-[#52b1ff]">chọn đối thủ để đấu</div>
           {/* <div class="fight_btn"><div class="loading_btn"></div></div> */}
         </div>
       </div>

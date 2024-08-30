@@ -3,9 +3,23 @@
 /* .login-btn {
   @apply px-2
 }
+
+
 .after-box {
   @apply after:absolute after:w-20 after:h-8 after:right-2
 } */
+.pointing_event_br-105 {
+  @apply cursor-pointer select-none hover:brightness-105
+}
+
+.pointing_event_br-95 {
+  @apply cursor-pointer select-none hover:brightness-95
+}
+
+.pointing_event_br-90 {
+  @apply cursor-pointer select-none hover:brightness-90
+}
+
 @tailwind utilities;
 
 hr {
@@ -25,3 +39,29 @@ body {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 } */
+
+.three_dot {
+  white-space: nowrap;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+}
+
+input#1:checked ~ .handle_user_gamemode_item {
+  display: block;
+}
+
+input#2:checked ~ .handle_user_gamemode_item {
+  display: block;
+}
+input#3:checked ~ .handle_user_gamemode_item {
+  display: block;
+}
+input:checked ~ .handle_user_gamemode_item {
+  display: block;
+}
+input:checked ~ .handle_user_gamemode_item {
+  display: block;
+}
+input:checked ~ .handle_user_gamemode_item {
+  display: block;
+}
