@@ -185,7 +185,7 @@ export default function Menu() {
       <div className="contact lg:w-3/5 w-[90%] mx-auto mt-10 flex flex-col lg:flex-row justify-center">
         <div className="lg:w-[49%] w-full text-center text-3xl mb-4">
           <p>Bạn thấy thế nào về Coganh</p>
-          <div className="w-full my-4">
+          <div className="w-full my-4 rounded-lg overflow-hidden">
             <img className=" object-cover" src={form_img}/>
           </div>
           <p>Hãy đánh giá tại đây</p>

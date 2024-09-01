@@ -272,7 +272,7 @@ canvas {
     width: 40px;
     height: 40px;
     /* z-index: 1000; */
-    transform: translate(50%,50%);
+    transform: translate(-50%,-50%);
     /* cursor: pointer; */
     border-radius: 50%;
 }
@@ -296,11 +296,27 @@ canvas {
     position: absolute;
     width: 60px;
     height: 60px;
+    transform: translate(-50%, -50%);
     border-radius: 50%;
     cursor: pointer;
     z-index: 1000;
     user-select: none;
+    display: grid;
+    place-content: center;
+    overflow: hidden; ;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* line-height: 0px; */
 }
+
+/* .custom_icon {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    z-index: 1000;
+    user-select: none;
+} */
 
 .chess.not_ready {
     cursor: not-allowed;
@@ -316,6 +332,14 @@ canvas {
     position: absolute;
     z-index: 1001;
     animation: fire 1s linear forwards;
+}
+
+.breaking {
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    z-index: 1001;
+    animation: breaking_animation 0.5s linear forwards;
 }
 
 .overflow {
@@ -663,7 +687,7 @@ canvas {
         width: 20px;
         height: 20px;
         /* z-index: 1000; */
-        transform: translate(50%,50%);
+        transform: translate(-50%,-50%);
         /* cursor: pointer; */
         border-radius: 50%;
     }
@@ -678,11 +702,19 @@ canvas {
         background-color: none;
     }
     
-    .chess,
-    .custom_icon {
+    .chess {
         position: absolute;
         width: 30px;
         height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 1000;
+        user-select: none;
+    }
+
+    .custom_icon {
+        position: absolute;
+        transform: translate(-50%, -50%);
         border-radius: 50%;
         cursor: pointer;
         z-index: 1000;

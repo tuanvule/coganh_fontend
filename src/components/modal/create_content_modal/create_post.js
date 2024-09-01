@@ -143,13 +143,11 @@ export default function Create_post() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            author: username,
-            author_id: user.id,
             content: text,
             image_url: url,
             title: title_input.value,
             description: description_input.value,
-            upload_time: formatter.format(new Date()),
+            update_time: formatter.format(new Date()),
             id: state.post.id
           })
         });

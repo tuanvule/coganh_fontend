@@ -9,10 +9,13 @@ const chess_rule = {
             if (dx >= -1 && dx <= 1 && dy >= -1 && dy <= 1 && (dx === 0 || dy === 0 || at_8intction)) {
                 if ((move[0] - dx >= 0 && move[0] - dx <= 4 && move[1] - dy >= 0 && move[1] - dy <= 4 && gameState.board[move[1] - dy][move[0] - dx] === opp_side) ||
                     (x0 + dx >= 0 && x0 + dx <= 4 && y0 + dy >= 0 && y0 + dy <= 4 && gameState.board[y0 + dy][x0 + dx] === side)) {
+                    console.log("ganh",(move[0] - dx >= 0 && move[0] - dx <= 4 && move[1] - dy >= 0 && move[1] - dy <= 4 && gameState.board[move[1] - dy][move[0] - dx] === opp_side))
+                    console.log("chet",(x0 + dx >= 0 && x0 + dx <= 4 && y0 + dy >= 0 && y0 + dy <= 4 && gameState.board[y0 + dy][x0 + dx] === side))
                     valid_remove.push([x0, y0]);
                 }
             }
         }
+        console.log(valid_remove, JSON.parse(JSON.stringify(opp_pos)))
         return valid_remove;
     },
     vay(gameState, opp_pos) {

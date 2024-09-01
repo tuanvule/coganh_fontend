@@ -191,6 +191,9 @@ export default function User_gamemode({ u_id, is_owner }) {
                       <div onClick={() => handle_delete(item.id, item.author_id)} className="grid place-content-center bg-red-400 px-8 py-4 rounded pointing_event_br-105">
                         <i class="fa-solid fa-xmark"></i>
                       </div>
+                      <div onClick={() => history(`create_gamemode?is_update=true`, {state: item})} className="grid place-content-center bg-slate-400 px-8 py-4 rounded pointing_event_br-105">
+                      <i class="fa-solid fa-pen-to-square"></i>
+                      </div>
                     </div>}
                   {/* <div  className="w-10 h-10 grid place-content-center text-xl bg-red-400 absolute z-[100000000] right-0 hover:brightness-90 cursor-pointer"><i class="fa-solid fa-xmark"></i></div>
                   <div onClick={() => handle_message(item.author_id)} className="w-10 h-10 grid place-content-center text-xl bg-slate-400 absolute z-[100000000] right-0 top-10 hover:brightness-90 cursor-pointer"></div> */}

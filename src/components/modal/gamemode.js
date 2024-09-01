@@ -40,24 +40,20 @@ export default function Gamemode() {
                 <div className="flex h-[90%]">
                     <div className="w-[49.95%] h-full mx-4 px-4 grid place-content-center">
                         <div className="flex flex-col mx-auto justify-center items-center text-white">
-                            {mode === "human_bot" &&
+                            {/* {mode === "human_bot" && */}
                                 <div className="gamemode_item p-2 my-2 mx-1 rounded-sm select-none bg-slate-400 hover:brightness-90 cursor-pointer transition-all">
                                     <div className="w-48 h-48">
                                         <img src={chessboard} className=" object-cover" />
                                     </div>
                                     <p className="text-3xl w-full text-center pt-2">NORMAL</p>
                                     <div className="gamemode_item-nav absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                                        <div className="grid place-content-center bg-slate-400 px-6 py-4 rounded hover:brightness-105 mr-4">
-                                            <i class="fa-solid fa-book-open"></i>
-                                        </div>
-
-                                        <div className="grid place-content-center bg-[#036cdc] px-6 py-4 rounded hover:brightness-105">
+                                        <div onClick={() => history(`/${mode}`)} className="grid place-content-center bg-[#036cdc] px-6 py-4 rounded hover:brightness-105">
                                             <i class="fa-solid fa-play text-xl"></i>
                                         </div>
                                     </div>
                                 </div>
-                            }
-                            <div className="flex">
+                            {/* } */}
+                            {/* <div className="flex">
                                 <div className="gamemode_item p-2 my-2 mx-1 rounded-sm select-none bg-slate-600 hover:brightness-90 cursor-pointer transition-all">
                                     <div className="w-48 h-48">
                                         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6dVMh5DFULcYvXneuqRPELfDruTLz2DyNaw&s" className=" object-cover" />
@@ -88,7 +84,7 @@ export default function Gamemode() {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                             {/* <div className="text-3xl px-10 py-2 my-2 mx-1 rounded-sm bg-red-500 select-none hover:brightness-95 cursor-pointer">HI..ER</div> */}
                         </div>
                     </div>

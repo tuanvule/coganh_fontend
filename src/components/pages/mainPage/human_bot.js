@@ -7,9 +7,11 @@ import Master from "../../../static/img/Master.png"
 import chessboard1 from "../../../static/img/chessboard1.png"
 import capture_audio from "../../../static/capture.mp3"
 import move_audio from "../../../static/move-self.mp3"
-import fireSound_audio from "../../../static/fireSound.mp3"
-import fire_webp from "../../../static/img/fire.webp"
+// import fireSound_audio from "../../../static/fireSound.mp3"
 import logo from "../../../static/img/logo.png"
+import red_break_img from "../../../static/img/red_remove_tracker.png"
+import blue_break_img from "../../../static/img/blue_remove_tracker.png"
+import break_sound from "../../../static/breaking_glass.mp3"
 
 import CreateRateModel from "../../modal/rate_model"
 
@@ -17,7 +19,7 @@ import "../../../style/human_bot.css"
 import "../../../style/rate_model.css"
 import { AppContext } from '../../../context/appContext'
 import Intervention from '../../../uti/intervention'
-import breakRule from '../../../uti/break_rule'
+// import breakRule from '../../../uti/break_rule'
 import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import chess_rule from "../../../uti/chess_rule"
 
@@ -51,7 +53,6 @@ export default function Human_Bot() {
 
     useEffect(() => {
         if(!(game_info && game_info.title)) {
-            console.log(title, upload_time)
             fetch(`http://192.168.1.249:8080/get_gamemode_by_post?title=${title}&upload_time=${upload_time}`)
             .then(res => res.json())
             .then(data => {
@@ -72,6 +73,8 @@ export default function Human_Bot() {
     useEffect(() => {
         // console.log(game_info)
         let board = $(".board")
+        let display_outBoard = $(".display_outBoard")
+        let custom_board = $(".custom_board")
         let boardValue = board.getBoundingClientRect()
         let chessGrapX = boardValue.width / 4
         let chessGrapY = boardValue.height / 4
@@ -105,7 +108,7 @@ export default function Human_Bot() {
         const moveSound = $(".move_sound")
         const captureSound = $(".capture_sound")
         const fireSound = $(".fire_sound")
-        fireSound.volume = 0.6
+        fireSound.volume = 1
 
         const rate_btn = $(".rate_btn")
 
@@ -155,11 +158,11 @@ export default function Human_Bot() {
                 [1, 1, 1, 1, 1]
             ],
             custom_board: [
-                ["","","","",""],
-                ["","","","",""],
-                ["","","","",""],
-                ["","","","",""],
-                ["","","","",""],
+                [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
+                [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
+                [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
+                [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
+                [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
             ],
             outside_display: [],
             positions: [
@@ -184,17 +187,17 @@ export default function Human_Bot() {
         [1, 1, 1, 1, 1]]
         let intervention = new Intervention(gameState)
 
-        function reset_display_item_outside() {
-            const display_outBoard = $(".display_outBoard")
-            display_outBoard.innerHTML = ""
-
-            gameState.outside_display.forEach(item => {
-                const {pos, value} = item
+        function reset_display_item_outside(item) {
+            if(item) {
+                const {pos, value, fill, size, stroke_fill, stroke_width} = item
                 const [x,y] = pos
+                
                 display_outBoard.innerHTML += `
-                    <div data-choosable="false" class="absolute select-none opacity-60 pointer-events-none grid place-content-center text-xl text-white" style="top:${y/4*100}%; left:${x/4*100}%;">${value}</div>
+                    <div data-choosable="false" class="custom_icon emoji-text w-[60px] h-[60px] rounded-full select-none pointer-events-none grid place-content-center text-xl text-white -translate-x-1/2 -translate-y-1/2" style="top:${y/4*100}%; left:${x/4*100}%; font-size: ${size * 1}px; border: ${stroke_width}px solid rgb(${stroke_fill}); background-color: rgb(${fill})">${value}</div>
                 `
-            })
+            }
+            // gameState.outside_display.forEach(item => {
+            // })
         
         }
 
@@ -210,17 +213,16 @@ export default function Human_Bot() {
             
             // let breakRule = new Function('return ' + func )()
             // console.log(game_info)
-            // const functionString = JSON.parse(game_info.break_rule_js).code;
-            // eval(functionString);
+            const functionString = JSON.parse(game_info.break_rule_js).code;
+            eval(functionString);
 
-            breakRule(gameState, intervention, global_var, local_var)
+            window.breakRule(gameState, intervention, global_var, local_var)
             let result = intervention.view_command()
-            console.log("first", local_var)
 
-            let a = result.filter(item => item.action === "set_value" && !check_is_display_outside(item.pos[0],item.pos[1])).forEach(({pos: [x,y], value}) => gameState.custom_board[y][x] = value)
-            result.filter(item => item.action === "set_value" && check_is_display_outside).forEach((item) => gameState.outside_display.push(item))
+            let a = result.filter(item => item.action === "set_value" && !check_is_display_outside(item.pos[0],item.pos[1])).forEach((item) => reset_custom_board(item))
+            result.filter(item => item.action === "set_value" && check_is_display_outside(item.pos[0],item.pos[1])).forEach((item) => reset_display_item_outside(item))
 
-            reset_display_item_outside()
+            
 
             intervention.action()
             game_info.bots.forEach(bot => {
@@ -237,20 +239,20 @@ export default function Human_Bot() {
             [1, 0, 1, 0, 1]
         ]
 
-        function reset_custom_board() {
-            let custom_board = $(".custom_board")
-            custom_board.innerHTML = ""
-            for (let i = 0; i < gameState.custom_board.length; i++) {
-                for (let j = 0; j < gameState.custom_board[i].length; j++) {
-                    custom_board.innerHTML += `
-                        <div data-choosable="false" data-posx="${j}" data-posy="${i}" class="custom_icon select-none opacity-60 pointer-events-none grid place-content-center" style="top:${chessGrapY * i - 33}px; left:${chessGrapX * j - 30}px;">${gameState.custom_board[i][j]}</div>
-                    `
-                }
-            }
+        function reset_custom_board(item) {
+            const { value, size, fill, stroke_width, stroke_fill, pos} = item
+            const [x,y] = pos
+
+            custom_board.innerHTML += `
+                <p data-choosable="false" data-posx="${x}" data-posy="${y}" class="custom_icon emoji-text pb-1" style="top:${chessGrapY * y}px; left:${chessGrapX * x}px; font-size: ${size * 1.8}px; border: ${stroke_width}px solid rgb(${stroke_fill}); ">${value}</p>
+            `
+            // for (let i = 0; i < gameState.custom_board.length; i++) {
+            //     for (let j = 0; j < gameState.custom_board[i].length; j++) {
+            //     }
+            // }
         }
 
         function resetBoard() {
-            let custom_board = $(".custom_board")
             board = $(".board")
             boardValue = board.getBoundingClientRect()
             chessGrapX = boardValue.width / 4
@@ -262,18 +264,16 @@ export default function Human_Bot() {
             canvas.height = boardValue.height + 2 * radius + 10
             cv2 = canvas.getContext("2d")
             board.innerHTML = gridHTML
-            custom_board.innerHTML = ""
+            // custom_board.innerHTML = ""
             dem = 0
             for (let i = 0; i < gameState.board.length; i++) {
                 for (let j = 0; j < gameState.board[i].length; j++) {
-                    custom_board.innerHTML += `
-                        <div data-choosable="false" data-posx="${j}" data-posy="${i}" class="custom_icon select-none opacity-60 pointer-events-none grid place-content-center" style="top:${chessGrapY * i - 33}px; left:${chessGrapX * j - 30 }px">${gameState.custom_board[i][j]}</div>
-                    `
-                    board.innerHTML += `<div data-choosable="false" data-posx="${j}" data-posy="${i}" class="box z-[1000]" style="top:${chessGrapY * i - 40 * rs}px; left:${chessGrapX * j - 40 * rs}px;"></div>`
+                    const { value, size, fill, stroke_width, stroke_fill} = gameState.custom_board[i][j]
+                    board.innerHTML += `<div data-choosable="false" data-posx="${j}" data-posy="${i}" class="box z-[1000]" style="top:${chessGrapY * i}px; left:${chessGrapX * j}px;"></div>`
                     if (gameState.board[i][j] === -1) {
-                        board.innerHTML += `<div data-so="${dem}" data-posx="${j}" data-posy="${i}" style="background-color: red; top:${chessGrapY * i - 30 * rs}px; left:${chessGrapX * j - 30 * rs}px;" class="chess HB_enemy"></div>`
+                        board.innerHTML += `<div data-so="${dem}" data-posx="${j}" data-posy="${i}" style="background-color: red; top:${chessGrapY * i}px; left:${chessGrapX * j}px;" class="chess HB_enemy"></div>`
                     } else if (gameState.board[i][j] === 1) {
-                        board.innerHTML += `<div data-so="${dem}" data-posx="${j}" data-posy="${i}" style="background-color: blue; top:${chessGrapY * i - 30 * rs}px; left:${chessGrapX * j - 30 * rs}px;" class="chess player"></div>`
+                        board.innerHTML += `<div data-so="${dem}" data-posx="${j}" data-posy="${i}" style="background-color: blue; top:${chessGrapY * i}px; left:${chessGrapX * j}px;" class="chess player"></div>`
                     }
                     dem++
                 }
@@ -389,7 +389,6 @@ export default function Human_Bot() {
         let boxes = $$(".box")
 
         function getPos(e) {
-            console.log(ready)
             if (!ready) return
 
             const eX = Number(e.dataset.posx)
@@ -434,7 +433,7 @@ export default function Human_Bot() {
             return e[0] === this[0] && e[1] === this[1]
         }
 
-        async function delete_chess(j,i) {
+        async function delete_chess(j,i, trackOn = true) {
             const chesses = $$(".chess")
             // console.log(Array.from(chesses).map(e => [Number(e.dataset.posx), Number(e.dataset.posy)]))
             const changedChess = Array.from(chesses).find(e => {
@@ -447,23 +446,29 @@ export default function Human_Bot() {
                         gameState.positions[index].splice(es.findIndex(findI, [j,i]),1)
                     }
                 }))
-                // captureSound.play()
-                // fireSound.play()
-                // const fire = document.createElement("img")
-                // fire.setAttribute("src", fire_webp)
-                // fire.setAttribute("style", `top:${chessGrapY*i - 30 * rs}px; left:${chessGrapX*j - 30 * rs}px;`)
-                // fire.setAttribute("class", "fire")
-                // let newFire = board.appendChild(fire)
-                // newFire.onanimationend = (e) => {
-                //     console.log("remove")
-                // }
+                captureSound.play()
+                if(trackOn) {
+                    fireSound.play()
+                    const breaking_img = document.createElement("img")
+                    breaking_img.setAttribute("src", changedChess.classList.contains("player") ? blue_break_img : red_break_img)
+                    breaking_img.setAttribute("style", `top:${chessGrapY*i}px; left:${chessGrapX*j}px;`)
+                    breaking_img.setAttribute("class", "breaking")
+                    changedChess.remove()
+                    let new_breaking_img = board.appendChild(breaking_img)
+                    setTimeout(() => {
+                        console.log("end")
+                        new_breaking_img.remove();
+                        console.log(Array.from($$(".breaking")).forEach(item => item.remove()))
+                    }, 500);
+                    return
+                }
                 changedChess.remove()
             }
         }
 
         async function add_chess([j,i], chess_type) {
             board = $(".board")
-            board.innerHTML += `<div data-so="${dem}" data-posx="${j}" data-posy="${i}" style="background-color: ${chess_type === "red" ? "red" : "blue"}; top:${chessGrapY * i - 30 * rs}px; left:${chessGrapX * j - 30 * rs}px;" class="chess ${chess_type === "red" ? "HB_enemy" : "player"}"></div>`
+            board.innerHTML += `<div data-so="${dem}" data-posx="${j}" data-posy="${i}" style="background-color: ${chess_type === "red" ? "red" : "blue"}; top:${chessGrapY * i}px; left:${chessGrapX * j}px;" class="chess ${chess_type === "red" ? "HB_enemy" : "player"}"></div>`
             dem++
             boxes = $$(".box")
             boxes.forEach((e) => {
@@ -488,81 +493,50 @@ export default function Human_Bot() {
         }
 
         async function handle_action(intervention) {
-            // console.log(JSON.parse(JSON.stringify(gameState.custom_board)))
-            gameState.custom_board = [
-                ["","","","",""],
-                ["","","","",""],
-                ["","","","",""],
-                ["","","","",""],
-                ["","","","",""],
-            ]
-            gameState.outside_display = []
-            let intervention_result = intervention.view_command()
-            console.log(intervention_result)
+            // gameState.custom_board = [
+            //     [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
+            //     [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
+            //     [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
+            //     [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
+            //     [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
+            // ]
+            // gameState.outside_display = []
+            custom_board = $(".custom_board")
+            custom_board.innerHTML = ""
+
+            display_outBoard = $(".display_outBoard")
+            display_outBoard.innerHTML = ""
             
+            let intervention_result = intervention.view_command()
             for(let item of intervention_result) {
                 let { action, pos: [x,y] } = item
                 switch(action) {
                     case "remove_blue" :
-                        await delete_chess(Number(x),Number(y))
+                        await delete_chess(Number(x),Number(y), item.trackOn)
                         break
                     case "remove_red" :
-                        await delete_chess(Number(x),Number(y))
+                        await delete_chess(Number(x),Number(y), item.trackOn)
                         break
                     case "insert_blue" :
-                        console.log("insert_blue-----------")
                         await add_chess([x,y], "blue")
                         break
                     case "insert_red" :
                         await add_chess([x,y], "red")
                         break
                     case "set_value" :
-                        // console.log(x,y,item.value)
                         if(!check_is_display_outside(x,y)) {
-                            gameState.custom_board[y][x] = item.value ? item.value : ""
+                            reset_custom_board(item)
                         } else {
-                            gameState.outside_display.push({
-                                ...item
-                            })
+                            // gameState.outside_display.push({
+                            //     ...item
+                            // })
+                            reset_display_item_outside(item)
                         }
                         break
                     default:
                         break
                 }
             }
-
-            // intervention_result.forEach((item) => {
-            //     let { action, pos: [x,y] } = item
-
-            //     switch(action) {
-            //         case "remove_blue" :
-            //             delete_chess(Number(x),Number(y))
-            //             break
-            //         case "remove_red" :
-            //             delete_chess(Number(x),Number(y))
-            //             break
-            //         case "insert_blue" :
-            //             add_chess([x,y], "blue")
-            //             break
-            //         case "insert_red" :
-            //             add_chess([x,y], "red")
-            //             break
-            //         case "set_value" :
-            //             // console.log(x,y,item.value)
-            //             if(!check_is_display_outside(x,y)) {
-            //                 gameState.custom_board[y][x] = item.value ? item.value : ""
-            //             } else {
-            //                 gameState.outside_display.push({
-            //                     ...item
-            //                 })
-            //             }
-            //             break
-            //         default:
-            //             break
-            //     }
-            // })
-            console.log(JSON.parse(JSON.stringify(gameState.custom_board)))
-            
         }
 
         function changeBoard(newBoard, removeDict, selected_pos, new_pos) {
@@ -576,20 +550,18 @@ export default function Human_Bot() {
                     curBoard[i][j] = newBoard[i][j];
                 }
             }
-            reset_custom_board()
-            reset_display_item_outside()
             
             img_data.img.push([selected_pos[0],selected_pos[1],new_pos[0],new_pos[1], intervention.view_command()])
 
             intervention.action()
         
-            if(gameState.positions[1].length === 0) {
+            if(gameState.positions[1].length === 0 || gameState.result === "win") {
                 gameStatus.innerHTML = "You Win"
                 gameStatus.style.backgroundColor = "green"
                 gameStatus.style.display = "block"
                 gameStatus.style.opacity = "1";
                 rate_btn.style.display = "block"
-            } else if(gameState.positions[0].length === 0) {
+            } else if(gameState.positions[0].length === 0 || gameState.result === "lost") {
                 gameStatus.innerHTML = "You lost"
                 gameStatus.style.backgroundColor = "red"
                 gameStatus.style.opacity = "1";
@@ -647,8 +619,8 @@ export default function Human_Bot() {
             if(box) {
                 handle_canvas(chess, "rgba(87, 125, 255, 0.6)")
 
-                chess.style.left = box.offsetLeft + 10 * rs + "px"
-                chess.style.top = box.offsetTop + 10 * rs + "px"
+                chess.style.left = box.offsetLeft + "px"
+                chess.style.top = box.offsetTop + "px"
         
                 newPos = [Number(box.dataset.posx), Number(box.dataset.posy)]
                 selected_pos = [Number(chess.dataset.posx),Number(chess.dataset.posy)]
@@ -658,8 +630,9 @@ export default function Human_Bot() {
                     new_pos: newPos,
                 }
                 
-                let opp_pos = gameState.positions[1]
                 changePos(chess.dataset.posx,chess.dataset.posy, box.dataset.posx, box.dataset.posy)
+                gameState.positions[0][gameState.positions[0].findIndex(findI, [Number(chess.dataset.posx), Number(chess.dataset.posy)])] = [Number(box.dataset.posx), Number(box.dataset.posy)]
+                let opp_pos = gameState.positions[1]
                 valid_remove = [...ganh_chet(gameState,[Number(box.dataset.posx), Number(box.dataset.posy)], opp_pos, 1, -1), ...vay(gameState, opp_pos)]
                 if(valid_remove.length > 0) valid_remove.forEach(item => intervention.remove_red(...item))
                 
@@ -679,12 +652,11 @@ export default function Human_Bot() {
                     removeDict[i.join(',')] = "remove_red";
                 });
                 
-                gameState.positions[0][gameState.positions[0].findIndex(findI, [Number(chess.dataset.posx), Number(chess.dataset.posy)])] = [Number(box.dataset.posx), Number(box.dataset.posy)]
                 chess.dataset.posx = box.dataset.posx
                 chess.dataset.posy = box.dataset.posy
 
                 if(game_info && game_info.title) {
-                    breakRule(gameState, intervention, global_var, local_var)
+                    window.breakRule(gameState, intervention, global_var, local_var)
                 }
                 await handle_action(intervention)
 
@@ -697,8 +669,9 @@ export default function Human_Bot() {
                     new_pos: newPos,
                 }
                 
-                let opp_pos = gameState.positions[0]
                 changePos(selected_pos[0], selected_pos[1], newPos[0], newPos[1])
+                gameState.positions[1][gameState.positions[1].findIndex(findI, [selected_pos[0], selected_pos[1]])] = [newPos[0], newPos[1]]
+                let opp_pos = gameState.positions[0]
                 valid_remove = [...ganh_chet(gameState, [newPos[0], newPos[1]], opp_pos, -1, 1), ...vay(gameState, opp_pos)]
                 if(valid_remove.length > 0) valid_remove.forEach(item => intervention.remove_blue(...item))
 
@@ -719,14 +692,13 @@ export default function Human_Bot() {
                     removeDict[i.join(',')] = "remove_blue";
                 });
         
-                gameState.positions[1][gameState.positions[1].findIndex(findI, [selected_pos[0], selected_pos[1]])] = [newPos[0], newPos[1]]
-                chess.style.left = newPos[0] * chessGrapX - 30 * rs + "px"
-                chess.style.top = newPos[1] * chessGrapX - 30 * rs + "px"
+                chess.style.left = newPos[0] * chessGrapX + "px"
+                chess.style.top = newPos[1] * chessGrapX + "px"
                 chess.dataset.posx  = `${newPos[0]}`
                 chess.dataset.posy = `${newPos[1]}`
 
                 if(game_info && game_info.title) {
-                    breakRule(gameState, intervention, global_var, local_var)
+                    window.breakRule(gameState, intervention, global_var, local_var)
                 }
                 await handle_action(intervention)
 
@@ -777,14 +749,16 @@ export default function Human_Bot() {
                         game_data: {
                             gameState,
                             global_var,
-                            local_var
+                            local_var: {
+                                ...local_var.data,
+                                updated: true
+                            }
                         }
                     }),
                 })
                     .then(res => res.json(data))
                     .then(resData => {
                         const { selected_pos, new_pos } = resData
-                        // console.log("selected_pos:  ", { selected_pos, new_pos })
                         const selectedChess = Array.from(chessEnemy).find(e => {
                             return Number(e.dataset.posx) === selected_pos[0] && Number(e.dataset.posy) === selected_pos[1]
                         })
@@ -816,7 +790,7 @@ export default function Human_Bot() {
             const chess = $$(".chess.player")
     
             chess.forEach(e => {
-                e.onclick = () => { getPos(e); cv2.clearRect(0, 0, canvas.width, canvas.height); console.log("click")}
+                e.onclick = () => { getPos(e); cv2.clearRect(0, 0, canvas.width, canvas.height);}
                 e.ontouchend = () => { getPos(e); cv2.clearRect(0, 0, canvas.width, canvas.height); }
             });
         }
@@ -957,8 +931,8 @@ export default function Human_Bot() {
                     }
             </div>
             <div className="relative">
-                <div style={{width: `100%`, height: `100%`}} class="custom_board absolute top-0 z-[10000] pointer-events-none grid grid-cols-5 grid-flow-row text-5xl select-none"></div>
-                <div style={{width: `100%`, height: `100%`}} class="display_outBoard absolute top-0 z-[10000] pointer-events-none grid grid-cols-5 grid-flow-row text-5xl select-none"></div>
+                <div style={{width: `100%`, height: `100%`}} class="display_outBoard emoji-text absolute top-0 z-[10000] pointer-events-none grid grid-cols-5 grid-flow-row text-5xl select-none"></div>
+                <div style={{width: `100%`, height: `100%`}} class="custom_board emoji-text absolute top-0 z-[10000] pointer-events-none grid grid-cols-5 grid-flow-row text-5xl select-none"></div>
                 <div className="board"/>
                 <canvas className="z-[10000]"/>
             </div>
@@ -1049,7 +1023,7 @@ export default function Human_Bot() {
             />
             <audio
                 className="fire_sound"
-                src={fireSound_audio}
+                src={break_sound}
             />
         </div>
 

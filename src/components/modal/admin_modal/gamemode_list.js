@@ -46,8 +46,8 @@ export default function Gamemode_list({ gamemodes, set_gamemode_chunk_index, set
     }
   }
 
-  function handle_accept(id, author_id, gamemode_title) {
-    fetch(`http://192.168.1.249:8080/accept_gamemode/${id}`)
+  function handle_accept(id, author_id, gamemode_title, post_id) {
+    fetch(`http://192.168.1.249:8080/accept_gamemode?gamemode_id=${id}&post_id=${post_id}`)
       .then(res => res.json())
       .then(data => {
         if (author_id) {
@@ -114,7 +114,7 @@ export default function Gamemode_list({ gamemodes, set_gamemode_chunk_index, set
               </div>
 
               <div className="gamemode_item-nav absolute right-4 top-1/2 -translate-y-1/2">
-                <div onClick={() => handle_accept(item.id, item.author_id, item.title)} className="grid place-content-center bg-blue-500 px-10 py-8 rounded pointing_event_br-105 mr-4">
+                <div onClick={() => handle_accept(item.id, item.author_id, item.title, item.post_id)} className="grid place-content-center bg-blue-500 px-10 py-8 rounded pointing_event_br-105 mr-4">
                   <i class="fa-solid fa-check text-5xl"></i>
                 </div>
 
@@ -139,7 +139,7 @@ export default function Gamemode_list({ gamemodes, set_gamemode_chunk_index, set
               </div>
             </div>
             <div className="handle_user_gamemode_item hidden w-full max-h-[800px] animate-open_code">
-              <Handle_user_gamemode gamemode={item} is_reset_gamemode={is_reset_gamemode} set_is_reset_gamemode={set_is_reset_gamemode}/>
+              <Handle_user_gamemode is_owner={true} gamemode={item} is_reset_gamemode={is_reset_gamemode} set_is_reset_gamemode={set_is_reset_gamemode}/>
             </div>
 
           </li>
@@ -190,7 +190,7 @@ export default function Gamemode_list({ gamemodes, set_gamemode_chunk_index, set
                 </div>
               </div>
               <div className="handle_user_gamemode_item hidden w-full max-h-[800px] animate-open_code">
-                <Handle_user_gamemode gamemode={item} is_reset_gamemode={is_reset_gamemode} set_is_reset_gamemode={set_is_reset_gamemode}/>
+                <Handle_user_gamemode is_owner={true} gamemode={item} is_reset_gamemode={is_reset_gamemode} set_is_reset_gamemode={set_is_reset_gamemode}/>
               </div>
 
             </li>

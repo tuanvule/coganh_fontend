@@ -12,11 +12,22 @@ import level3 from "../../../static/img/level3.png"
 import level4 from "../../../static/img/level4.png"
 import Master from "../../../static/img/Master.png"
 
+import AceEditor from "react-ace";
+
+import "ace-builds/src-noconflict/mode-python";
+import "ace-builds/src-noconflict/mode-javascript";
+import "ace-builds/src-noconflict/theme-github";
+import "ace-builds/src-noconflict/ext-language_tools";
+import "ace-builds/src-noconflict/worker-javascript";
+import "ace-builds/webpack-resolver";
+
 export default function Create_gamemode() {
     const [editor, set_editor] = useState()
     const { user, history } = useContext(AppContext)
     const [is_require_login, set_is_require_login] = useState(false)
-    const [is_use_own_bot, set_is_use_own_bot] = useState(true)
+    const [is_use_own_bot, set_is_use_own_bot] = useState(false)
+    const [post, set_post] = useState(null)
+    const [code, set_code] = useState("")
     const [searchParams] = useSearchParams();
     const { state } = useLocation()
     let is_update = searchParams.get("is_update")
@@ -27,14 +38,24 @@ export default function Create_gamemode() {
     const add_bot_btn_ref = useRef(null)
     const your_own_bot_list_ref = useRef(null)
     const demo_gamemode_image_ref = useRef(null)
+    const BR_save_btn = useRef(null)
 
     useEffect(() => {
-        if (is_update && state) {
+        if(is_update && !post) {
+            fetch("http://192.168.1.249:8080/get_post_by_id/" + state.post_id)
+            .then(res => res.json())
+            .then(data => set_post(data))
+            .catch(err => console.log(err))
+        }
+    }, [])
+
+    useEffect(() => {
+        if (is_update && post) {
             if (editor) {
-                editor.setData(state.post.content)
+                editor.setData(post.content)
             }
         }
-    }, [editor, state])
+      }, [editor, state, post])
 
     useEffect(() => {
 
@@ -65,9 +86,11 @@ export default function Create_gamemode() {
 
         let formatter = new Intl.DateTimeFormat([], options);
 
-        if (is_update && state) {
-            title_input.value = state.post.title
-            description_input.value = state.post.description
+        if (is_update && state && post) {
+            title_input.value = post.title
+            description_input.value = post.description
+            demo_gamemode_image_ref.current.value = state.demo_img
+            set_code(JSON.parse(state.break_rule).code)
         }
 
         function check_valid_post() {
@@ -153,29 +176,49 @@ export default function Create_gamemode() {
             if (!check_valid_post()) return
                 // console.log(text)
                 // return
-            let fetchData  = await fetch('http://192.168.1.249:8080/upload_post', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    type: "create_game_mode",
-                    author: username,
-                    author_id: user.id,
-                    content: text,
-                    image_url: url,
-                    title: title_input.value,
-                    description: description_input.value,
-                    id: `${new Date().getTime()}`,
-                    is_public: false,
-                    upvote: [],
-                    downvote: [],
-                    upload_time: upload_time,
-                    demo_img: demo_gamemode_image_ref.current.value
+            if (!is_update) {
+                let fetchData  = await fetch('http://192.168.1.249:8080/upload_post', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        type: "create_game_mode",
+                        author: username,
+                        author_id: user.id,
+                        content: text,
+                        image_url: url,
+                        title: title_input.value,
+                        description: description_input.value,
+                        id: `${new Date().getTime()}`,
+                        is_public: false,
+                        upvote: [],
+                        downvote: [],
+                        upload_time: upload_time,
+                        demo_img: demo_gamemode_image_ref.current.value
+                    })
                 })
-            })
-            let data = await fetchData.json()
-            return {...data, upload_time}
+                let data = await fetchData.json()
+                return {...data, upload_time}
+            } else {
+                let fetchData  = await fetch('http://192.168.1.249:8080/update_post', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        content: text,
+                        image_url: url,
+                        title: title_input.value,
+                        description: description_input.value,
+                        update_time: upload_time,
+                        demo_img: demo_gamemode_image_ref.current.value,
+                        id: state.post_id
+                    })
+                })
+                let data = await fetchData.json()
+                return {...data, upload_time, id: state.post_id}
+            }
         }
 
         function readFileAsText(file) {
@@ -205,42 +248,49 @@ export default function Create_gamemode() {
                 }
             }
 
-            console.log(file_input.current.files[0])
-
-            console.log({
-                author: username,
-                author_id: user.id,
-                title: title_input.value,
-                description: description_input.value,
-                upload_time: upload_time,
-                gamemode_id: `${new Date().getTime()}`,
-                post_id: post_id,
-                break_rule: await readFileAsText(file_input.current.files[0]),
-                bots: is_use_own_bot ? bots : []
-            })
-            let fetchData  = await fetch('http://192.168.1.249:8080/create_gamemode', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    author: username,
-                    author_id: user.id,
-                    title: title_input.value,
-                    description: description_input.value,
-                    upload_time: upload_time,
-                    gamemode_id: `${new Date().getTime()}`,
-                    post_id: post_id,
-                    break_rule: JSON.stringify({code : await readFileAsText(file_input.current.files[0])}),
-                    bots: is_use_own_bot ? bots : [],
-                    demo_img: demo_gamemode_image_ref.current.value,
-                    upvote: [],
-                    downvote: [],
-                    is_public: false
+            if(!is_update) {
+                let fetchData  = await fetch('http://192.168.1.249:8080/create_gamemode', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        author: username,
+                        author_id: user.id,
+                        title: title_input.value,
+                        description: description_input.value,
+                        upload_time: upload_time,
+                        gamemode_id: `${new Date().getTime()}`,
+                        post_id: post_id,
+                        break_rule: JSON.stringify({code : await readFileAsText(file_input.current.files[0])}),
+                        bots: is_use_own_bot && bots.length > 0 ? bots : [],
+                        demo_img: demo_gamemode_image_ref.current.value,
+                        upvote: [],
+                        downvote: [],
+                        is_public: false
+                    })
                 })
-            })
-            let data = await fetchData.json()
-            return data
+                let data = await fetchData.json()
+                return data
+            } else {
+                let fetchData  = await fetch('http://192.168.1.249:8080/update_gamemode', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        title: title_input.value,
+                        description: description_input.value,
+                        break_rule: JSON.stringify({code : await readFileAsText(file_input.current.files[0])}),
+                        bots: is_use_own_bot ? bots : [],
+                        demo_img: demo_gamemode_image_ref.current.value,
+                        update_time: upload_time,
+                        id: state.id
+                    })
+                })
+                let data = await fetchData.json()
+                return data
+            }
         }
 
         post_btn.onclick = async () => {
@@ -331,7 +381,7 @@ export default function Create_gamemode() {
             overflow.style.display = "none"
         }
 
-    }, [editor])
+    }, [editor, post])
 
     function create_your_own_bot_item(dem) {
         // Tạo phần tử <li> với class "mb-4"
@@ -505,9 +555,9 @@ export default function Create_gamemode() {
                 }} />
             </div>
 
-            <input ref={demo_gamemode_image_ref} className=" w-[1000px] px-[20px] py-[10px] mt-4 outline-[#007BFF] text-xl border border-slate-300" placeholder="Nhập url hình minh họa"></input>
+            <input ref={demo_gamemode_image_ref} className="demo_img w-[1000px] px-[20px] py-[10px] mt-4 outline-[#007BFF] text-xl border border-slate-300" placeholder="Nhập url hình minh họa"></input>
 
-            <dic ref={file_detector} className="file_detector flex mx-auto w-[500px] rounded-xl bg-white border border-slate-300 mt-5 h-64 pointing_event_br-95">
+            <dic ref={file_detector} className={`file_detector flex mx-auto w-[500px] rounded-xl bg-white border border-slate-300 mt-5 h-64 pointing_event_br-95`}>
                 <label htmlFor='code_file' className="w-2/3 h-4/5 m-auto grid place-content-center text-2xl rounded-lg border-2 border-dashed border-slate-300 transition-all">
                     <p><i class="fa-solid fa-cloud-arrow-up text-5xl"></i></p>
                     <p className="file_name">tải code lên</p>

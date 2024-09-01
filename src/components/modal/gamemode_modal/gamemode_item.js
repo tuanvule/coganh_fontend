@@ -6,13 +6,13 @@ export default function Gamemode_item({gamemode}) {
         <div className="flex-1 flex flex-col justify-between">
             <div className="flex justify-between my-auto">
                 <div className="flex flex-1 mr-6 rounded-lg overflow-hidden bg-slate-700">
-                    <div className="w-52 h-52 ">
+                    <div className="min-w-52 max-w-52 h-52">
                         <img src={gamemode.demo_img} className=" object-cover" />
                     </div>
                     <div className="px-4 py-2 flex flex-col">
                         <p className="text-xl">{gamemode.title}</p>
                         <p className=" text-slate-300 text-lg">BY {gamemode.author}</p>
-                        <p className=" text-slate-300 text-lg my-auto">{gamemode.description}</p>
+                        <p className=" text-slate-300 text-lg my-auto">{gamemode.description.slice(0, 100) + "..."}</p>
                         <p className=" text-slate-300 text-lg mt-auto"><i class="fa-solid fa-heart mr-1"></i> {gamemode.upvote.length - gamemode.downvote.length}</p>
                     </div>
                 </div>

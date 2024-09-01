@@ -46,22 +46,6 @@ body {
   text-overflow: ellipsis;
 }
 
-input#1:checked ~ .handle_user_gamemode_item {
-  display: block;
-}
-
-input#2:checked ~ .handle_user_gamemode_item {
-  display: block;
-}
-input#3:checked ~ .handle_user_gamemode_item {
-  display: block;
-}
-input:checked ~ .handle_user_gamemode_item {
-  display: block;
-}
-input:checked ~ .handle_user_gamemode_item {
-  display: block;
-}
-input:checked ~ .handle_user_gamemode_item {
-  display: block;
+.emoji-text {
+  font-family: 'Segoe UI Emoji', sans-serif;
 }

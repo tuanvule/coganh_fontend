@@ -121,7 +121,7 @@ export default function User() {
                         Training
                     </li>
                     <li data-name="gamemodes" className={`U_nav_item text-xl px-5 py-5 hover:bg-blue-600 hover:bg-opacity-50 rounded-md cursor-pointer select-none bg-opacity-80 ${page === "gamemodes" ? "bg-blue-700" : ""}`}>
-                        <i class="fa-solid fa-graduation-cap mr-5"></i>
+                        <i class="fa-solid fa-chess-board mr-5"></i>
                         Gamemodes
                     </li>
                 </ul>

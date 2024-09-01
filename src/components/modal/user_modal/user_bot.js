@@ -12,6 +12,7 @@ import Master from "../../../static/img/Master.png"
 import logo from "../../../static/img/logo.png"
 import View_code from '../view_code';
 import { AppContext } from '../../../context/appContext';
+import Handle_chunk from '../handle_chunk';
 
 export default function User_bot({ bots, raw_bots, is_owner, set_is_require_owner }) {
   const { history, user, theme } = useContext(AppContext)
@@ -59,10 +60,11 @@ export default function User_bot({ bots, raw_bots, is_owner, set_is_require_owne
         item.querySelector(".bot_info").classList.toggle("hidden")
       }
     })
-    set_enemy_bot_id(raw_bots.map(bot => bot.fight_history.map(item => item.enemy.bot_id)))
+    
+    set_enemy_bot_id(raw_bots.filter(bot => bot.gamemode === "normal").map(bot => bot.fight_history.map(item => item.enemy.bot_id)))
     set_bot_status(status)
   }, [raw_bots, user, chunk_index, is_public_list])
-
+  console.log(enemy_bot_id)
   useEffect(() => {
     if (enemy_bot_id.length > 0) {
       fetch("http://192.168.1.249:8080/get_code_to_show", {
@@ -201,7 +203,7 @@ export default function User_bot({ bots, raw_bots, is_owner, set_is_require_owne
 
         <ul className="U_bot_list p-0 lg:w-full lg:mx-0 mx-auto">
           {bots && bots[chunk_index] && bots[chunk_index].map((bot, i) =>
-            <li className="U_bot_item rounded-lg border-[#a0d8fa] dark:bg-[#111c2c] bg-white border-2 dark:bg-opacity-15 lg:p-5 py-5 mb-4">
+            <li className="U_bot_item list-none rounded-lg border-[#a0d8fa] dark:bg-[#111c2c] bg-white border-2 dark:bg-opacity-15 lg:p-5 py-5 mb-4">
               <div className="ml-auto flex w-fit">
                 <div onClick={() => toggle_is_public(bot.id, !is_public_list[i], i)} className="text-2xl grid place-content-center border border-[#a0d8fa] hover:bg-[#a0d8fa] hover:text-black transition-all cursor-pointer select-none w-fit p-3 py-1 rounded-md mb-5 mr-2">{is_public_list[i] ? "PUBLIC" : "PRIVATE"}</div>
                 <div data-isp={is_public_list[i]} className="open_bot_info_btn text-3xl border border-[#a0d8fa] hover:bg-[#a0d8fa] hover:text-black transition-all cursor-pointer select-none p-3 py-1 rounded-md mb-5">
@@ -212,7 +214,7 @@ export default function User_bot({ bots, raw_bots, is_owner, set_is_require_owne
                 <div className="lg:w-[55%] w-full lg:h-72 h-56 rounded-lg py-5 pr-5 mb-5 flex">
                   <div className="flex flex-col items-center w-1/2">
                     <div className="lg:w-28 lg:h-28 w-20 h-20 lg:text-5xl text-3xl font-bold rounded-full bg-[#a0d8fa] text-black grid place-content-center">{bot.bot_name[0].toUpperCase()}</div>
-                    <div className="my-5 lg:text-3xl text-2xl">{bot.bot_name}</div>
+                    <div className="my-5 lg:text-3xl text-2xl max-w-[250px] three_dot">{bot.bot_name}</div>
                     <div className="text-2xl">{bot.elo}</div>
                   </div>
                   <div className="w-1/2 flex lg:h-full">
@@ -300,11 +302,11 @@ export default function User_bot({ bots, raw_bots, is_owner, set_is_require_owne
                       ]}
                       sx={{
                         [`& .${pieArcLabelClasses.root}`]: {
-                          fill: theme === "dark" ? 'white' : "black",
+                          fill: theme === "dark" ? 'white' : "white",
                           font: 'bold 20px sans-serif',
                         },
-                        ["& .MuiChartsLegend-series text"]: {
-                          fill: theme === "dark" ? 'white' : "black",
+                        ["& .MuiChartsLegend-series text tspan"]: {
+                          fill: theme === "dark" ? 'white' : "white",
                           font: 'bold 20px sans-serif !important',
                         }
                       }}
@@ -357,6 +359,10 @@ export default function User_bot({ bots, raw_bots, is_owner, set_is_require_owne
             </li>
           )}
         </ul>
+
+        <div className="mb-4">
+          {bots.length > 1 && <Handle_chunk chunk_index={chunk_index} set_chunk_index={set_chunk_index} max_chunk={Math.ceil(raw_bots.length / 4) - 1}/>}
+        </div>
 
         { is_un_public && 
         <div className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-20 z-[100000000000000]">

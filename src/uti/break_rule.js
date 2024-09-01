@@ -226,12 +226,11 @@
 //     }
 // }
 
-function execute(intervention, command, x, y, side) {
-    console.log(command, x, y, side)
-    if (command === "remove" && side === 1) intervention.remove_blue(x, y);
-    else if (command === "remove" && side !== 1) intervention.remove_red(x, y);
-    else if (command === "insert" && side === 1) intervention.insert_blue(x, y);
-    else if (command === "insert" && side !== 1) intervention.insert_red(x, y);
+function execute(intervention, command, x, y, side, trackOn=false) {
+    if (command === "remove" && side === 1) intervention.remove_blue(x, y, trackOn);
+    else if (command === "remove" && side !== 1) intervention.remove_red(x, y, trackOn);
+    else if (command === "insert" && side === 1) intervention.insert_blue(x, y, trackOn);
+    else if (command === "insert" && side !== 1) intervention.insert_red(x, y, trackOn);
 }
 
 export default function breakRule(gameState, intervention, globalVar, localVar) {
@@ -249,8 +248,6 @@ export default function breakRule(gameState, intervention, globalVar, localVar) 
     let spy = localVar.spy;
     let traitor = localVar.traitor;
 
-    console.log(localVar)
-
     if (gameState.move_counter > 0) {
         let selectedPos = gameState.move.selected_pos;
         let newPos = gameState.move.new_pos;
@@ -258,7 +255,6 @@ export default function breakRule(gameState, intervention, globalVar, localVar) 
         let choseRightSide = true;
 
         // Di chuyển
-        console.log(traitor[+side])
         if (arraysEqual(selectedPos, king[side])) {
             king[side] = newPos;
         } else if (arraysEqual(selectedPos, spy[side])) {
@@ -286,9 +282,12 @@ export default function breakRule(gameState, intervention, globalVar, localVar) 
 
         // Cải trang
         let pos = spy.concat(traitor[0]).concat(traitor[1]);
-        console.log("contrain",pos)
-        for (let i of pos) execute(intervention, "remove", ...i, side);
-        for (let i of pos) execute(intervention, "insert", ...i, +!side);
+        for (let i of pos) {
+            execute(intervention, "remove", i[0], i[1], side)
+        };
+        for (let i of pos) {
+            execute(intervention, "insert", i[0], i[1], +!side)
+        }
 
         // Vua
         if (choseRightSide) {
@@ -304,17 +303,17 @@ export default function breakRule(gameState, intervention, globalVar, localVar) 
 
     } else {
         // Setup
-        intervention.remove_red(4, 2);
-        intervention.insert_blue(4, 2);
+        intervention.remove_red(4, 2, false);
+        intervention.insert_blue(4, 2, false);
     }
 
     // Cài đặt trạng thái
     for (let i = 0; i < 2; i++) {
-        intervention.set_value(...spy[i], "⚪");
+        intervention.set_value(spy[i][0], spy[i][1], "⚪", 35, [255,255,255])
         intervention.set_value(...spy[i], "👥");
     }
     for (let i of traitor[0].concat(traitor[1])) {
-        intervention.set_value(...i, "⚪");
+        intervention.set_value(i[0], i[1], "⚪", 35, [255,255,255])
     }
     for (let i = 0; i < 2; i++) {
         intervention.set_value(...king[i], "👑");
@@ -331,7 +330,6 @@ function arraysEqual(a, b) {
 }
 
 function arrayInArray(arr, arrList) {
-    console.log(arr, arrList)
     return arrList.some(el => arraysEqual(el, arr));
 }
 

@@ -6,6 +6,9 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
+    fontFamily: {
+      'emoji': ['"Segoe UI Emoji"', 'sans-serif'],
+    },
     extend: {
       keyframes: {
         close_code: {

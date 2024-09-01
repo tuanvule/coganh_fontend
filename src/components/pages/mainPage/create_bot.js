@@ -236,7 +236,8 @@ def main(player):
                 CB_bot_items.forEach(e => e.classList.remove("CB_selected"))
                 choosen_bot = item.dataset.level
                 item.classList.add("CB_selected")
-                request_data.bot = game_info ? gamemode_bot[choosen_bot] : choosen_bot
+                request_data.bot = game_info && gamemode_bot[choosen_bot] ? gamemode_bot[choosen_bot] : choosen_bot
+                request_data.username = choosen_bot === selected_bot.bot_name ? choosen_bot : username
                 bot_html = item
                 runBtn.classList.add("CB_active")
             }
