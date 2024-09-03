@@ -131,6 +131,7 @@ export default class Intervention {
         this._res.push({ action: 'remove_blue', pos: [x, y], trackOn });
         this.game_state.board[y][x] = 0;
         this.game_state.positions[0] = this.game_state.positions[0].filter(pos => pos[0] !== x || pos[1] !== y);
+        return this.game_state
     }
 
     remove_red(x, y, trackOn = true) {
@@ -139,6 +140,7 @@ export default class Intervention {
         this._res.push({ action: 'remove_red', pos: [x, y], trackOn });
         this.game_state.board[y][x] = 0;
         this.game_state.positions[1] = this.game_state.positions[1].filter(pos => pos[0] !== x || pos[1] !== y);
+        return this.game_state
     }
 
     insert_blue(x, y, trackOn = true) {
@@ -151,6 +153,7 @@ export default class Intervention {
         remove = new Set([...remove, ...ganh_chet(this.game_state, [x, y], this.game_state.positions[1], 1, -1)]);
         remove = new Set([...remove, ...vay(this.game_state, this.game_state.positions[1])]);
         remove.forEach(pos => this.remove_red(pos[0], pos[1]));
+        return this.game_state
     }
 
     insert_red(x, y, trackOn = true) {
@@ -163,6 +166,7 @@ export default class Intervention {
         remove = new Set([...remove, ...ganh_chet(this.game_state, [x, y], this.game_state.positions[0], -1, 1)]);
         remove = new Set([...remove, ...vay(this.game_state,this.game_state.positions[0])]);
         remove.forEach(pos => this.remove_blue(pos[0], pos[1]));
+        return this.game_state
     }
 
     blue_win() {
@@ -177,12 +181,13 @@ export default class Intervention {
         this.game_state.result = "draw";
     }
 
-    set_value(x, y, value, size = 20, fill = [255, 255, 255], stroke_width = 1, stroke_fill = [0, 0, 0]) {
+    set_value(x, y, value, size = 20, fill = [255, 255, 255, 255], stroke_width = 1, stroke_fill = [0, 0, 0, 255]) {
         if (typeof value !== 'string') throw new Error(`value must be string (not ${typeof value})`);
         if (typeof size !== 'number') throw new Error(`size must be int (not ${typeof size})`);
-        if (!Array.isArray(fill) || fill.length !== 3) throw new Error(`fill must be list of [r, g, b]`);
+        console.log(fill)
+        if (!Array.isArray(fill) || fill.length !== 4) throw new Error(`fill must be list of [r, g, b, a]`);
         if (typeof stroke_width !== 'number') throw new Error(`stroke_width must be int (not ${typeof stroke_width})`);
-        if (!Array.isArray(stroke_fill) || stroke_fill.length !== 3) throw new Error(`stroke_fill must be list of [r, g, b]`);
+        if (!Array.isArray(stroke_fill) || stroke_fill.length !== 4) throw new Error(`stroke_fill must be list of [r, g, b, a]`);
         this._res.push({ action: 'set_value', pos: [x, y], value, size, fill, stroke_width, stroke_fill });
     }
 

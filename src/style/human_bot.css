@@ -625,61 +625,80 @@ canvas {
     .board {
         display: grid;
         grid-template-columns: auto auto;
-        column-gap: 1px;
-        row-gap: 1px;
         position: relative;
         /* top: 50%;
         left: 50%; 
         transform: translate(-50%,-50%); */
-        width: 202px;
-        height: 202px;
+        width: 200px;
+        height: 200px;
         background-color: #242527;
     }
     
     .HB_grid {
-        height: 101px;
-        width: 101px;
+        height: 100%;
+        width: 100%;
         /* background-color: #fff; */
         position: relative;
         overflow: hidden;
     }
+
+    .HB_rowx {
+        position: absolute;
+        top: calc(50% - 0.5px);
+        /* left: 49%; */
+        height: 1px;
+        background-color: #242527;
+        width: 100%;
+    }
+    
+    .HB_rowy {
+        position: absolute;
+        left: calc(50% - 0.5px);
+        width: 1px;
+        background-color: #242527;
+        height: 100%;
+    }
     
     .HB_row2 {
         position: absolute;
-        top: -39%;
-        left: 8%;
+        top: -22%;
+        left: calc(50% - 0.5px);
         width: 1px;
-        height: 265px;
-        transform: rotate(45deg);
         background-color: #242527;
+        height: 146px;
+        transform: rotate(45deg);
+        
     }
     
     .HB_row1 {
         position: absolute;
-        top: -121%;
-        left: 8%;
+        top: -22%;
+        left: calc(50% - 0.5px);
         width: 1px;
-        height: 265px;
-        transform: rotate(135deg);
         background-color: #242527;
+        height: 146px;
+        transform: rotate(135deg);
+        
     }
     
     .HB_row3 {
         position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
+        left: calc(50% - 0.5px);
+        /* transform: translateX(-50%); */
         width: 1px;
-        height: 100%;
         background-color: #242527;
+        height: 100%;
+        
     }
     
     .HB_row4 {
         position: absolute;
-        left: 50%;
-        width: 1px;
+        left: calc(50% - 0.5px);
         height: 100%;
-        transform: translateX(-50%) rotate(90deg);
+        width: 1px;
         background-color: #242527;
+        transform: rotate(90deg);
+        
     }
     
     .box {
@@ -735,5 +754,13 @@ canvas {
         position: absolute;
         z-index: 1001;
         animation: fire 1s linear forwards;
+    }
+
+    .breaking {
+        width: 30px;
+        height: 30px;
+        position: absolute;
+        z-index: 1001;
+        animation: breaking_animation 0.5s linear forwards;
     }
 }

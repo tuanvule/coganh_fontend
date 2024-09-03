@@ -5,7 +5,7 @@ export default function Check_admin_modal() {
     const [is_admin, set_is_admin] = useState(true)
     const input_ref = useRef(null)
     function check_admin() {
-        fetch("http://192.168.1.249:8080/check_admin?password="+input_ref.current.value)
+        fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/check_admin?password="+input_ref.current.value)
         .then(res => res.json())
         .then(is_admin => {
             if(Boolean(is_admin)) {

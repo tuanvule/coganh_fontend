@@ -33,7 +33,7 @@ export default function Signin(props) {
     // const inputAvataRef = useRef()
     // const fileUpload = useRef()
     useEffect(() => {
-        fetch('http://192.168.1.249:8080/get_all_user', {
+        fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/get_all_user', {
             method: "GET",
         })
         .then((response) => response.json())
@@ -141,7 +141,7 @@ export default function Signin(props) {
                 ...value,
             })
 
-            fetch('http://192.168.1.249:8080/handle_signin', {
+            fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/handle_signin', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

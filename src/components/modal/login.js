@@ -19,11 +19,13 @@ export default function Login(props) {
 
         if(res.status) {
             console.log(res)
-            const { username, fightable, elo, id } = res.userData
+            const { username, id } = res.userData
             localStorage.setItem("username", username);
             localStorage.setItem("id", id);
+            localStorage.setItem("access_token", res.access_token);
             setUser({
-                username:username, id: id
+                username:username, id: id,
+                access_token: res.access_token
             })
 
             setErrorVisible('hidden')
@@ -40,7 +42,7 @@ export default function Login(props) {
 
         console.log(password, name)
 
-        fetch('http://192.168.1.249:8080/handle_login', {
+        fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/handle_login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

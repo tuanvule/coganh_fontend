@@ -14,7 +14,8 @@ export default function AppProvider({ children, theme, setTheme }) {
     if(localStorage.getItem("username")) {
       setUser({
         username: localStorage.getItem("username"),
-        id: localStorage.getItem("id")
+        id: localStorage.getItem("id"),
+        access_token: localStorage.getItem("access_token")
       })
     } 
   }, [JSON.stringify(user)])

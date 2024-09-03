@@ -8,7 +8,7 @@ export default function Add_bot({set_new_bot, set_code, set_selected_bot, set_is
 
     useEffect(() => {
         btn_Ref.current.onclick = () => {
-            fetch(`http://192.168.1.249:8080/create_bot?owner=${user.username}&bot_name=${bot_name}&gamemode=${gamemode}`)
+            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/create_bot?owner=${user.username}&bot_name=${bot_name}&gamemode=${gamemode}`)
             .then(res => res.json())
             .then(data => {
                 set_new_bot((new Date).getMilliseconds())

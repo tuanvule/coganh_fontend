@@ -174,7 +174,7 @@ export default function Create_content() {
               formData.append('totalChunks', totalChunks);
       
               try {
-                const response = await fetch('http://192.168.1.249:8080/upload_chunk', {
+                const response = await fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/upload_chunk', {
                   method: 'POST',
                   body: formData
                 });
@@ -246,7 +246,7 @@ export default function Create_content() {
             if (!check_valid_task(tags, inOupValue)) return
             let status = true
             if(is_update) {
-                fetch("http://192.168.1.249:8080/update_task", {
+                fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/update_task/" + state.task.id, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -282,7 +282,7 @@ export default function Create_content() {
                         return
                     })
             } else {
-                fetch("http://192.168.1.249:8080/upload_task", {
+                fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/upload_task", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

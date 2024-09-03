@@ -27,7 +27,7 @@ export default function Post() {
     if (state) {
       set_post(state)
     } else {
-      fetch("http://192.168.1.249:8080/get_post_by_id/" + post_id)
+      fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_post_by_id/" + post_id)
         .then(res => res.json())
         .then(data => {
           set_post(data)
@@ -74,7 +74,7 @@ export default function Post() {
       <Navbar back_link="/post_page"/>
       {!is_mobile &&
         <div className="absolute top-28 left-28 text-6xl select-none">
-          {post && <Vote_modal post={post}/>}
+          {post && <Vote_modal type="post" doc={post}/>}
           <i onClick={() => scroll_to_comment()} class="fa-solid fa-comment dark:text-[#a0d8fa] text-[#007bff] hover:brightness-90 cursor-pointer"></i>
           <p className="text-2xl text-center">{comment_count}</p>
         </div>
@@ -94,7 +94,7 @@ export default function Post() {
           </div>
         </div>
         {is_mobile && <div className="flex select-none items-center">
-          {post && <Vote_modal post={post} is_mobile={is_mobile}/>}
+          {post && <Vote_modal type="post" doc={post} is_mobile={is_mobile}/>}
           <i onClick={() => scroll_to_comment()} class="fa-solid fa-comment text-[#a0d8fa] lg:text-6xl mr-3 lg:mr-0 text-xl hover:brightness-90 cursor-pointer"></i>
           <p className="text-2xl text-center">{comment_count}</p>
         </div>

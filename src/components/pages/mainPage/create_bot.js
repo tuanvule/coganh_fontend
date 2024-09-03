@@ -58,7 +58,7 @@ export default function Create_bot() {
 
     useEffect(() => {
         if(title && upload_time) {
-            fetch(`http://192.168.1.249:8080/get_gamemode_by_post?title=${title}&upload_time=${upload_time}`)
+            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_gamemode_by_post?title=${title}&upload_time=${upload_time}`)
             .then(res => res.json())
             .then(data => {
                 set_game_info(data)
@@ -69,7 +69,7 @@ export default function Create_bot() {
 
     useEffect(() => {
         if (username) {
-            fetch(`http://192.168.1.249:8080/get_user_bot?username=${user.username}&gamemode=${game_info ? game_info.gamemode : "normal"}`)
+            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_user_bot?username=${user.username}&gamemode=${game_info ? game_info.title : "normal"}`)
                 .then(res => res.json())
                 .then(data => {
                     // console.log(data)
@@ -81,23 +81,7 @@ export default function Create_bot() {
                         }
                         set_bots(data)
                     } else {
-                        set_code(`# NOTE: tool
-# valid_move(x, y, board): trả về các nước đi hợp lệ của một quân cờ - ((x, y), ...)
-# distance(x1, y1, x2, y2): trả về số nước đi ít nhất từ (x1, y1) đến (x2, y2) - n
-
-# NOTE: player
-# player.your_pos: vị trí tất cả quân cờ của bản thân - [(x, y), ...]
-# player.opp_pos: vị trí tất cả quân cờ của đối thủ - [(x, y), ...]
-# player.your_side: màu quân cờ của bản thân - 1:🔵
-# player.board: bàn cờ - -1:🔴 / 1:🔵 / 0:∅
-
-# Remember that player.board[y][x] is the tile at (x, y) when printing
-def main(player):
-    move = [[-1,0],[0,-1],[0,1],[1,0]]
-    for x,y in player.your_pos:
-        for mx,my in move:
-            if 0 <= x+mx <= 4 and 0 <= y+my <= 4 and player.board[y+my][x+mx] == 0:
-                return {"selected_pos": (x,y), "new_pos": (x+mx, y+my)}`)
+                        set_code(`# Bạn chư có bot. Hãy tạo 1 con bot mới với nút Add bot`)
                     }
                 })
                 .catch(err => console.error(err))
@@ -262,7 +246,7 @@ def main(player):
             }
             saveBtn.dataset.saved = "true"
 
-            fetch("http://192.168.1.249:8080/save_bot", {
+            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/save_bot", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -332,7 +316,7 @@ def main(player):
                 loadingNavVideoFI.style.display = "none"
             }
             
-            fetch("http://192.168.1.249:8080/debug_bot", {
+            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/debug_bot", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -403,7 +387,7 @@ def main(player):
             video.style.display = "none"
             loadingNavVideoLD.style.display = "block"
             loadingNavVideoCI.style.display = "none"
-            fetch("http://192.168.1.249:8080/run_bot", {
+            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/run_bot", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -669,7 +653,7 @@ def main(player):
     return (
         <div className="h-screen bg-[#111c2c] text-white">
             {is_require_login && <Login_require set_is_require_login={set_is_require_login} />}
-            {is_open_add_bot && <Add_bot set_new_bot={set_new_bot} set_is_open_add_bot={set_is_open_add_bot} set_code={set_code} set_selected_bot={set_selected_bot} gamemode={game_info ? game_info.gamemode : "normal"}/>}
+            {is_open_add_bot && <Add_bot set_new_bot={set_new_bot} set_is_open_add_bot={set_is_open_add_bot} set_code={set_code} set_selected_bot={set_selected_bot} gamemode={game_info ? game_info.title : "normal"}/>}
             {is_open_remove_bot && <Remove_bot set_selected_bot={set_selected_bot} set_new_bot={set_new_bot} selected_bot={selected_bot} set_is_open_remove_bot={set_is_open_remove_bot} />}
             <div
                 className="cover"

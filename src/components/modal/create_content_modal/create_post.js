@@ -99,7 +99,7 @@ export default function Create_post() {
         formData.append('totalChunks', totalChunks);
 
         try {
-          const response = await fetch('http://192.168.1.249:8080/upload_chunk', {
+          const response = await fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/upload_chunk', {
             method: 'POST',
             body: formData
           });
@@ -131,16 +131,17 @@ export default function Create_post() {
       noti_content.innerHTML = err
       noti_content.classList.add("err")
     }
-
+    console.log(user.access_token)
     function add_post(text, url) {
       if (!check_valid_post()) return
       if(is_update) {
         // console.log(text)
         // return
-        fetch('http://192.168.1.249:8080/update_post', {
+        fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/update_post/'+state.post.id, {
           method: 'POST',
           headers: {
             "Content-Type": "application/json",
+            'Authorization': `Bearer ${user.access_token}`,
           },
           body: JSON.stringify({
             content: text,
@@ -152,7 +153,7 @@ export default function Create_post() {
           })
         });
       } else {
-        fetch('http://192.168.1.249:8080/upload_post', {
+        fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/upload_post', {
           method: 'POST',
           headers: {
             "Content-Type": "application/json",

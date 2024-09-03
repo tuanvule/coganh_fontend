@@ -16,7 +16,7 @@ export default function User_post({ username, posts, is_owner, set_is_require_ow
 
   useEffect(() => {
     if (is_reset_post !== check) {
-      fetch(`http://192.168.1.249:8080/get_post_by_username/${username}`)
+      fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_post_by_username/${username}`)
         .then(res => res.json())
         .then(data => set_Posts(data))
         .catch(err => console.log(err))
@@ -25,7 +25,7 @@ export default function User_post({ username, posts, is_owner, set_is_require_ow
   }, [is_reset_post])
 
   useEffect(() => {
-    fetch(`http://192.168.1.249:8080/get_unpublic_user_posts?username=${username}&page=${UPP_chunk_index}&size=9`)
+    fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_unpublic_user_posts?username=${username}&page=${UPP_chunk_index}&size=9`)
       .then(res => res.json())
       .then(data => set_un_public_posts(data))
       .catch(err => console.log(err))
@@ -38,7 +38,11 @@ export default function User_post({ username, posts, is_owner, set_is_require_ow
     }
     let is_delete = window.confirm("bạn có chắc muốn xóa")
     if (is_delete) {
-      fetch(`http://192.168.1.249:8080/delete_post/${id}`)
+      fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/delete_post/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${user.access_token}`,
+        }
+      })
         .then(res => res.json())
         .then(data => {
           console.log(data)

@@ -1,40 +1,16 @@
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
 
-
-export default function Notification(props) {
-  const notificationRef = useRef()
-
-  useEffect(() => {
-    notificationRef.current.onanimationend = function () {
-      this.style.display = 'none'
-      props.setIsErr(false)
-    }
-  })
-
-
+export default function Notification({content, set_is_open}) {
   return (
-    <div ref={notificationRef} className={`animate-[moveNotification_2s_ease-in] z-50 fixed -right-1 top-[4.5rem] min-w-[208px] px-2 py-1 rounded-lg text-xl leading-none border-2 ${props.type === 'error' && 'bg-[#FCEDE9]  border-[#E6D0CB]'} ${props.type === 'success' && 'bg-[#EAF7EE]  border-[#CAE0D0]'} ${props.type === 'warning' && 'bg-[#FEF7EA]  border-[#F2E4CD]'}`}>
-        {props.type === 'success' &&
-          <div className=" flex items-center">
-            <i className="fa-solid fa-circle-check text-[#39B55C] text-3xl mr-2"></i>
-            <span className=" font-medium">Successfuly</span>
+    <div className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-20 z-[100000000000000]">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#0757ad] w-1/3 h-3/4 rounded-2xl grid place-content-center px-20">
+          <div className="flex flex-col items-center text-2xl"> 
+              <p className="text-3xl text-center">
+                {content}
+              </p>
+              <div onClick={() => set_is_open({open: false, content: ""})} className="text-2xl py-1 px-4 rounded-lg mt-10 bg-[#278ae8] hover:brightness-90 cursor-pointer select-none">OK</div>
           </div>
-          
-        }
-        {props.type === 'warning' && 
-          <div className=" flex items-center">
-            <i className="fa-solid fa-triangle-exclamation text-[#EE9500] text-3xl mr-2"></i>
-            <span className=" font-medium">Something wrong</span>
-          </div>
-          
-        }
-        {props.type === 'error' && 
-          <div className=" flex items-center">
-            <i className="fa-solid fa-circle-xmark text-[#EA4E2D] text-3xl mr-2"></i>
-            <span className=" font-medium">Unqualified file</span>
-          </div>
-          
-        }
+      </div>
     </div>
   )
 }

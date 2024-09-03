@@ -190,31 +190,31 @@
 //                     break;
 //             }
 
-//             pos_lst.forEach(([x, y]) => {
-//                 let board = gameState.board;
-//                 let d8 = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [-1, 1], [1, -1]];
-//                 let d4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+            pos_lst.forEach(([x, y]) => {
+                let board = gameState.board;
+                let d8 = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [-1, 1], [1, -1]];
+                let d4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
                 
-//                 let directions = (x + y) % 2 === 0 ? d8 : d4;
-//                 let connect = directions
-//                     .map(([mx, my]) => [x + mx, y + my])
-//                     .filter(([nx, ny]) => 
-//                         nx >= 0 && nx <= 4 && ny >= 0 && ny <= 4 && 
-//                         board[ny][nx] !== 0 && board[y][x] !== 0
-//                     );
+                let directions = (x + y) % 2 === 0 ? d8 : d4;
+                let connect = directions
+                    .map(([mx, my]) => [x + mx, y + my])
+                    .filter(([nx, ny]) => 
+                        nx >= 0 && nx <= 4 && ny >= 0 && ny <= 4 && 
+                        board[ny][nx] !== 0 && board[y][x] !== 0
+                    );
 
-//                 if (connect.length >= 2) {
-//                     Intervention.set_value(x, y, "⛵");
-//                 } else {
-//                     // Cuốn trôi
-//                     if (board[y][x] === 1) {
-//                         Intervention.remove_blue(x, y);
-//                     } else if (board[y][x] === -1) {
-//                         Intervention.remove_red(x, y);
-//                     }
-//                     Intervention.set_value(x, y, "🌊");
-//                 }
-//             });
+                if (connect.length >= 2) {
+                    Intervention.set_value(x, y, "⛵");
+                } else {
+                    // Cuốn trôi
+                    if (board[y][x] === 1) {
+                        Intervention.remove_blue(x, y);
+                    } else if (board[y][x] === -1) {
+                        Intervention.remove_red(x, y);
+                    }
+                    Intervention.set_value(x, y, "🌊");
+                }
+            });
 //         }
 
 //         // Cài đặt trạng thái
@@ -309,11 +309,11 @@ export default function breakRule(gameState, intervention, globalVar, localVar) 
 
     // Cài đặt trạng thái
     for (let i = 0; i < 2; i++) {
-        intervention.set_value(spy[i][0], spy[i][1], "⚪", 35, [255,255,255])
+        intervention.set_value(spy[i][0], spy[i][1], "⚪", 35)
         intervention.set_value(...spy[i], "👥");
     }
     for (let i of traitor[0].concat(traitor[1])) {
-        intervention.set_value(i[0], i[1], "⚪", 35, [255,255,255])
+        intervention.set_value(i[0], i[1], "⚪", 35)
     }
     for (let i = 0; i < 2; i++) {
         intervention.set_value(...king[i], "👑");

@@ -32,7 +32,7 @@ export default function Visualize() {
 
 
   useEffect(() => {
-    fetch("http://192.168.1.249:8080/get_visualize/" + id)
+    fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_visualize/" + id)
       .then(res => res.json())
       .then(data => set_data(data))
       .catch(err => console.log(err))

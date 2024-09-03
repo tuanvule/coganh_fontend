@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import level1 from "../../../static/img/level1.png"
 import level2 from "../../../static/img/level2.png"
 import level3 from "../../../static/img/level3.png"
@@ -22,6 +22,9 @@ import Intervention from '../../../uti/intervention'
 // import breakRule from '../../../uti/break_rule'
 import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import chess_rule from "../../../uti/chess_rule"
+import Notification from '../../primary/notification'
+import P5Wrapper from '../../../uti/p5_board'
+import Vote_modal from '../../modal/vote_modal'
 
 const {ganh_chet, vay} = chess_rule
 
@@ -40,6 +43,10 @@ export default function Human_Bot() {
     const [ user_bots, set_user_bots] = useState([])
     const [ selected_user_bot, set_selected_user_bot] = useState()
     const [ is_open_bot_list, set_is_open_bot_list] = useState(false)
+    const [ is_open_notification, set_is_open_notification] = useState({
+        open: false,
+        content: ""
+    })
     const isMobile = (window.innerWidth <= 600)
     let radius = 16
 
@@ -51,9 +58,11 @@ export default function Human_Bot() {
 
     const [game_info, set_game_info] = useState(state)
 
+    const p5Ref = useRef(null)
+
     useEffect(() => {
         if(!(game_info && game_info.title)) {
-            fetch(`http://192.168.1.249:8080/get_gamemode_by_post?title=${title}&upload_time=${upload_time}`)
+            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_gamemode_by_post?title=${title}&upload_time=${upload_time}`)
             .then(res => res.json())
             .then(data => {
                 set_game_info(data)
@@ -71,7 +80,6 @@ export default function Human_Bot() {
         }
     }, [selected_user_bot])
     useEffect(() => {
-        // console.log(game_info)
         let board = $(".board")
         let display_outBoard = $(".display_outBoard")
         let custom_board = $(".custom_board")
@@ -112,7 +120,13 @@ export default function Human_Bot() {
 
         const rate_btn = $(".rate_btn")
 
-        play_again_btn.onclick = () => set_reload(Math.random())
+        play_again_btn.onclick = () => {
+            if (p5Ref.current) {
+                p5Ref.current.clearCanvas();
+            }
+            overflow.style.display = "block"
+            set_reload(Math.random())
+        }
 
         const gridHTML = `
 <div class="HB_grid dark:bg-white bg-slate-200">
@@ -143,9 +157,6 @@ export default function Human_Bot() {
 <div class="HB_rowy"></div>
 `
 
-        // let grid = 
-
-        // let gameState.positions = 
         let gamemode_bot = {}
 
         var gameState = {
@@ -186,50 +197,52 @@ export default function Human_Bot() {
         [1, 0, 0, 0, 1],
         [1, 1, 1, 1, 1]]
         let intervention = new Intervention(gameState)
+        
+        function isIcon(character) {
+            const codePoint = character.codePointAt(0);
+            // Kiểm tra nếu mã Unicode nằm trong khoảng của biểu tượng
+            return (
+                (codePoint >= 0x1F600 && codePoint <= 0x1F64F) ||  // Emoticons
+                (codePoint >= 0x1F300 && codePoint <= 0x1F5FF) ||  // Misc Symbols and Pictographs
+                (codePoint >= 0x1F680 && codePoint <= 0x1F6FF) ||  // Transport & Map Symbols
+                (codePoint >= 0x1F700 && codePoint <= 0x1F77F) ||  // Alchemical Symbols
+                (codePoint >= 0x1F780 && codePoint <= 0x1F7FF) ||  // Geometric Shapes Extended
+                (codePoint >= 0x1F800 && codePoint <= 0x1F8FF) ||  // Supplemental Arrows-C
+                (codePoint >= 0x1F900 && codePoint <= 0x1F9FF) ||  // Supplemental Symbols and Pictographs
+                (codePoint >= 0x1FA00 && codePoint <= 0x1FA6F) ||  // Chess Symbols
+                (codePoint >= 0x1FA70 && codePoint <= 0x1FAFF) ||  // Symbols and Pictographs Extended-A
+            
+                // Các ký tự đặc biệt khác
+                (codePoint >= 0x2600 && codePoint <= 0x26FF) ||    // Miscellaneous Symbols
+                (codePoint >= 0x2700 && codePoint <= 0x27BF) ||    // Dingbats
+                (codePoint >= 0x2B50 && codePoint <= 0x2B59)  
+            )
+          }
 
         function reset_display_item_outside(item) {
             if(item) {
                 const {pos, value, fill, size, stroke_fill, stroke_width} = item
                 const [x,y] = pos
                 
-                display_outBoard.innerHTML += `
-                    <div data-choosable="false" class="custom_icon emoji-text w-[60px] h-[60px] rounded-full select-none pointer-events-none grid place-content-center text-xl text-white -translate-x-1/2 -translate-y-1/2" style="top:${y/4*100}%; left:${x/4*100}%; font-size: ${size * 1}px; border: ${stroke_width}px solid rgb(${stroke_fill}); background-color: rgb(${fill})">${value}</div>
-                `
+                // display_outBoard.innerHTML += `
+                //     <div data-choosable="false" class="custom_icon emoji-text w-[60px] h-[60px] rounded-full select-none pointer-events-none grid place-content-center text-xl text-white -translate-x-1/2 -translate-y-1/2" style="top:${y/4*100}%; left:${x/4*100}%; font-size: ${size * 1}px; border: ${stroke_width}px solid rgb(${stroke_fill}); background-color: rgb(${fill})">${value}</div>
+                // `
+                if (p5Ref.current && item) {
+                    p5Ref.current.drawText(
+                        x * chessGrapX + chessGrapX - (isIcon(value) ? 70  : 40)  * (size * 1.75 / (!isMobile ? 1 : 2 ) /100) + (!isMobile ? 0 : 13 ), 
+                        y * chessGrapY + chessGrapY + 35 * (size * 1.75 / (!isMobile ? 1 : 2 ) / 100) + (!isMobile ? 0 : 12 ), 
+                        value, 
+                        size * 1.75 / (!isMobile ? 1 : 2 ), 
+                        fill, stroke_width, stroke_fill
+                    );
+                }
             }
             // gameState.outside_display.forEach(item => {
             // })
         
         }
 
-        function check_is_display_outside(x,y) {
-            if(Number.isInteger(x+y) && x >= 0 && x <=4 && y >= 0 && y <= 4) {
-                return false
-            }
-            return true
-        }
 
-        if(game_info && game_info.title) {
-            // let func = JSON.parse(game_info.break_rule_js).code
-            
-            // let breakRule = new Function('return ' + func )()
-            // console.log(game_info)
-            const functionString = JSON.parse(game_info.break_rule_js).code;
-            eval(functionString);
-
-            window.breakRule(gameState, intervention, global_var, local_var)
-            let result = intervention.view_command()
-
-            let a = result.filter(item => item.action === "set_value" && !check_is_display_outside(item.pos[0],item.pos[1])).forEach((item) => reset_custom_board(item))
-            result.filter(item => item.action === "set_value" && check_is_display_outside(item.pos[0],item.pos[1])).forEach((item) => reset_display_item_outside(item))
-
-            
-
-            intervention.action()
-            game_info.bots.forEach(bot => {
-                gamemode_bot[bot.name] = bot.code
-                gamemode_bot[bot.name + "_avatar"] = bot.avatar
-            })
-        }
         
         const type = [
             [1, 0, 1, 0, 1],
@@ -238,19 +251,6 @@ export default function Human_Bot() {
             [0, 1, 0, 1, 0],
             [1, 0, 1, 0, 1]
         ]
-
-        function reset_custom_board(item) {
-            const { value, size, fill, stroke_width, stroke_fill, pos} = item
-            const [x,y] = pos
-
-            custom_board.innerHTML += `
-                <p data-choosable="false" data-posx="${x}" data-posy="${y}" class="custom_icon emoji-text pb-1" style="top:${chessGrapY * y}px; left:${chessGrapX * x}px; font-size: ${size * 1.8}px; border: ${stroke_width}px solid rgb(${stroke_fill}); ">${value}</p>
-            `
-            // for (let i = 0; i < gameState.custom_board.length; i++) {
-            //     for (let j = 0; j < gameState.custom_board[i].length; j++) {
-            //     }
-            // }
-        }
 
         function resetBoard() {
             board = $(".board")
@@ -264,7 +264,6 @@ export default function Human_Bot() {
             canvas.height = boardValue.height + 2 * radius + 10
             cv2 = canvas.getContext("2d")
             board.innerHTML = gridHTML
-            // custom_board.innerHTML = ""
             dem = 0
             for (let i = 0; i < gameState.board.length; i++) {
                 for (let j = 0; j < gameState.board[i].length; j++) {
@@ -281,6 +280,10 @@ export default function Human_Bot() {
         }
 
         resetBoard()
+
+        // if (p5Ref.current) {
+        //     p5Ref.current.resizeCanvas(boardValue.width + 250 / (!isMobile ? 1 : 2), boardValue.height + 250 / (!isMobile ? 1 : 2)); // Thay đổi kích thước canvas
+        // }
 
         let choosen_bot = bot
         const bot_items = $$(".bot_item")
@@ -304,11 +307,24 @@ export default function Human_Bot() {
                 fight_btn.classList.add("active")
             }
         })
+        console.log(user.access_token)
 
         function get_user_bot() {
-            fetch(`http://192.168.1.249:8080/get_your_bots?username=${user.username}&gamemode=${game_info ? game_info.gamemode : "normal"}`)
+            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_your_bots?username=${user.username}&gamemode=${game_info ? game_info.title : "normal"}`,{
+                "headers": {
+                    'Authorization': `Bearer ${user.access_token}`,
+                }
+            })
             .then(res => res.json())
             .then(data => {
+                if(data.length === 0) {
+                    set_is_open_notification({
+                        open: true,
+                        content: "Bạn chưa có bot hoặc bot của bạn chưa sẵn sàng"
+                    })
+                    overflow.style.display = "block"
+                    return
+                }
                 set_selected_user_bot(data[0])
                 set_user_bots(data)
             })
@@ -332,6 +348,29 @@ export default function Human_Bot() {
             overflow.style.display = "none"
             if(choosen_bot === "you") {
                 get_user_bot()
+            }
+            try {
+                if(game_info && game_info.title && p5Ref.current) {
+                    // let func = JSON.parse(game_info.break_rule_js).code
+                    
+                    // let breakRule = new Function('return ' + func )()
+                    // console.log(game_info)
+                    const functionString = JSON.parse(game_info.break_rule_js).code;
+                    eval(functionString);
+        
+                    window.breakRule(JSON.parse(JSON.stringify(gameState)), intervention, global_var, local_var)
+                    let result = intervention.view_command()
+        
+                    result.filter(item => item.action === "set_value").forEach((item) => reset_display_item_outside(item))
+        
+                    intervention.action()
+                    game_info.bots.forEach(bot => {
+                        gamemode_bot[bot.name] = bot.code
+                        gamemode_bot[bot.name + "_avatar"] = bot.avatar
+                    })
+                }
+            } catch {
+                console.log("loi")
             }
             set_bot(choosen_bot)
         }
@@ -358,7 +397,7 @@ export default function Human_Bot() {
                 rate_btn.classList.add("active")
             }
             rateModel = true
-            fetch("http://192.168.1.249:8080/get_rate", {
+            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_rate", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -493,19 +532,9 @@ export default function Human_Bot() {
         }
 
         async function handle_action(intervention) {
-            // gameState.custom_board = [
-            //     [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
-            //     [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
-            //     [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
-            //     [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
-            //     [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
-            // ]
-            // gameState.outside_display = []
-            custom_board = $(".custom_board")
-            custom_board.innerHTML = ""
-
-            display_outBoard = $(".display_outBoard")
-            display_outBoard.innerHTML = ""
+            if (p5Ref.current) {
+                p5Ref.current.clearCanvas();
+            }
             
             let intervention_result = intervention.view_command()
             for(let item of intervention_result) {
@@ -524,14 +553,14 @@ export default function Human_Bot() {
                         await add_chess([x,y], "red")
                         break
                     case "set_value" :
-                        if(!check_is_display_outside(x,y)) {
-                            reset_custom_board(item)
-                        } else {
-                            // gameState.outside_display.push({
-                            //     ...item
-                            // })
-                            reset_display_item_outside(item)
-                        }
+                        // if(!check_is_display_outside(x,y)) {
+                        //     reset_custom_board(item)
+                        // } else {
+                        //     // gameState.outside_display.push({
+                        //     //     ...item
+                        //     // })
+                        // }
+                        reset_display_item_outside(item)
                         break
                     default:
                         break
@@ -656,7 +685,7 @@ export default function Human_Bot() {
                 chess.dataset.posy = box.dataset.posy
 
                 if(game_info && game_info.title) {
-                    window.breakRule(gameState, intervention, global_var, local_var)
+                    window.breakRule(JSON.parse(JSON.stringify(gameState)), intervention, global_var, local_var)
                 }
                 await handle_action(intervention)
 
@@ -698,7 +727,7 @@ export default function Human_Bot() {
                 chess.dataset.posy = `${newPos[1]}`
 
                 if(game_info && game_info.title) {
-                    window.breakRule(gameState, intervention, global_var, local_var)
+                    window.breakRule(JSON.parse(JSON.stringify(gameState)), intervention, global_var, local_var)
                 }
                 await handle_action(intervention)
 
@@ -734,7 +763,7 @@ export default function Human_Bot() {
                     })
                 })
 
-                fetch("http://192.168.1.249:8080/get_pos_of_playing_chess", {
+                fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_pos_of_playing_chess", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -824,10 +853,9 @@ export default function Human_Bot() {
                     }
                 }
             })
-
             handle_event()
         }
-
+        console.log("reload")
         window.onload= (event) => {
             if (window.outerWidth <= 500) {
                 rs = 0.5
@@ -856,7 +884,12 @@ export default function Human_Bot() {
                     }
                 }
             })
+            // window.breakRule(JSON.parse(JSON.stringify(gameState)), intervention, global_var, local_var)
+            // let result = intervention.view_command()
 
+            // result.filter(item => item.action === "set_value").forEach((item) => reset_display_item_outside(item))
+
+            // intervention.action()
             handle_event()
         }
     }, [game_info, username, reload, selected_user_bot])
@@ -924,17 +957,17 @@ export default function Human_Bot() {
                                 </div>
                             </li>
                             )}
-
                             </ul>
                         }
                         </>
                     }
             </div>
             <div className="relative">
-                <div style={{width: `100%`, height: `100%`}} class="display_outBoard emoji-text absolute top-0 z-[10000] pointer-events-none grid grid-cols-5 grid-flow-row text-5xl select-none"></div>
-                <div style={{width: `100%`, height: `100%`}} class="custom_board emoji-text absolute top-0 z-[10000] pointer-events-none grid grid-cols-5 grid-flow-row text-5xl select-none"></div>
                 <div className="board"/>
                 <canvas className="z-[10000]"/>
+                <div className={`absolute lg:w-[750px] md:w-[750px] w-[375px] lg:h-[750px] md:h-[750px] h-[375px] lg:top-[-125px] md:top-[-125px] top-[-62.5px] lg:left-[-125px] md:left-[-125px] left-[-62.5px] z-[10000] pointer-events-none select-none`}>
+                    <P5Wrapper width={!isMobile ? 750 : 375} height={!isMobile ? 750 : 375} ref={p5Ref} />
+                </div>
             </div>
             <div className="game_turn game_turn-player mobile_active">
                 <div className="player_avatar">{(username && username[0].toUpperCase()) || "C"}</div>
@@ -956,7 +989,7 @@ export default function Human_Bot() {
                     <i className="fa-solid fa-angles-down arrow_down" />
                 </label>
                 <div className="HB_game_status text-white dark:bg-[#007BFF] bg-[#2997ff]">Game on...</div>
-                <a onClick={() => history("/menu")} className={` dark:bg-[#111c2c] bg-[#0062d9] ${isMobile ? "HB_menu_btn" : "fixed top-5 left-5 HB_menu_btn"}`}>
+                <a onClick={() => history("/menu")} className={` dark:bg-[#111c2c] bg-[#0062d9] ${isMobile ? "HB_menu_btn" : "fixed top-[4%] left-[6%] HB_menu_btn"}`}>
                     Menu
                 </a>
                 <div className="rate_btn hidden dark:bg-[#111c2c] bg-[#0062d9] text-white">Xem đánh giá</div>
@@ -1025,6 +1058,12 @@ export default function Human_Bot() {
                 className="fire_sound"
                 src={break_sound}
             />
+            {is_open_notification.open && <Notification content={is_open_notification.content} set_is_open={set_is_open_notification}/>}
+            {game_info && 
+                <div className="fixed lg:right-[11%] md:right-[11%] lg:scale-100 md:scale-100 scale-150 right-[35%] top-[4%]">
+                    <Vote_modal type="gamemode" doc={game_info}/>
+                </div>
+            }   
         </div>
 
     )

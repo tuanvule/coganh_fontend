@@ -67,7 +67,7 @@ export default function User_bot({ bots, raw_bots, is_owner, set_is_require_owne
   console.log(enemy_bot_id)
   useEffect(() => {
     if (enemy_bot_id.length > 0) {
-      fetch("http://192.168.1.249:8080/get_code_to_show", {
+      fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_code_to_show", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -134,7 +134,7 @@ export default function User_bot({ bots, raw_bots, is_owner, set_is_require_owne
       set_is_require_owner(true)
       return
     }
-    fetch(`http://192.168.1.249:8080/change_is_public?bot_id=${id}&type=${type ? 1 : 0}`)
+    fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/change_is_public?bot_id=${id}&type=${type ? 1 : 0}`)
       .then(res => res.json())
       .then(data => {
         let new_IPLL = JSON.parse(JSON.stringify(is_public_list))

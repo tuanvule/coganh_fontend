@@ -60,7 +60,7 @@ function App() {
           <Route path="menu" element={<Menu/>} />
           <Route path="user/:id" element={<User/>} />
           <Route path="signin" element={<Signin_page />} />
-          <Route path="ADMIN" element={<Check_admin_modal />} />
+          {/* <Route path="ADMIN" element={<Check_admin_modal />} /> */}
           <Route path="gamemode" element={<Gamemode />} />
         </Routes>
       </AppProvider>

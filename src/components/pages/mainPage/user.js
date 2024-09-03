@@ -25,7 +25,7 @@ export default function User() {
 
     useEffect(() => {
         if(id) {
-            fetch("http://192.168.1.249:8080/get_all_user_data/" + id)
+            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_all_user_data/" + id)
             .then(res => res.json())
             .then(data => {set_data({raw_data: data, chunked_data: handle_chunk(data)}); {
                 set_is_owner(data.username === user.username)
@@ -81,7 +81,7 @@ export default function User() {
 
     useEffect(() => {
         if (!fetch_gamemodes) return
-        fetch(`http://192.168.1.249:8080/get_user_gamemode?page=${gamemode_chunk_index}&size=9`)
+        fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_user_gamemode?page=${gamemode_chunk_index}&size=9`)
             .then(res => res.json())
             .then(data => {
                 set_gamemodes(data)

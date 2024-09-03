@@ -42,7 +42,7 @@ export default function Create_gamemode() {
 
     useEffect(() => {
         if(is_update && !post) {
-            fetch("http://192.168.1.249:8080/get_post_by_id/" + state.post_id)
+            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_post_by_id/" + state.post_id)
             .then(res => res.json())
             .then(data => set_post(data))
             .catch(err => console.log(err))
@@ -137,7 +137,7 @@ export default function Create_gamemode() {
                 formData.append('totalChunks', totalChunks);
 
                 try {
-                    const response = await fetch('http://192.168.1.249:8080/upload_chunk', {
+                    const response = await fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/upload_chunk', {
                         method: 'POST',
                         body: formData
                     });
@@ -177,7 +177,7 @@ export default function Create_gamemode() {
                 // console.log(text)
                 // return
             if (!is_update) {
-                let fetchData  = await fetch('http://192.168.1.249:8080/upload_post', {
+                let fetchData  = await fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/upload_post', {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json",
@@ -201,10 +201,20 @@ export default function Create_gamemode() {
                 let data = await fetchData.json()
                 return {...data, upload_time}
             } else {
-                let fetchData  = await fetch('http://192.168.1.249:8080/update_post', {
+                console.log({
+                    content: text,
+                    image_url: url,
+                    title: title_input.value,
+                    description: description_input.value,
+                    update_time: upload_time,
+                    demo_img: demo_gamemode_image_ref.current.value,
+                    id: state.post_id
+                })
+                let fetchData  = await fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/update_post/'+state.post_id, {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json",
+                        'Authorization': `Bearer ${user.access_token}`,
                     },
                     body: JSON.stringify({
                         content: text,
@@ -248,8 +258,11 @@ export default function Create_gamemode() {
                 }
             }
 
+            console.log(is_use_own_bot ? bots : [])
+            // return
+
             if(!is_update) {
-                let fetchData  = await fetch('http://192.168.1.249:8080/create_gamemode', {
+                let fetchData  = await fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/create_gamemode', {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json",
@@ -273,15 +286,16 @@ export default function Create_gamemode() {
                 let data = await fetchData.json()
                 return data
             } else {
-                let fetchData  = await fetch('http://192.168.1.249:8080/update_gamemode', {
+                let fetchData  = await fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/update_gamemode/'+state.id, {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json",
+                        'Authorization': `Bearer ${user.access_token}`,
                     },
                     body: JSON.stringify({
                         title: title_input.value,
                         description: description_input.value,
-                        break_rule: JSON.stringify({code : await readFileAsText(file_input.current.files[0])}),
+                        break_rule: file_input.current.files[0] ? JSON.stringify({code : await readFileAsText(file_input.current.files[0])}) : "",
                         bots: is_use_own_bot ? bots : [],
                         demo_img: demo_gamemode_image_ref.current.value,
                         update_time: upload_time,

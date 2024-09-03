@@ -3,7 +3,7 @@ import { AppContext } from '../../../context/appContext'
 import Handle_user_gamemode from '../handle_user_gamemode'
 
 export default function User_gamemode({ u_id, is_owner }) {
-  const { history } = useContext(AppContext)
+  const { history, user } = useContext(AppContext)
   const [un_public_gamemode, set_un_public_gamemodes] = useState()
   const [UPGM_chunk_index, set_UPGM_chunk_index] = useState(0)
   const [is_reset_gamemode, set_is_reset_gamemode] = useState(0)
@@ -14,7 +14,7 @@ export default function User_gamemode({ u_id, is_owner }) {
   console.log(gamemodes)
 
   function handle_send_notification(u_id, content) {
-    fetch(`http://192.168.1.249:8080/send_notification/${u_id}`, {
+    fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/send_notification/${u_id}`, {
       method: "gamemode",
       headers: {
         "Content-Type": "application/json",
@@ -38,7 +38,11 @@ export default function User_gamemode({ u_id, is_owner }) {
     if (is_delete) {
       let notification = prompt("nhập lý do muốn xóa (tối thiểu 5 ký tự")
       if (notification.length < 5) return
-      fetch(`http://192.168.1.249:8080/delete_gamemode/${id}`)
+      fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/delete_gamemode/${id}`,{
+        headers: {
+          'Authorization': `Bearer ${user.access_token}`,
+        }
+      })
         .then(res => res.json())
         .then(data => {
           if (author_id) {
@@ -50,20 +54,8 @@ export default function User_gamemode({ u_id, is_owner }) {
     }
   }
 
-  function handle_accept(id, author_id, gamemode_title) {
-    fetch(`http://192.168.1.249:8080/accept_gamemode/${id}`)
-      .then(res => res.json())
-      .then(data => {
-        if (author_id) {
-          handle_send_notification(author_id, `bài đăng của bạn với tiêu đề "${gamemode_title.length > 10 ? gamemode_title.slice(0, 10) + "..." : gamemode_title}" đã được chấp nhận`)
-        }
-        set_is_reset_gamemode(Math.random())
-      })
-      .catch(err => console.log(err))
-  }
-
   useEffect(() => {
-    fetch(`http://192.168.1.249:8080/get_user_unpublic_gamemode?u_id=${u_id}&page=${UPGM_chunk_index}&size=9`)
+    fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_user_unpublic_gamemode?u_id=${u_id}&page=${UPGM_chunk_index}&size=9`)
       .then(res => res.json())
       .then(data => {
         set_un_public_gamemodes(data)
@@ -81,7 +73,7 @@ export default function User_gamemode({ u_id, is_owner }) {
 
   useEffect(() => {
     if (!fetch_gamemodes) return
-    fetch(`http://192.168.1.249:8080/get_user_gamemode?u_id=${u_id}&page=${gamemode_chunk_index}&size=9`)
+    fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_user_gamemode?u_id=${u_id}&page=${gamemode_chunk_index}&size=9`)
       .then(res => res.json())
       .then(data => {
         set_gamemodes(data)
@@ -128,7 +120,7 @@ export default function User_gamemode({ u_id, is_owner }) {
                   </div>
                 </div>
 
-                <div className="gamemode_item-nav absolute right-4 top-1/2 -translate-y-1/2">
+                <div className="gamemode_item-nav hidden absolute right-4 top-1/2 -translate-y-1/2">
                   <div onClick={() => history("/post/" + item.post_id)} className="grid place-content-center bg-slate-400 px-10 py-8 rounded pointing_event_br-105 mr-4">
                     <i class="fa-solid fa-book-open text-5xl"></i>
                   </div>
@@ -177,7 +169,7 @@ export default function User_gamemode({ u_id, is_owner }) {
                   </div>
                 </div>
 
-                <div className="gamemode_item-nav absolute right-4 top-1/2 -translate-y-1/2">
+                <div className="gamemode_item-nav hidden absolute right-4 top-1/2 -translate-y-1/2">
                   <div onClick={() => history("/post/" + item.post_id)} className="grid place-content-center bg-slate-400 px-10 py-8 rounded pointing_event_br-105 mr-4">
                     <i class="fa-solid fa-book-open text-5xl"></i>
                   </div>
