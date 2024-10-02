@@ -18,7 +18,7 @@ export default function Bot_Bot() {
   const [is_require_login, set_is_require_login] = useState(false)
 
   useEffect(() => {
-    fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_rank_board", {
+    fetch("http://127.0.0.1:8080/get_rank_board", {
       method: "GET",
     })
       .then(res => res.json())
@@ -31,7 +31,7 @@ export default function Bot_Bot() {
 
   useEffect(() => {
     if (user.username) {
-      fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_user_bots", {
+      fetch("http://127.0.0.1:8080/get_user_bots", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -63,7 +63,7 @@ export default function Bot_Bot() {
     let newValue = 0
 
     function resetSuggestion() {
-      fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_user_bots", {
+      fetch("http://127.0.0.1:8080/get_user_bots", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -191,7 +191,7 @@ export default function Bot_Bot() {
       const eElo = parseInt(enemyElo.innerHTML)
       const rankBoard = $(".rank_board_list")
 
-      fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/update_rank_board", {
+      fetch("http://127.0.0.1:8080/update_rank_board", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -267,7 +267,7 @@ export default function Bot_Bot() {
       fightBtn.innerHTML = `<div class="loading_btn"></div>`
       fightBtn.style.backgroundColor = "#191B26"
       fightBtnStatus.onLoading = true
-      fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/fight_bot", {
+      fetch("http://127.0.0.1:8080/fight_bot", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

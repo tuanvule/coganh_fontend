@@ -42,7 +42,7 @@ export default function Login(props) {
 
         console.log(password, name)
 
-        fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/handle_login', {
+        fetch('http://127.0.0.1:8080/handle_login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

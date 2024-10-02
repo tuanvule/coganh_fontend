@@ -63,7 +63,7 @@ export default function Comment_modal({ post_id = null, task_id = null, bg = "bg
   useEffect(() => {
     console.log(post_id, task_id)
     if (post_id) {
-      fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_post_comments/${post_id}`)
+      fetch(`http://127.0.0.1:8080/get_post_comments/${post_id}`)
         .then(res => res.json())
         .then(data => {
           let comment = handle_data(data, "comment_time")
@@ -72,7 +72,7 @@ export default function Comment_modal({ post_id = null, task_id = null, bg = "bg
         })
         .catch(err => console.log(err))
     } else if (task_id) {
-      fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_task_comments/${task_id}`)
+      fetch(`http://127.0.0.1:8080/get_task_comments/${task_id}`)
       .then(res => res.json())
       .then(data => {
         let comment = handle_data(data, "comment_time")
@@ -99,7 +99,7 @@ export default function Comment_modal({ post_id = null, task_id = null, bg = "bg
         return
       } else {
         let formatter = new Intl.DateTimeFormat([], options);
-        fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/handle_comment', {
+        fetch('http://127.0.0.1:8080/handle_comment', {
           method: 'POST',
           headers: {
             "Content-Type": "application/json",

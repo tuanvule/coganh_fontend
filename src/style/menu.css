@@ -210,7 +210,7 @@ margin: 16px;
 
 .detail_image img {
     /* width: 100%; */
-    object-fit: cover;
+    /* object-fit: contain; */
 }
 
 .detail_nav {

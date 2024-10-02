@@ -17,7 +17,7 @@ export default React.memo(function Navbar({ type = {}, back_link = "/menu", mode
 
   useEffect(() => {
     if(user.id) {
-      fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_user_notification/${user.id}`)
+      fetch(`http://127.0.0.1:8080/get_user_notification/${user.id}`)
       .then(res => res.json())
       .then(data => set_notifications(data))
       .catch(err => console.log(err))
@@ -25,7 +25,7 @@ export default React.memo(function Navbar({ type = {}, back_link = "/menu", mode
   }, [reset_notifications])
 
   function delete_notification(data) {
-    fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/delete_notification/${user.id}`, {
+    fetch(`http://127.0.0.1:8080/delete_notification/${user.id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,7 +39,7 @@ export default React.memo(function Navbar({ type = {}, back_link = "/menu", mode
 
   function all_delete_notification() {
     if(notifications.length === 0) return
-    fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/delete_all_notification/${user.id}`)
+    fetch(`http://127.0.0.1:8080/delete_all_notification/${user.id}`)
       .then(res => res.json())
       .then(() => set_notifications([]))
       .catch(err => console.log(err))

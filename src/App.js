@@ -16,6 +16,7 @@ import Visualize_page from './components/pages/mainPage/visualize_page';
 import Bot_Bot from './components/pages/mainPage/bot_bot';
 import Human_Bot from './components/pages/mainPage/human_bot';
 import Menu from './components/pages/mainPage/menu';
+import Freedom from './components/pages/mainPage/freedom';
 import Home from './components/pages/home';
 import Login from './components/pages/login';
 import Post from './components/pages/post';
@@ -62,6 +63,7 @@ function App() {
           <Route path="signin" element={<Signin_page />} />
           {/* <Route path="ADMIN" element={<Check_admin_modal />} /> */}
           <Route path="gamemode" element={<Gamemode />} />
+          <Route path="freedom" element={<Freedom />} />
         </Routes>
       </AppProvider>
     </div>

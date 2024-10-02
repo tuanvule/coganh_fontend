@@ -10,7 +10,6 @@ export default function Vote_modal({doc, is_mobile, type}) {
     const [is_require_login, set_is_require_login] = useState(false)
 
     useEffect(() => {
-        console.log(doc, user)
         if(doc.upvote && doc.upvote.find(({username, id}) => username === user.username && id === user.id)) {
             set_is_upvote(true)
         }
@@ -28,7 +27,7 @@ export default function Vote_modal({doc, is_mobile, type}) {
             return
         }
         if(!is_upvote) {
-            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/up_vote?type=${type}&doc_id=${doc.id}&username=${user.username}&u_id=${user.id}`)
+            fetch(`http://127.0.0.1:8080/up_vote?type=${type}&doc_id=${doc.id}&username=${user.username}&u_id=${user.id}`)
             .then(res => res.json())
             .then(msg => {
                 console.log(msg)
@@ -42,7 +41,7 @@ export default function Vote_modal({doc, is_mobile, type}) {
             })
             .catch(err => console.log(err))
         } else {
-            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/up_vote_reverse?type=${type}&doc_id=${doc.id}&username=${user.username}&u_id=${user.id}`)
+            fetch(`http://127.0.0.1:8080/up_vote_reverse?type=${type}&doc_id=${doc.id}&username=${user.username}&u_id=${user.id}`)
             .then(res => res.json())
             .then(msg => {
                 console.log(msg)
@@ -59,7 +58,7 @@ export default function Vote_modal({doc, is_mobile, type}) {
             return
         }
         if(!is_downvote) {
-            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/down_vote?type=${type}&doc_id=${doc.id}&username=${user.username}&u_id=${user.id}`)
+            fetch(`http://127.0.0.1:8080/down_vote?type=${type}&doc_id=${doc.id}&username=${user.username}&u_id=${user.id}`)
             .then(res => res.json())
             .then(msg => {
                 console.log(msg)
@@ -73,7 +72,7 @@ export default function Vote_modal({doc, is_mobile, type}) {
             })
             .catch(err => console.log(err))
         } else {
-            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/down_vote_reverse?type=${type}&doc_id=${doc.id}&username=${user.username}&u_id=${user.id}`)
+            fetch(`http://127.0.0.1:8080/down_vote_reverse?type=${type}&doc_id=${doc.id}&username=${user.username}&u_id=${user.id}`)
             .then(res => res.json())
             .then(msg => {
                 console.log(msg)
@@ -93,9 +92,6 @@ export default function Vote_modal({doc, is_mobile, type}) {
             <div onClick={() => handle_downvote()} className={`lg:h-16 lg:w-16 h-6 w-6 select-none mr-4 lg:mr-0 rounded-full grid place-content-center ${is_downvote ? "bg-blue-500 bg-opacity-100 hover:bg-opacity-100" : "bg-slate-400 bg-opacity-20 hover:bg-opacity-40"}`}>
                 <i class="fa-solid fa-chevron-down"></i>
             </div>
-            {/* {is_vote ? <i class="fa-solid fa-heart"></i> : <i class="fa-regular fa-heart"></i>} */}
-            {/* <i class="fa-regular fa-heart"></i>
-        <i class="fa-solid fa-heart"></i> */}
         </div>
     )
 }

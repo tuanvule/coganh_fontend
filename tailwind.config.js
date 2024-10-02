@@ -11,6 +11,19 @@ module.exports = {
     },
     extend: {
       keyframes: {
+        deleteChessAnimation: {
+          "0%": { transform: "translate(0.1px,0.1px) rotate(0deg);"},
+          "10%": { transform: "translate(-0.1px,-0.2px) rotate(-1deg);" },
+          "20%": { transform: "translate(-0.3px,0.0px) rotate(1deg);" },
+          "30%": { transform: "translate(0.3px,0.2px) rotate(0deg);" },
+          "40%": { transform: "translate(0.1px,-0.1px) rotate(1deg);" },
+          "50%": { transform: "translate(-0.1px,0.2px) rotate(-1deg);" },
+          "60%": { transform: "translate(-0.3px,0.1px) rotate(0deg);" },
+          "70%": { transform: "translate(0.3px,0.1px) rotate(-1deg);" },
+          "80%": { transform: "translate(-0.1px,-0.1px) rotate(1deg);" },
+          "90%": { transform: "translate(0.1px,0.2px) rotate(0deg);" },
+          "100%": { transform: "translate(0.1px,-0.2px) rotate(-1deg);", display: "none;"}
+      },
         close_code: {
           '0%': { height: 'auto' },
           '100%': { height: '0' },
@@ -60,7 +73,8 @@ module.exports = {
         moveSigninModalToLeft: 'moveSigninModalToLeft .6s ease-in-out forwards',
         moveSignupModalToLeft: 'moveSignupModalToLeft .6s ease-in-out forwards',
         enlarge: 'enlarge .3s ease-in-out',
-        informationAppears: 'informationAppears .25s ease-in-out'
+        informationAppears: 'informationAppears .25s ease-in-out',
+        deleteChessAnimation: "deleteChessAnimation 0.5s linear forwards"
       },
     },
   },

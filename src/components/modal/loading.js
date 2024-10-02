@@ -13,7 +13,6 @@ export default function Loading({set_close_loading}) {
         setTimeout(() => {
             set_percentage((e) => e + 1)
         }, 500)
-        // console.log(percentage)
     }, [percentage])
     return (
         <div className="w-40 h-40 z-[10000000000000000] absolute">

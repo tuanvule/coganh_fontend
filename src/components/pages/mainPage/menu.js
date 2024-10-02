@@ -9,6 +9,7 @@ import bot_bot from "../../../static/img/bot_bot.png"
 import visualize from "../../../static/img/visualize.png"
 import post_page from "../../../static/img/post_page.png"
 import form_img from "../../../static/img/form.png"
+import freedoom from "../../../static/img/freedom.png"
 
 import "../../../style/style.css"
 import "../../../style/menu.css"
@@ -136,8 +137,19 @@ export default function Menu() {
           <div className="detail_module_title">Others</div>
           <div className="detail_list">
             <div className="detail_item dark:bg-[#0e335b] bg-[#52b1ff]">
+              <div className="detail_nav">
+                <div className="icon">
+                  <i className="fa-solid fa-robot" />
+                </div>
+                <a className="btn2 bot_bot">Freedom mode</a>
+              </div>
               <div className="detail_image dark:bg-black bg-slate-200">
-                <img src={bot_bot} alt="" />
+                <img className="object-contain" src={freedoom} alt="" />
+              </div>
+            </div>
+            <div className="detail_item dark:bg-[#0e335b] bg-[#52b1ff]">
+              <div className="detail_image dark:bg-black bg-slate-200">
+                <img className="object-cover" src={bot_bot} alt="" />
               </div>
               <div className="detail_nav">
                 <div className="icon">
@@ -156,12 +168,12 @@ export default function Menu() {
                 </a>
               </div>
               <div className="detail_image dark:bg-black bg-slate-200">
-                <img src={post_page} alt="" />
+                <img className="object-cover" src={post_page} alt="" />
               </div>
             </div>
             <div className="detail_item dark:bg-[#0e335b] bg-[#7ac8ff]">
               <div className="detail_image dark:bg-black bg-slate-200">
-                <img src={visualize} alt="" />
+                <img className="object-cover" src={visualize} alt="" />
               </div>
               <div className="detail_nav">
                 <div className="icon">

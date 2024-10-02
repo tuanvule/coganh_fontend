@@ -21,7 +21,7 @@ export default function Gamemode() {
     }, [])
 
     useEffect(() => {
-        fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_gamemode?page=${gamemode_chunk_index}&size=9`)
+        fetch(`http://127.0.0.1:8080/get_gamemode?page=${gamemode_chunk_index}&size=9`)
         .then(res => res.json())
         .then(data => {
             console.log(data)

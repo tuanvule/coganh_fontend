@@ -62,7 +62,7 @@ export default function Human_Bot() {
 
     useEffect(() => {
         if(!(game_info && game_info.title)) {
-            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_gamemode_by_post?title=${title}&upload_time=${upload_time}`)
+            fetch(`http://127.0.0.1:8080/get_gamemode_by_post?title=${title}&upload_time=${upload_time}`)
             .then(res => res.json())
             .then(data => {
                 set_game_info(data)
@@ -81,8 +81,6 @@ export default function Human_Bot() {
     }, [selected_user_bot])
     useEffect(() => {
         let board = $(".board")
-        let display_outBoard = $(".display_outBoard")
-        let custom_board = $(".custom_board")
         let boardValue = board.getBoundingClientRect()
         let chessGrapX = boardValue.width / 4
         let chessGrapY = boardValue.height / 4
@@ -125,6 +123,10 @@ export default function Human_Bot() {
                 p5Ref.current.clearCanvas();
             }
             overflow.style.display = "block"
+            gameStatus.innerHTML = "Game on..."
+            gameStatus.style.backgroundColor = "#2997ff"
+            // gameStatus.style.opacity = "1";
+            rate_btn.style.display = "none"
             set_reload(Math.random())
         }
 
@@ -168,14 +170,6 @@ export default function Human_Bot() {
                 [1, 0, 0, 0, 1],
                 [1, 1, 1, 1, 1]
             ],
-            custom_board: [
-                [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
-                [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
-                [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
-                [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
-                [{value: ""},{value: ""},{value: ""},{value: ""},{value: ""}],
-            ],
-            outside_display: [],
             positions: [
                 [[0, 2], [0, 3], [2, 4], [4, 3], [0, 4], [1, 4], [3, 4], [4, 4]],
                 [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [0, 1], [4, 1], [4, 2]]
@@ -267,7 +261,6 @@ export default function Human_Bot() {
             dem = 0
             for (let i = 0; i < gameState.board.length; i++) {
                 for (let j = 0; j < gameState.board[i].length; j++) {
-                    const { value, size, fill, stroke_width, stroke_fill} = gameState.custom_board[i][j]
                     board.innerHTML += `<div data-choosable="false" data-posx="${j}" data-posy="${i}" class="box z-[1000]" style="top:${chessGrapY * i}px; left:${chessGrapX * j}px;"></div>`
                     if (gameState.board[i][j] === -1) {
                         board.innerHTML += `<div data-so="${dem}" data-posx="${j}" data-posy="${i}" style="background-color: red; top:${chessGrapY * i}px; left:${chessGrapX * j}px;" class="chess HB_enemy"></div>`
@@ -307,10 +300,9 @@ export default function Human_Bot() {
                 fight_btn.classList.add("active")
             }
         })
-        console.log(user.access_token)
 
         function get_user_bot() {
-            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_your_bots?username=${user.username}&gamemode=${game_info ? game_info.title : "normal"}`,{
+            fetch(`http://127.0.0.1:8080/get_your_bots?username=${user.username}&gamemode=${game_info ? game_info.title : "normal"}`,{
                 "headers": {
                     'Authorization': `Bearer ${user.access_token}`,
                 }
@@ -387,7 +379,8 @@ export default function Human_Bot() {
         let rateModel
 
         rate_btn.onclick = () => {
-            // rate.classList.toggle("RM_appear")
+            console.log(move_list)
+
             if(rate_btn.classList.contains("active")) {
                 rate_btn.classList.remove("active")
                 set_is_open_rate_modal({is_open: false, is_loading: true})
@@ -397,7 +390,7 @@ export default function Human_Bot() {
                 rate_btn.classList.add("active")
             }
             rateModel = true
-            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_rate", {
+            fetch("http://127.0.0.1:8080/get_rate", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -474,12 +467,10 @@ export default function Human_Bot() {
 
         async function delete_chess(j,i, trackOn = true) {
             const chesses = $$(".chess")
-            // console.log(Array.from(chesses).map(e => [Number(e.dataset.posx), Number(e.dataset.posy)]))
             const changedChess = Array.from(chesses).find(e => {
                 return Number(e.dataset.posx) === j && Number(e.dataset.posy) === i
             })
             if(changedChess) {
-                // console.log("changedChess: ",changedChess)
                 gameState.positions.forEach((es,index) => es.forEach((e, indx)=> {
                     if(es.findIndex(findI, [j,i]) !== -1) {
                         gameState.positions[index].splice(es.findIndex(findI, [j,i]),1)
@@ -495,9 +486,7 @@ export default function Human_Bot() {
                     changedChess.remove()
                     let new_breaking_img = board.appendChild(breaking_img)
                     setTimeout(() => {
-                        console.log("end")
                         new_breaking_img.remove();
-                        console.log(Array.from($$(".breaking")).forEach(item => item.remove()))
                     }, 500);
                     return
                 }
@@ -553,13 +542,6 @@ export default function Human_Bot() {
                         await add_chess([x,y], "red")
                         break
                     case "set_value" :
-                        // if(!check_is_display_outside(x,y)) {
-                        //     reset_custom_board(item)
-                        // } else {
-                        //     // gameState.outside_display.push({
-                        //     //     ...item
-                        //     // })
-                        // }
                         reset_display_item_outside(item)
                         break
                     default:
@@ -588,18 +570,18 @@ export default function Human_Bot() {
                 gameStatus.innerHTML = "You Win"
                 gameStatus.style.backgroundColor = "green"
                 gameStatus.style.display = "block"
-                gameStatus.style.opacity = "1";
+                // gameStatus.style.opacity = "1";
                 rate_btn.style.display = "block"
             } else if(gameState.positions[0].length === 0 || gameState.result === "lost") {
                 gameStatus.innerHTML = "You lost"
                 gameStatus.style.backgroundColor = "red"
-                gameStatus.style.opacity = "1";
+                // gameStatus.style.opacity = "1";
                 rate_btn.style.display = "block"
             } else if(gameState.positions[0].length === 1 && gameState.positions[1].length === 1) {
                 gameStatus.innerHTML = "draw"
                 gameStatus.style.backgroundColor = "#ccc"
                 gameStatus.style.display = "block"
-                gameStatus.style.opacity = "1";
+                // gameStatus.style.opacity = "1";
                 rate_btn.style.display = "block"
             }
         }
@@ -703,8 +685,6 @@ export default function Human_Bot() {
                 let opp_pos = gameState.positions[0]
                 valid_remove = [...ganh_chet(gameState, [newPos[0], newPos[1]], opp_pos, -1, 1), ...vay(gameState, opp_pos)]
                 if(valid_remove.length > 0) valid_remove.forEach(item => intervention.remove_blue(...item))
-
-                // console.log(JSON.parse(JSON.stringify(gameState.board)))
         
                 move_list.push({
                     your_pos: [...gameState.positions[0]],
@@ -763,7 +743,7 @@ export default function Human_Bot() {
                     })
                 })
 
-                fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_pos_of_playing_chess", {
+                fetch("http://127.0.0.1:8080/get_pos_of_playing_chess", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -855,7 +835,7 @@ export default function Human_Bot() {
             })
             handle_event()
         }
-        console.log("reload")
+
         window.onload= (event) => {
             if (window.outerWidth <= 500) {
                 rs = 0.5
@@ -1045,7 +1025,6 @@ export default function Human_Bot() {
                     <div className="fight_btn border dark:border-[#ccc] border-[#333]">Thách đấu</div>
                 </div>
             </div>
-            {/* <img className="fire" src={fire_webp} alt="" hidden/> */}
             <audio
                 className="capture_sound"
                 src={capture_audio}
@@ -1059,7 +1038,7 @@ export default function Human_Bot() {
                 src={break_sound}
             />
             {is_open_notification.open && <Notification content={is_open_notification.content} set_is_open={set_is_open_notification}/>}
-            {game_info && 
+            {game_info && Object.keys(game_info).length > 0 && user.username &&
                 <div className="fixed lg:right-[11%] md:right-[11%] lg:scale-100 md:scale-100 scale-150 right-[35%] top-[4%]">
                     <Vote_modal type="gamemode" doc={game_info}/>
                 </div>
