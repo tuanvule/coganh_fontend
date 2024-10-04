@@ -14,7 +14,7 @@ export default function User_gamemode({ u_id, is_owner }) {
   console.log(gamemodes)
 
   function handle_send_notification(u_id, content) {
-    fetch(`http://127.0.0.1:8080/send_notification/${u_id}`, {
+    fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/send_notification/${u_id}`, {
       method: "gamemode",
       headers: {
         "Content-Type": "application/json",
@@ -38,7 +38,7 @@ export default function User_gamemode({ u_id, is_owner }) {
     if (is_delete) {
       let notification = prompt("nhập lý do muốn xóa (tối thiểu 5 ký tự")
       if (notification.length < 5) return
-      fetch(`http://127.0.0.1:8080/delete_gamemode/${id}`,{
+      fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/delete_gamemode/${id}`,{
         headers: {
           'Authorization': `Bearer ${user.access_token}`,
         }
@@ -55,7 +55,7 @@ export default function User_gamemode({ u_id, is_owner }) {
   }
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8080/get_user_unpublic_gamemode?u_id=${u_id}&page=${UPGM_chunk_index}&size=9`)
+    fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_user_unpublic_gamemode?u_id=${u_id}&page=${UPGM_chunk_index}&size=9`)
       .then(res => res.json())
       .then(data => {
         set_un_public_gamemodes(data)
@@ -73,7 +73,7 @@ export default function User_gamemode({ u_id, is_owner }) {
 
   useEffect(() => {
     if (!fetch_gamemodes) return
-    fetch(`http://127.0.0.1:8080/get_user_gamemode?u_id=${u_id}&page=${gamemode_chunk_index}&size=9`)
+    fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_user_gamemode?u_id=${u_id}&page=${gamemode_chunk_index}&size=9`)
       .then(res => res.json())
       .then(data => {
         set_gamemodes(data)

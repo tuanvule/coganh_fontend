@@ -10,7 +10,7 @@ export default function Help_post() {
 
 
     useEffect(() => {
-        fetch(`http://127.0.0.1:8080/get_posts?type=help_post&page=${post_chunk_index}&size=10`)
+        fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_posts?type=help_post&page=${post_chunk_index}&size=10`)
         .then(res => res.json())
         .then(data => {
             console.log(data)

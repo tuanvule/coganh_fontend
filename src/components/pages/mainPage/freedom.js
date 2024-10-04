@@ -88,8 +88,11 @@ export default function Freedom() {
   const [codes, set_codes] = useState([
     {
       code: `def main(player):
-    return {"selected_pos": (2,2), "new_pos": (3,3)}`,
-      is_open: false,
+    
+    #some code here
+
+    return {"selected_pos": (), "new_pos": ()}`,
+      is_open: true,
       id: 0,
       move: {
         selected_pos: [],
@@ -107,7 +110,6 @@ export default function Freedom() {
   if(break_sound_ref.current) {
     break_sound_ref.volume = 1
   }
-
 
   function handle_remove(valid_remove, side) {
     let pre_gameBoard = JSON.parse(JSON.stringify(gameState.board))
@@ -250,7 +252,7 @@ export default function Freedom() {
     if(check_err()) return
     // view_gameState(id)
     setTimeout(() => {
-      fetch(`http://127.0.0.1:8080/run_freedom_code`, {
+      fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/run_freedom_code`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -333,7 +335,7 @@ export default function Freedom() {
       opp_pos: gameState.positions[0],
       board: gameState.board,
     }
-    fetch("http://127.0.0.1:8080/get_pos_of_playing_chess", {
+    fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_pos_of_playing_chess", {
       method: "POST",
       headers: {
           "Content-Type": "application/json",
@@ -425,7 +427,7 @@ export default function Freedom() {
   return (
     <div className="w-full h-screen flex overflow-hidden">
       <DndProvider backend={HTML5Backend}>
-        <div className="relative w-[60%] h-full bg-slate-700 grid overflow-hidden">
+        <div className="relative w-[60%] h-full bg-[#111c2c] grid overflow-hidden">
           <div className="absolute z-[100] top-4 left-1/2 -translate-x-1/2">
             <Bot_list bot={bot} set_bot={set_bot} move_bot={move_bot}/>
             <div></div>
@@ -534,6 +536,7 @@ export default function Freedom() {
       <div className="w-[40%] h-full bg-slate-500">
         <div className="w-full px-2 py-1 bg-slate-600 flex">
           <div onClick={() => history("/menu")} className="px-2 bg-black grid place-content-center rounded pointing_event_br-90">Menu</div>
+          <div onClick={() => history("post/Kldh2aEE5QAtiCnoE9uu")} className="px-2 bg-black grid place-content-center rounded pointing_event_br-90 ml-2 ">Hướng dẫn</div>
           <div ref={next_move_btn_ref} className="ml-auto text-lg py-[2px] px-2 bg-blue-500 w-fit rounded pointing_event_br-90">
             Next move
           </div>

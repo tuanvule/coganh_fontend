@@ -25,7 +25,7 @@ export default function Handle_user_gamemode({gamemode, set_gamemode_chunk_index
         python_save_btn.current.onclick = () => {
             python_save_btn.current.classList.add("dark:bg-[white]")
             python_save_btn.current.classList.add("dark:text-black")
-            fetch("http://127.0.0.1:8080/save_gamemode_code", {
+            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/save_gamemode_code", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -53,7 +53,7 @@ export default function Handle_user_gamemode({gamemode, set_gamemode_chunk_index
         js_save_btn.current.onclick = () => {
             js_save_btn.current.classList.add("dark:bg-[white]")
             js_save_btn.current.classList.add("dark:text-black")
-            fetch("http://127.0.0.1:8080/save_gamemode_code", {
+            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/save_gamemode_code", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

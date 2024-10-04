@@ -27,7 +27,7 @@ export default function Vote_modal({doc, is_mobile, type}) {
             return
         }
         if(!is_upvote) {
-            fetch(`http://127.0.0.1:8080/up_vote?type=${type}&doc_id=${doc.id}&username=${user.username}&u_id=${user.id}`)
+            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/up_vote?type=${type}&doc_id=${doc.id}&username=${user.username}&u_id=${user.id}`)
             .then(res => res.json())
             .then(msg => {
                 console.log(msg)
@@ -41,7 +41,7 @@ export default function Vote_modal({doc, is_mobile, type}) {
             })
             .catch(err => console.log(err))
         } else {
-            fetch(`http://127.0.0.1:8080/up_vote_reverse?type=${type}&doc_id=${doc.id}&username=${user.username}&u_id=${user.id}`)
+            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/up_vote_reverse?type=${type}&doc_id=${doc.id}&username=${user.username}&u_id=${user.id}`)
             .then(res => res.json())
             .then(msg => {
                 console.log(msg)
@@ -58,7 +58,7 @@ export default function Vote_modal({doc, is_mobile, type}) {
             return
         }
         if(!is_downvote) {
-            fetch(`http://127.0.0.1:8080/down_vote?type=${type}&doc_id=${doc.id}&username=${user.username}&u_id=${user.id}`)
+            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/down_vote?type=${type}&doc_id=${doc.id}&username=${user.username}&u_id=${user.id}`)
             .then(res => res.json())
             .then(msg => {
                 console.log(msg)
@@ -72,7 +72,7 @@ export default function Vote_modal({doc, is_mobile, type}) {
             })
             .catch(err => console.log(err))
         } else {
-            fetch(`http://127.0.0.1:8080/down_vote_reverse?type=${type}&doc_id=${doc.id}&username=${user.username}&u_id=${user.id}`)
+            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/down_vote_reverse?type=${type}&doc_id=${doc.id}&username=${user.username}&u_id=${user.id}`)
             .then(res => res.json())
             .then(msg => {
                 console.log(msg)

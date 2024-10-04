@@ -30,24 +30,16 @@ export default function Menu() {
     const fightBotBtn = document.querySelector(".bot_bot")
     const visualizeBtn = document.querySelector(".visualize")
     const training_btn = document.querySelector(".training")
-    let fightable = 'True'
+    const freedom_mode = document.querySelector(".freedom_mode")
 
     const isMobile = (window.innerWidth <= 500)
     window.onresize = null
 
     window.onload = null
 
-    // window.onpageshow = function (event) {
-    //   var historyTraversal = event.persisted || (typeof window.performance != "undefined" && window.performance.navigation.type === 2);
-    //   if (historyTraversal) {
-    //     window.location.reload();
-    //   }
-    // }
       fightBotBtn.onclick = () => {
         if (isMobile) {
           sign.style.display = "flex"
-        } else if (fightable === "False") {
-          notification.style.display = "block"
         } else {
           history("/bot_bot")
           // window.location.href = "/bot_bot"
@@ -69,7 +61,13 @@ export default function Menu() {
           sign.style.display = "flex"
         } else {
           history("/task_list")
-          // window.location.href = "/task_list"
+        }
+      }
+      freedom_mode.onclick = () => {
+        if (isMobile) {
+          sign.style.display = "flex"
+        } else {
+          history("/freedom")
         }
       }
       sign_btn.onclick = () => sign.style.display = "none"
@@ -139,9 +137,9 @@ export default function Menu() {
             <div className="detail_item dark:bg-[#0e335b] bg-[#52b1ff]">
               <div className="detail_nav">
                 <div className="icon">
-                  <i className="fa-solid fa-robot" />
+                  <i class="fa-solid fa-sliders"></i>
                 </div>
-                <a className="btn2 bot_bot">Freedom mode</a>
+                <a className="btn2 freedom_mode">Freedom mode</a>
               </div>
               <div className="detail_image dark:bg-black bg-slate-200">
                 <img className="object-contain" src={freedoom} alt="" />
@@ -206,7 +204,7 @@ export default function Menu() {
         <div className="lg:w-[49%] w-full pl-6 py-4 flex flex-col dark:bg-slate-700 bg-slate-300 rounded-lg">
           <p className="text-2xl font-bold">Thành viên</p>
           <ul className="p-0 m-0">
-            <li>lê Tuấn Vũ</li>
+            <li>Lê Tuấn Vũ</li>
             <li>Thông Minh Quân</li>
             <li>Nguyễn Quang Huy</li>
             <li>Nguyễn Thành Tài</li>
@@ -214,7 +212,7 @@ export default function Menu() {
             <li>Đinh Huỳnh Vinh Quang</li>
           </ul>
           <p className="text-2xl font-bold mt-4">Cố vẫn</p>
-          <p>Nguyễn thị Bích Hảo</p>
+          <p>Nguyễn Thị Bích Hảo</p>
           <p className="text-2xl font-bold mt-4">Đơn vị</p>
           <p>THPT Nguyễn Hữu Huân</p>
           <p>NHH IT club</p>

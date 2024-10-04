@@ -7,7 +7,7 @@ export default function Task_list({tasks, set_is_reset_task, set_task_chunk_inde
   const [UPT_chunk_index, set_UPT_chunk_index] = useState(0)
 
   function handle_send_notification(u_id, content) {
-    fetch(`http://127.0.0.1:8080/send_notification/${u_id}`, {
+    fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/send_notification/${u_id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -29,7 +29,7 @@ export default function Task_list({tasks, set_is_reset_task, set_task_chunk_inde
     let is_delete = window.confirm("bạn có chắc muốn xóa")
     if (is_delete) {
       let notification = prompt("nhập lý do muốn xóa")
-      fetch(`http://127.0.0.1:8080/delete_task/${id}`,{
+      fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/delete_task/${id}`,{
         headers: {
           'Authorization': `Bearer ${user.access_token}`,
         }
@@ -46,7 +46,7 @@ export default function Task_list({tasks, set_is_reset_task, set_task_chunk_inde
   }
 
   function handle_accept(id, author_id, task_title) {
-    fetch(`http://127.0.0.1:8080/accept_task/${id}`)
+    fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/accept_task/${id}`)
       .then(res => res.json())
       .then(data => {
         if(author_id) {
@@ -65,7 +65,7 @@ export default function Task_list({tasks, set_is_reset_task, set_task_chunk_inde
   }
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8080/get_unpublic_tasks?page=${UPT_chunk_index}&size=9`)
+    fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_unpublic_tasks?page=${UPT_chunk_index}&size=9`)
     .then(res => res.json())
     .then(data => {
       set_un_public_tasks(data)

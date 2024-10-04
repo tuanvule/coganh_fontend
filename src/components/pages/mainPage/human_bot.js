@@ -62,7 +62,7 @@ export default function Human_Bot() {
 
     useEffect(() => {
         if(!(game_info && game_info.title)) {
-            fetch(`http://127.0.0.1:8080/get_gamemode_by_post?title=${title}&upload_time=${upload_time}`)
+            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_gamemode_by_post?title=${title}&upload_time=${upload_time}`)
             .then(res => res.json())
             .then(data => {
                 set_game_info(data)
@@ -302,7 +302,7 @@ export default function Human_Bot() {
         })
 
         function get_user_bot() {
-            fetch(`http://127.0.0.1:8080/get_your_bots?username=${user.username}&gamemode=${game_info ? game_info.title : "normal"}`,{
+            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_your_bots?username=${user.username}&gamemode=${game_info ? game_info.title : "normal"}`,{
                 "headers": {
                     'Authorization': `Bearer ${user.access_token}`,
                 }
@@ -390,7 +390,7 @@ export default function Human_Bot() {
                 rate_btn.classList.add("active")
             }
             rateModel = true
-            fetch("http://127.0.0.1:8080/get_rate", {
+            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_rate", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -743,7 +743,7 @@ export default function Human_Bot() {
                     })
                 })
 
-                fetch("http://127.0.0.1:8080/get_pos_of_playing_chess", {
+                fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_pos_of_playing_chess", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

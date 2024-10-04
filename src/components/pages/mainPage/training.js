@@ -37,7 +37,7 @@ export default function Training() {
     }, [task])
     // useEffect(() => {
     //     if(!task_name) {
-    //         fetch(`http://127.0.0.1:8080/get_task_by_id/${task_id}`)
+    //         fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_task_by_id/${task_id}`)
     //         .then(res => res.json())
     //         .then(data => {
     //             // console.log(data)
@@ -84,7 +84,7 @@ export default function Training() {
 
     useEffect(() => {
         console.log("Asd")
-        fetch("http://127.0.0.1:8080/get_task/" + task_id)
+        fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_task/" + task_id)
             .then(res => res.json())
             .then(data => {
                 console.log(data)
@@ -209,7 +209,7 @@ export default function Training() {
             })
             let formatter = new Intl.DateTimeFormat([], options);
 
-            fetch("http://127.0.0.1:8080/run_task", {
+            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/run_task", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -264,7 +264,7 @@ export default function Training() {
                 return
             }
             let formatter = new Intl.DateTimeFormat([], options);
-            fetch("http://127.0.0.1:8080/submit_code", {
+            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/submit_code", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -494,7 +494,7 @@ export default function Training() {
                             {task_name}
                         </div>
                         <ul className="bot_display-task--class_list p-0">
-                            <li className={`bot_display-task--class_item ${task.tag && task.tag.difficult}`}>
+                            <li className={`bot_display-task--class_item ${task.tag && task.tag.difficult} list-none`}>
                                 {task.tag && task.tag.difficult}
                             </li>
                         </ul>
@@ -598,7 +598,7 @@ export default function Training() {
                         <div className="help_title">Kiến thức cần thiết</div>
                         <ul className="help_list help_type p-0">
                             {task.tag && task.tag.skill_require.map((skill, i) =>
-                                <li key={i} className="help_item help_type">
+                                <li key={i} className="help_item help_type list-none">
                                     <a href={skill.link}>
                                         {skill.name}
                                     </a>

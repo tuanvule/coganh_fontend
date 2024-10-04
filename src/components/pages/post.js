@@ -27,7 +27,7 @@ export default function Post() {
     if (state) {
       set_post(state)
     } else {
-      fetch("http://127.0.0.1:8080/get_post_by_id/" + post_id)
+      fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_post_by_id/" + post_id)
         .then(res => res.json())
         .then(data => {
           set_post(data)
@@ -56,7 +56,10 @@ export default function Post() {
         item.style.textDecoration = "none"
       }
     })
-  }, [theme])
+    document.querySelectorAll("pre").forEach(item => {
+      item.style.color = "white"
+    })
+  })
 
   function scroll_to_comment() {
     const element = document.querySelector("#comment_modal");

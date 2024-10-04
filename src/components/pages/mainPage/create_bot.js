@@ -58,7 +58,7 @@ export default function Create_bot() {
 
     useEffect(() => {
         if(title && upload_time) {
-            fetch(`http://127.0.0.1:8080/get_gamemode_by_post?title=${title}&upload_time=${upload_time}`)
+            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_gamemode_by_post?title=${title}&upload_time=${upload_time}`)
             .then(res => res.json())
             .then(data => {
                 set_game_info(data)
@@ -69,7 +69,7 @@ export default function Create_bot() {
 
     useEffect(() => {
         if (username) {
-            fetch(`http://127.0.0.1:8080/get_user_bot?username=${user.username}&gamemode=${game_info ? game_info.title : "normal"}`)
+            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_user_bot?username=${user.username}&gamemode=${game_info ? game_info.title : "normal"}`)
                 .then(res => res.json())
                 .then(data => {
                     // console.log(data)
@@ -245,7 +245,7 @@ export default function Create_bot() {
             }
             saveBtn.dataset.saved = "true"
 
-            fetch("http://127.0.0.1:8080/save_bot", {
+            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/save_bot", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -315,7 +315,7 @@ export default function Create_bot() {
                 loadingNavVideoFI.style.display = "none"
             }
             
-            fetch("http://127.0.0.1:8080/debug_bot", {
+            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/debug_bot", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -386,7 +386,7 @@ export default function Create_bot() {
             video.style.display = "none"
             loadingNavVideoLD.style.display = "block"
             loadingNavVideoCI.style.display = "none"
-            fetch("http://127.0.0.1:8080/run_bot", {
+            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/run_bot", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

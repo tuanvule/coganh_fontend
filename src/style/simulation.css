@@ -484,7 +484,7 @@ nav {
     border-bottom-right-radius: 4px;
 }
 
-pre {
+.simulation pre {
     background-color: none;
     display: grid;
     place-content: center;

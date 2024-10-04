@@ -23,7 +23,7 @@ export default function Bot_list({bot, set_bot, move_bot}) {
     }, [])
 
     return (
-        <div className="relative w-[180px] h-[60px] bg-black px-2 flex items-center justify-around rounded">
+        <div className="relative w-[180px] h-[60px] bg-slate-600 px-2 flex items-center justify-around rounded">
             <div ref={bot_list_btn_ref} onClick={() => set_is_open_bot_list(!is_open_bot_list)} className={`w-12 h-12 rounded-full overflow-hidden ${ bot !== "Master" ? "bg-slate-500" : "bg-red-500" } p-[6px] pointing_event_br-90`}>
                 <img className="object-cover" src={imgs[bot]} />
             </div>
