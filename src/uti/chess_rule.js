@@ -19,6 +19,7 @@ const chess_rule = {
         return valid_remove;
     },
     vay(gameState, opp_pos) {
+        console.log(gameState, opp_pos)
         for (let pos of opp_pos) {
             let move_list
             if ((pos[0] + pos[1]) % 2 === 0) {
@@ -30,6 +31,7 @@ const chess_rule = {
                 let new_valid_x = pos[0] + move[0];
                 let new_valid_y = pos[1] + move[1];
                 if (new_valid_x >= 0 && new_valid_x <= 4 && new_valid_y >= 0 && new_valid_y <= 4 && gameState.board[new_valid_y][new_valid_x] === 0) {
+                    console.log(new_valid_x, new_valid_y)
                     return [];
                 }
             }

@@ -10,7 +10,7 @@ export default function Gamemode_post() {
 
 
     useEffect(() => {
-        fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_posts?type=gamemode&page=${post_chunk_index}&size=10`)
+        fetch(`http://127.0.0.1:8080/get_posts?type=gamemode&page=${post_chunk_index}&size=10`)
             .then(res => res.json())
             .then(data => {
                 console.log(data)

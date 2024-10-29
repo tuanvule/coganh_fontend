@@ -9,7 +9,7 @@ export default function Task_list() {
     const [task_chunk_index, set_task_chunk_index] = useState(0)
 
     useEffect(() => {
-        fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_all_task?page=${task_chunk_index}&size=30`, {method: "GET"})
+        fetch(`http://127.0.0.1:8080/get_all_task?page=${task_chunk_index}&size=30`, {method: "GET"})
             .then(res => res.json())
             .then(data => {set_tasks(data)})
     }, [])

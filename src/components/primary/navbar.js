@@ -17,7 +17,7 @@ export default React.memo(function Navbar({ type = {}, back_link = "/menu", mode
 
   useEffect(() => {
     if(user.id) {
-      fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_user_notification/${user.id}`)
+      fetch(`http://127.0.0.1:8080/get_user_notification/${user.id}`)
       .then(res => res.json())
       .then(data => set_notifications(data))
       .catch(err => console.log(err))
@@ -25,7 +25,7 @@ export default React.memo(function Navbar({ type = {}, back_link = "/menu", mode
   }, [reset_notifications])
 
   function delete_notification(data) {
-    fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/delete_notification/${user.id}`, {
+    fetch(`http://127.0.0.1:8080/delete_notification/${user.id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,7 +39,7 @@ export default React.memo(function Navbar({ type = {}, back_link = "/menu", mode
 
   function all_delete_notification() {
     if(notifications.length === 0) return
-    fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/delete_all_notification/${user.id}`)
+    fetch(`http://127.0.0.1:8080/delete_all_notification/${user.id}`)
       .then(res => res.json())
       .then(() => set_notifications([]))
       .catch(err => console.log(err))
@@ -82,7 +82,7 @@ export default React.memo(function Navbar({ type = {}, back_link = "/menu", mode
               }
               <ul className="p-0">
                 {notifications.map((noti, key) => 
-                <li className={`noti_item relative px-4 py-1 bg-slate-700 hover:brightness-90 cursor-pointer select-none rounded transition-all mb-1`}>
+                <li className={`noti_item relative px-4 py-1 bg-slate-700 hover:brightness-90 cursor-pointer select-none rounded transition-all mb-1 list-none`}>
                   <div>
                     <p className="font-bold text-blue-400 text-left">{noti.sender}</p>
                   </div>
@@ -102,8 +102,8 @@ export default React.memo(function Navbar({ type = {}, back_link = "/menu", mode
             </div>
             { is_open_setting && 
             <ul className="absolute p-0 w-32 -right-4 top-5 dark:bg-slate-600 bg-slate-300 px-2 py-2 rounded shadow-lg shadow-slate-500">
-              <li onClick={() => history("/user/" + user.id)} className="py-1 dark:hover:bg-slate-700 hover:bg-slate-200 px-1 rounded cursor-pointer select-none">Trang cá nhân</li>
-              <li onClick={() => {handle_logout(); console.log(123)}} className="py-1 dark:hover:bg-slate-700 hover:bg-slate-200 px-1 rounded cursor-pointer select-none">Đăng xuất</li>
+              <li onClick={() => history("/user/" + user.id)} className="py-1 dark:hover:bg-slate-700 hover:bg-slate-200 px-1 rounded cursor-pointer select-none list-none">Trang cá nhân</li>
+              <li onClick={() => {handle_logout(); console.log(123)}} className="py-1 dark:hover:bg-slate-700 hover:bg-slate-200 px-1 rounded cursor-pointer select-none list-none">Đăng xuất</li>
             </ul>}
           </div>
         </>}

@@ -25,7 +25,7 @@ import { type } from '@testing-library/user-event/dist/type';
 
 import break_sound from "../../../static/breaking_glass.mp3"
 
-const initialPieces = [
+let initialPieces = [
   { id: '0', position: null, side: 0 },
   { id: '1', position: null, side: 0 },
   { id: '2', position: null, side: 0 },
@@ -104,6 +104,48 @@ export default function Freedom() {
     }
   ])
 
+  useEffect(() => {
+    gameState = {
+      current_turn: 1,
+      board: [
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0]
+      ],
+      positions: [
+        [],
+        []
+      ],
+      move: {
+        selected_pos: [],
+        new_pos: []
+      },
+      move_counter: 0,
+      result: null,
+      id: 0
+    }
+    initialPieces = [
+      { id: '0', position: null, side: 0 },
+      { id: '1', position: null, side: 0 },
+      { id: '2', position: null, side: 0 },
+      { id: '3', position: null, side: 0 },
+      { id: '4', position: null, side: 0 },
+      { id: '5', position: null, side: 0 },
+      { id: '6', position: null, side: 0 },
+      { id: '7', position: null, side: 0 },
+      { id: '8', position: null, side: 1 },
+      { id: '9', position: null, side: 1 },
+      { id: '10', position: null, side: 1 },
+      { id: '11', position: null, side: 1 },
+      { id: '12', position: null, side: 1 },
+      { id: '13', position: null, side: 1 },
+      { id: '14', position: null, side: 1 },
+      { id: '15', position: null, side: 1 },
+    ];
+  }, [])
+
   const next_move_btn_ref = useRef(null)
 
   const break_sound_ref = useRef(null)
@@ -131,6 +173,7 @@ export default function Freedom() {
       const [x,y] = pos
       gameState.board[y][x] = 0
       gameState.positions[Math.abs(side - 1)] = gameState.positions[Math.abs(side - 1)].filter(item => item[0] !== x && item[1] !== y)
+      console.log(gameState.positions[Math.abs(side - 1)].filter(item => item[0] !== x && item[1] !== y))
     }
     if(valid_remove.length > 0) {
       break_sound_ref.current.play()
@@ -148,17 +191,6 @@ export default function Freedom() {
       new_pos: [new_x, new_y],
     }
     console.log(gameState.move)
-  }
-
-  function handle_show_pre_pos(pos) {
-    if(pos && pos[0] && pos[1]) {
-      
-    }
-  }
-  function handle_show_new_pos(pos) {
-    if(pos && pos[0] && pos[1]) {
-      
-    }
   }
 
   function handle_clear_hight_light() {
@@ -213,7 +245,7 @@ export default function Freedom() {
           }
           let is_has_chess = gameState.board[pos[1]][pos[0]] === 0
           gameState.board[pos[1]][pos[0]] = piece.side === 1 ? 1 : piece.side === 0 ? -1 : 0
-          if (piece.pos > 0) {
+          if (piece.pos && piece.pos.length > 0) {
             gameState.board[piece.pos[1]][piece.pos[0]] = 0
           }
           return is_has_chess ? { ...piece, position: positionId, pos: pos } : piece
@@ -250,81 +282,87 @@ export default function Freedom() {
 
   function run_code(code, id) {
     if(check_err()) return
-    // view_gameState(id)
-    setTimeout(() => {
-      fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/run_freedom_code`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            code: code.replaceAll('\r', ''),
-            game_state: gameState
-        }),
-      })
-      .then(res => res.json())
-      .then(data => {
-        // if(data.is_err) return
-        if(data.is_err || data.err) {
-          set_error({
-            is_open: true,
-            is_err: true,
-            content: data.err,
-            type: data.err.type
-          })
-        }
-        if(data.move) {
-          let {selected_pos, new_pos} = data.move
-          let pre_gameState = JSON.parse(JSON.stringify(gameState))
-          if(selected_pos[0] < -1) selected_pos[0] = -1
-          if(selected_pos[1] < -1) selected_pos[1] = -1
-          if(new_pos[0] < -1) new_pos[0] = -1
-          if(new_pos[1] < -1) new_pos[1] = -1
-          let positionId = (new_pos[1] + 1) * 7 + new_pos[0] + 1
-          let selected_piece = pieces.find(piece => JSON.stringify(piece.pos) === JSON.stringify(selected_pos))
-          if(!Number.isInteger(selected_pos[0] + selected_pos[1]) || !Number.isInteger(new_pos[0] + new_pos[1])) return
-          handle_hight_light(selected_pos, new_pos)
 
-          if(selected_piece) {
-            if(gameState.board[new_pos[1]][new_pos[0]] !== 0) return
-            let valid_remove = [...ganh_chet(gameState,[new_pos[0], new_pos[1]], gameState.positions[selected_piece.side === 1 ? 0 : 1], selected_piece.side === 1 ? 1 : -1, selected_piece.side === 1 ? -1 : 1), ...vay(gameState, gameState.positions[selected_piece.side === 1 ? 0 : 1])]
-            if(!data.is_err) {
-              handle_move(data.move, selected_piece.side === 1 ? 1 : selected_piece.side === 0 ? -1 : 0)
-              handle_remove(valid_remove, selected_piece.side)
-            }
-  
-            setPieces((prevPieces) => {
-              return prevPieces.map((piece) => {
-                if(piece.pos && valid_remove.some(pos => pos[0] === piece.pos[0] && pos[1] === piece.pos[1])) {
-                  return { ...piece, position: null, pos: [] }
-                }
-                return JSON.stringify(piece.pos) === JSON.stringify(selected_pos) ? { ...piece, position: positionId, pos: new_pos } : piece
-              })
-            });
-            set_codes(pre => {
-              pre[id].pieces = JSON.parse(JSON.stringify(pieces))
-              pre[id].game_state = JSON.parse(JSON.stringify(pre_gameState))
-              pre[id].move = {
-                selected_pos: selected_pos,
-                new_pos: new_pos,
-              }
-              pre[id].is_loading = false
-              return pre
-            })
-            console.log(data.print_oup)
-            if(!(data.is_err || data.err)) {
-              set_error({
-                is_open: true,
-                is_err: false,
-                content: data.print_oup,
-                type: ""
-              })
-            }
+    console.log(gameState, pieces)
+
+    // return
+
+    fetch(`http://127.0.0.1:8080/run_freedom_code`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+          code: code.replaceAll('\r', ''),
+          game_state: gameState
+      }),
+    })
+    .then(res => res.json())
+    .then(data => {
+      if(data.is_err || data.err) {
+        set_error({
+          is_open: true,
+          is_err: true,
+          content: data.err.content,
+          type: data.err.type
+        })
+      }
+      if(data.move) {
+        let {selected_pos, new_pos} = data.move
+        let pre_gameState = JSON.parse(JSON.stringify(gameState))
+        if(selected_pos[0] < -1) selected_pos[0] = -1
+        if(selected_pos[1] < -1) selected_pos[1] = -1
+        if(new_pos[0] < -1) new_pos[0] = -1
+        if(new_pos[1] < -1) new_pos[1] = -1
+        let positionId = (new_pos[1] + 1) * 7 + new_pos[0] + 1
+        let selected_piece = pieces.find(piece => JSON.stringify(piece.pos) === JSON.stringify(selected_pos))
+        if(!Number.isInteger(selected_pos[0] + selected_pos[1]) || !Number.isInteger(new_pos[0] + new_pos[1])) return
+        handle_hight_light(selected_pos, new_pos)
+
+        if(selected_piece) {
+          if(gameState.board[new_pos[1]][new_pos[0]] !== 0) return
+          let valid_remove = []
+          if(!data.is_err) {
+            handle_move(data.move, selected_piece.side === 1 ? 1 : selected_piece.side === 0 ? -1 : 0)
+            valid_remove = [
+              ...ganh_chet(gameState,[new_pos[0], new_pos[1]], 
+                gameState.positions[selected_piece.side === 1 ? 0 : 1], 
+                selected_piece.side === 1 ? 1 : -1, selected_piece.side === 1 ? -1 : 1), 
+              ...vay(gameState, gameState.positions[selected_piece.side === 1 ? 0 : 1]
+            )]
+            handle_remove(valid_remove, selected_piece.side)
           }
 
+          setPieces((prevPieces) => {
+            return prevPieces.map((piece) => {
+              if(piece.pos && valid_remove.some(pos => pos[0] === piece.pos[0] && pos[1] === piece.pos[1])) {
+                return { ...piece, position: null, pos: null }
+              }
+              return JSON.stringify(piece.pos) === JSON.stringify(selected_pos) ? { ...piece, position: positionId, pos: new_pos } : piece
+            })
+          });
+          set_codes(pre => {
+            pre[id].pieces = JSON.parse(JSON.stringify(pieces))
+            pre[id].game_state = JSON.parse(JSON.stringify(pre_gameState))
+            pre[id].move = {
+              selected_pos: selected_pos,
+              new_pos: new_pos,
+            }
+            pre[id].is_loading = false
+            return pre
+          })
+          if(!(data.is_err || data.err)) {
+            set_error({
+              is_open: true,
+              is_err: false,
+              content: data.print_oup,
+              type: ""
+            })
+          }
         }
-      })
-    }, 1000)
+
+      }
+    })
   }
 
   function get_pos() {
@@ -335,7 +373,7 @@ export default function Freedom() {
       opp_pos: gameState.positions[0],
       board: gameState.board,
     }
-    fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_pos_of_playing_chess", {
+    fetch("http://127.0.0.1:8080/get_pos_of_playing_chess", {
       method: "POST",
       headers: {
           "Content-Type": "application/json",
@@ -407,13 +445,7 @@ export default function Freedom() {
   }, [codes, pieces])
 
   function view_gameState(id) {
-    // if(id === 0 && codes.length <= 1) {
-    //   // codes[id].game_state = gameState
-    //   // codes[id].pieces = pieces
-    //   console.log(codes[id].pieces)
-    // }
     gameState = JSON.parse(JSON.stringify(codes[id].game_state))
-    console.log(gameState)
     gameState.id = id
     setPieces(codes[id].pieces);
     handle_clear_hight_light()
@@ -437,7 +469,7 @@ export default function Freedom() {
             <div className="top-[-25%] left-[-25%] absolute w-[175%] h-[175%] grid grid-cols-7 grid-flow-row">
               {[...Array(49).keys()].map((i) => (
                 <BoardSquare key={i} id={i} pos={[i % 7 - 1, Math.floor(i / 7) - 1]} onDrop={handleDrop}>
-                  {pieces.find((piece) => piece.position === i) && (
+                  {pieces.find((piece) => piece.position === i && piece.pos) && (
                     <Piece
                       side={pieces.find((piece) => piece.position === i).side}
                       id={pieces.find((piece) => piece.position === i).id}
@@ -506,7 +538,6 @@ export default function Freedom() {
               </div>
               <p className="text-xl font-bold mt-2">MOVE</p>
               <div className="flex w-full justify-between text-xl">
-                {console.log(gameState)}
                 <div className="list-none px-2 py-1 bg-slate-600 w-fit rounded mr-1 mb-1 pointing_event_br-90">({gameState.move.selected_pos[0]},{gameState.move.selected_pos[1]})</div>
                 <div className="list-none px-2 py-1 bg-slate-600 w-fit rounded mr-1 mb-1 pointing_event_br-90"><i class="fa-solid fa-right-long"></i></div>
                 <div className="list-none px-2 py-1 bg-slate-600 w-fit rounded mr-1 mb-1 pointing_event_br-90">({gameState.move.new_pos[0]},{gameState.move.new_pos[1]})</div>

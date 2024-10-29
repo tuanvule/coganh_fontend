@@ -201,7 +201,7 @@ export default function Menu() {
           <p>Hãy đánh giá tại đây</p>
         </div>
         <div className="w-[2%]"></div>
-        <div className="lg:w-[49%] w-full pl-6 py-4 flex flex-col dark:bg-slate-700 bg-slate-300 rounded-lg">
+        {/* <div className="lg:w-[49%] w-full pl-6 py-4 flex flex-col dark:bg-slate-700 bg-slate-300 rounded-lg">
           <p className="text-2xl font-bold">Thành viên</p>
           <ul className="p-0 m-0">
             <li>Lê Tuấn Vũ</li>
@@ -211,7 +211,7 @@ export default function Menu() {
             <li>Phạm Vũ Minh Phương</li>
             <li>Đinh Huỳnh Vinh Quang</li>
           </ul>
-          <p className="text-2xl font-bold mt-4">Cố vẫn</p>
+          <p className="text-2xl font-bold mt-4">Cố vấn</p>
           <p>Nguyễn Thị Bích Hảo</p>
           <p className="text-2xl font-bold mt-4">Đơn vị</p>
           <p>THPT Nguyễn Hữu Huân</p>
@@ -222,7 +222,7 @@ export default function Menu() {
             <p>Contact: itclub.nhh@gmail.com</p>
             <p>Fanpage: facebook.com/itclub.nhh</p>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   )

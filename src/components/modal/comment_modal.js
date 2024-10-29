@@ -57,13 +57,12 @@ export default function Comment_modal({ post_id = null, task_id = null, bg = "bg
       d.push(chunk)
     }
     return d
-  }
-  console.log("hell3")
+  } 
 
   useEffect(() => {
     console.log(post_id, task_id)
     if (post_id) {
-      fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_post_comments/${post_id}`)
+      fetch(`http://127.0.0.1:8080/get_post_comments/${post_id}`)
         .then(res => res.json())
         .then(data => {
           let comment = handle_data(data, "comment_time")
@@ -72,7 +71,7 @@ export default function Comment_modal({ post_id = null, task_id = null, bg = "bg
         })
         .catch(err => console.log(err))
     } else if (task_id) {
-      fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_task_comments/${task_id}`)
+      fetch(`http://127.0.0.1:8080/get_task_comments/${task_id}`)
       .then(res => res.json())
       .then(data => {
         let comment = handle_data(data, "comment_time")
@@ -99,7 +98,7 @@ export default function Comment_modal({ post_id = null, task_id = null, bg = "bg
         return
       } else {
         let formatter = new Intl.DateTimeFormat([], options);
-        fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/handle_comment', {
+        fetch('http://127.0.0.1:8080/handle_comment', {
           method: 'POST',
           headers: {
             "Content-Type": "application/json",
@@ -149,7 +148,7 @@ export default function Comment_modal({ post_id = null, task_id = null, bg = "bg
       </div>
       <ul className="p-0">
         {comments[chunk_index] && comments[chunk_index].map((cm, i) =>
-          <li className="mb-4">
+          <li className="mb-4 list-none">
             <div className="flex items-center">
               <div className="w-10 h-10 grid place-content-center text-3xl rounded-full bg-white text-[#007BFF] font-bold mr-4">{cm && cm.username[0].toUpperCase()}</div>
               <div className="text-lg">

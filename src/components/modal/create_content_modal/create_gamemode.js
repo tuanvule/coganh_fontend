@@ -42,7 +42,7 @@ export default function Create_gamemode() {
 
     useEffect(() => {
         if(is_update && !post) {
-            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_post_by_id/" + state.post_id)
+            fetch("http://127.0.0.1:8080/get_post_by_id/" + state.post_id)
             .then(res => res.json())
             .then(data => set_post(data))
             .catch(err => console.log(err))
@@ -137,7 +137,7 @@ export default function Create_gamemode() {
                 formData.append('totalChunks', totalChunks);
 
                 try {
-                    const response = await fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/upload_chunk', {
+                    const response = await fetch('http://127.0.0.1:8080/upload_chunk', {
                         method: 'POST',
                         body: formData
                     });
@@ -177,7 +177,7 @@ export default function Create_gamemode() {
                 // console.log(text)
                 // return
             if (!is_update) {
-                let fetchData  = await fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/upload_post', {
+                let fetchData  = await fetch('http://127.0.0.1:8080/upload_post', {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json",
@@ -210,7 +210,7 @@ export default function Create_gamemode() {
                     demo_img: demo_gamemode_image_ref.current.value,
                     id: state.post_id
                 })
-                let fetchData  = await fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/update_post/'+state.post_id, {
+                let fetchData  = await fetch('http://127.0.0.1:8080/update_post/'+state.post_id, {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json",
@@ -262,7 +262,7 @@ export default function Create_gamemode() {
             // return
 
             if(!is_update) {
-                let fetchData  = await fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/create_gamemode', {
+                let fetchData  = await fetch('http://127.0.0.1:8080/create_gamemode', {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json",
@@ -286,7 +286,7 @@ export default function Create_gamemode() {
                 let data = await fetchData.json()
                 return data
             } else {
-                let fetchData  = await fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/update_gamemode/'+state.id, {
+                let fetchData  = await fetch('http://127.0.0.1:8080/update_gamemode/'+state.id, {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json",

@@ -18,7 +18,7 @@ export default function Post_page() {
   const is_mobile = (window.innerWidth <= 600)
 
   useEffect(() => {
-    fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_posts?page=${post_chunk_index}&size=10`)
+    fetch(`http://127.0.0.1:8080/get_posts?page=${post_chunk_index}&size=10`)
     .then(res => res.json())
     .then(data => {
       set_posts(data)

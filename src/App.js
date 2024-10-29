@@ -3,6 +3,7 @@
 import {
   Routes,
   Route,
+  Navigate
   // Router
 } from "react-router-dom";
 
@@ -34,12 +35,19 @@ import { useState } from 'react';
 import "./style/index.css"
 import "./style/animation.css"
 import "./style/App.css"
+import NotFoundPage from "./components/pages/not_found";
+import Roadmap from "./components/pages/mainPage/roadmap";
 
 function App() {
   const { user ,setUser } = useContext(AppContext)
 
   const [theme, setTheme] = useState(localStorage.getItem("theme") || 'dark')
-
+  // fetch(`http://127.0.0.1:8080/get_all_bot`)
+  // .then(res => res.json())
+  // .then(data => {
+  //   // if(data.is_err) return
+  //   console.log(data)
+  //   })
   return (
     <div className={`${theme}`}>
       <AppProvider theme={theme} setTheme={setTheme}>
@@ -61,9 +69,12 @@ function App() {
           <Route path="menu" element={<Menu/>} />
           <Route path="user/:id" element={<User/>} />
           <Route path="signin" element={<Signin_page />} />
-          <Route path="ADMIN" element={<Check_admin_modal />} />
+          {/* <Route path="ADMIN" element={<Check_admin_modal />} /> */}
           <Route path="gamemode" element={<Gamemode />} />
           <Route path="freedom" element={<Freedom />} />
+          <Route path="roadmap" element={<Roadmap />} />
+          <Route path="*" element={<Navigate to="/not-found" />} />
+          <Route path="/not-found" element={<NotFoundPage />} />
         </Routes>
       </AppProvider>
     </div>

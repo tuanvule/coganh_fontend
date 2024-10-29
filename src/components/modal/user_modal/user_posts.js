@@ -3,29 +3,34 @@ import { AppContext } from '../../../context/appContext'
 import Handle_chunk from '../handle_chunk'
 import logo from "../../../static/img/logo.png"
 
-var check = 0
-export default function User_post({ username, posts, is_owner, set_is_require_owner }) {
+var check = "a"
+export default function User_post({ create_chunk, username, posts, is_owner, set_is_require_owner }) {
   const { user, history } = useContext(AppContext)
 
-  const [is_reset_post, set_is_reset_post] = useState(0)
+  const [is_reset_post, set_is_reset_post] = useState("a")
   const [is_reset_UPP, set_is_reset_UPP] = useState(0)
   const [Posts, set_Posts] = useState(posts)
   const [un_public_post, set_un_public_posts] = useState()
   const [chunk_index, set_chunk_index] = useState(0)
   const [UPP_chunk_index, UPP_set_chunk_index] = useState(0)
 
+  console.log(posts)
+
   useEffect(() => {
     if (is_reset_post !== check) {
-      fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_post_by_username/${username}`)
+      check = "b"
+      fetch(`http://127.0.0.1:8080/get_post_by_username/${username}`)
         .then(res => res.json())
-        .then(data => set_Posts(data))
+        .then(data => {console.log(create_chunk(data, 9));set_Posts(create_chunk(data, 9))})
         .catch(err => console.log(err))
+
+      console.log("refetch")
       check = is_reset_post
     }
   }, [is_reset_post])
 
   useEffect(() => {
-    fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_unpublic_user_posts?username=${username}&page=${UPP_chunk_index}&size=9`)
+    fetch(`http://127.0.0.1:8080/get_unpublic_user_posts?username=${username}&page=${UPP_chunk_index}&size=9`)
       .then(res => res.json())
       .then(data => set_un_public_posts(data))
       .catch(err => console.log(err))
@@ -38,7 +43,8 @@ export default function User_post({ username, posts, is_owner, set_is_require_ow
     }
     let is_delete = window.confirm("bạn có chắc muốn xóa")
     if (is_delete) {
-      fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/delete_post/${id}`, {
+      console.log(user.access_token)
+      fetch(`http://127.0.0.1:8080/delete_post/${id}`, {
         headers: {
           'Authorization': `Bearer ${user.access_token}`,
         }
@@ -47,6 +53,7 @@ export default function User_post({ username, posts, is_owner, set_is_require_ow
         .then(data => {
           console.log(data)
           set_is_reset_post(Math.random())
+          set_is_reset_UPP(Math.random())
         })
         .catch(err => console.log(err))
     }
@@ -55,7 +62,7 @@ export default function User_post({ username, posts, is_owner, set_is_require_ow
   return (
     <div className=" h-full flex flex-col">
       <div className="w-full flex">
-        <a onClick={() => history("/create_content")} class="dark:text-white px-5 py-1 rounded-lg border cursor-pointer select-none hover:bg-white transition-all dark:hover:text-black ml-auto">Viết bài</a>
+        <a onClick={() => history("/create_post")} class="dark:text-white px-5 py-1 rounded-lg border cursor-pointer select-none hover:bg-white transition-all dark:hover:text-black ml-auto">Viết bài</a>
       </div>
       <div className="">
         <p className="text-3xl font-bold">Chờ được duyệt</p>

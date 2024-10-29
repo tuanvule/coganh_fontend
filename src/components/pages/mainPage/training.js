@@ -37,7 +37,7 @@ export default function Training() {
     }, [task])
     // useEffect(() => {
     //     if(!task_name) {
-    //         fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_task_by_id/${task_id}`)
+    //         fetch(`http://127.0.0.1:8080/get_task_by_id/${task_id}`)
     //         .then(res => res.json())
     //         .then(data => {
     //             // console.log(data)
@@ -84,7 +84,7 @@ export default function Training() {
 
     useEffect(() => {
         console.log("Asd")
-        fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_task/" + task_id)
+        fetch("http://127.0.0.1:8080/get_task/" + task_id)
             .then(res => res.json())
             .then(data => {
                 console.log(data)
@@ -209,7 +209,7 @@ export default function Training() {
             })
             let formatter = new Intl.DateTimeFormat([], options);
 
-            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/run_task", {
+            fetch("http://127.0.0.1:8080/run_task", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -264,7 +264,7 @@ export default function Training() {
                 return
             }
             let formatter = new Intl.DateTimeFormat([], options);
-            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/submit_code", {
+            fetch("http://127.0.0.1:8080/submit_code", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

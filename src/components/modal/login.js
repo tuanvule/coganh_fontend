@@ -15,34 +15,28 @@ export default function Login(props) {
     const inputPasswordRef = useRef()
     const errorRef = useRef()
 
-    function handleStatus(res) {
+    function handleStatus(data) {
+        console.log(data)
+        const { username, id, password } = data.userData
+        localStorage.setItem("username", username);
+        localStorage.setItem("password", password);
+        localStorage.setItem("id", id);
+        localStorage.setItem("access_token", data.access_token);
+        setUser({
+            username:username, id: id,
+            access_token: data.access_token
+        })
 
-        if(res.status) {
-            console.log(res)
-            const { username, id } = res.userData
-            localStorage.setItem("username", username);
-            localStorage.setItem("id", id);
-            localStorage.setItem("access_token", res.access_token);
-            setUser({
-                username:username, id: id,
-                access_token: res.access_token
-            })
-
-            setErrorVisible('hidden')
-            history("/menu")
-        } else {
-            setErrorVisible('')
-        }
+        setErrorVisible('hidden')
+        history("/menu")
     }
 
-    function handleLogin() {
+    async function handleLogin() {
 
         let password = inputPasswordRef.current.value
         let name = inputNameRef.current.value
 
-        console.log(password, name)
-
-        fetch('https://coganh-cloud-827199215700.asia-southeast1.run.app/handle_login', {
+        const response = await fetch('http://127.0.0.1:8080/handle_login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -52,9 +46,18 @@ export default function Login(props) {
                 password: password   // Thay thế bằng giá trị thực tế
             })
         })
-            .then(res => res.json())
-            .then(data => handleStatus(data))
-            .catch(err => setErrorVisible('')) 
+
+        const data = await response.json();
+        console.log(data)
+        if (response.ok) {
+            // Lưu access token trong bộ nhớ (in-memory)
+            handleStatus(data.data)
+        } else {
+            setErrorVisible('')
+        }
+            // .then(res => res.json())
+            // .then(data => handleStatus(data))
+            // .catch(err => setErrorVisible('')) 
     }
 
     function inputChange() {
@@ -70,14 +73,14 @@ export default function Login(props) {
             <h4 className='text-xl'>Name</h4>
             <div className="relative">
                 <i className="fa-solid fa-circle-user absolute top-1/2 transform -translate-y-1/2 text-xl"></i>
-                <input onChange={inputChange} ref={inputNameRef} placeholder="Enter your account's password" className="placeholder:text-gray-300 bg-transparent pl-8 pr-2 py-2 border-b border-white outline-none w-full" type="text" />
+                <input onChange={inputChange} ref={inputNameRef} placeholder="Enter your account's name" className="placeholder:text-gray-300 bg-transparent pl-8 pr-2 py-2 border-b border-white outline-none w-full" type="text" />
             </div>
         </div>
         <div className="mt-8 w-[80%]">
             <h4 className='text-xl'>Password</h4>
             <div className="relative">
                 <i className="fa-solid fa-lock absolute top-1/2 transform -translate-y-1/2 text-xl"></i>
-                <input onChange={inputChange} ref={inputPasswordRef} placeholder="Enter your account's name" className="placeholder:text-gray-300 bg-transparent pl-8 pr-2 py-2 border-b border-white outline-none w-full" type="text" />
+                <input onChange={inputChange} ref={inputPasswordRef} placeholder="Enter your account's password" className="placeholder:text-gray-300 bg-transparent pl-8 pr-2 py-2 border-b border-white outline-none w-full" type="text" />
             </div>
         </div>
 

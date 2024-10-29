@@ -10,17 +10,38 @@ export default function AppProvider({ children, theme, setTheme }) {
   const [searchInfo, setSearchInfo] = useState({})
   const history = useNavigate()
 
-  useEffect(() =>  {
-    if(localStorage.getItem("username")) {
-      setUser({
-        username: localStorage.getItem("username"),
-        id: localStorage.getItem("id"),
-        access_token: localStorage.getItem("access_token")
-      })
-    } 
-  }, [JSON.stringify(user)])
-  // console.log(typeof user === "string")
 
+  async function refreshAccessToken() {
+    const response = await fetch('http://127.0.0.1:8080/refresh_access_token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({uid: localStorage.getItem("id")})
+    });
+
+    if (response.ok) {
+        const data = await response.json();
+        setUser({
+          username: localStorage.getItem("username"),
+          id: localStorage.getItem("id"),
+          access_token: data.access_token
+        })
+    } else {
+        console.error('Failed to refresh token');
+    }
+  }
+  
+  useEffect(() =>  {
+    if(!user.username && localStorage.getItem("username")) {
+      refreshAccessToken()
+      // setUser({
+      //   username: localStorage.getItem("username"),
+      //   id: localStorage.getItem("id"),
+      //   access_token: localStorage.getItem("access_token")
+      // })
+    }
+  }, [JSON.stringify(user)])
 
   return (
     <AppContext.Provider
@@ -30,7 +51,7 @@ export default function AppProvider({ children, theme, setTheme }) {
         profile, setProfile,
         page, setPage,
         theme, setTheme,
-        searchInfo, setSearchInfo
+        searchInfo, setSearchInfo,
       }}
     >
       {children}

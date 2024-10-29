@@ -200,3 +200,35 @@ input#comment:checked ~ .comment__model{
     border-color: #007BFF;
     background-color: rgb(203 213 225);
 }
+
+.just_post_allow td {
+    border: 1px solid white;
+}
+
+.just_post_allow th {
+    border: 1px solid white;
+}
+
+.roadmap_node {
+    cursor: pointer;
+    fill: #f4c542;
+    stroke: black;
+    stroke-width: 2px;
+  }
+
+  .roadmap_link {
+    fill: none;
+    stroke: #aaa;
+    stroke-width: 2px;
+    stroke-dasharray: 2, 3;
+  }
+
+  .roadmap_label {
+    font: 12px sans-serif;
+    text-anchor: middle;
+    fill: black;
+  }
+
+.roadmap_text {
+    color: white;
+}

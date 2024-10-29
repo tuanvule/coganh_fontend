@@ -1,5 +1,7 @@
 import React, { useContext } from 'react'
 import { AppContext } from '../../context/appContext'
+import logo from "../../static/img/logo.png"
+
 
 export default function Home() {
     const { history } = useContext(AppContext)
@@ -7,7 +9,8 @@ export default function Home() {
     return (
         <>
             <div className="H_content flex flex-col items-center">
-                <h1 className="H_title text-[25x] m-10">Xin chào</h1>
+                <img src={logo} className="w-40 h-40 mt-10"/>
+                <p className=" text-[25px]">Xin chào</p>
                 <h1 className="H_title1 text-xl w-2/5 text-center">
                     Rất cảm ơn bạn khi đã thử trải nghiệm sản phẩm này của nhóm chúng mình. Dự
                     án này được bọn mình làm ra với mục đích là để các bạn có 1 công cụ để áp

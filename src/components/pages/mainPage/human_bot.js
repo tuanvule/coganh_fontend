@@ -62,7 +62,7 @@ export default function Human_Bot() {
 
     useEffect(() => {
         if(!(game_info && game_info.title)) {
-            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_gamemode_by_post?title=${title}&upload_time=${upload_time}`)
+            fetch(`http://127.0.0.1:8080/get_gamemode_by_post?title=${title}&upload_time=${upload_time}`)
             .then(res => res.json())
             .then(data => {
                 set_game_info(data)
@@ -302,7 +302,7 @@ export default function Human_Bot() {
         })
 
         function get_user_bot() {
-            fetch(`https://coganh-cloud-827199215700.asia-southeast1.run.app/get_your_bots?username=${user.username}&gamemode=${game_info ? game_info.title : "normal"}`,{
+            fetch(`http://127.0.0.1:8080/get_your_bots?username=${user.username}&gamemode=${game_info ? game_info.title : "normal"}`,{
                 "headers": {
                     'Authorization': `Bearer ${user.access_token}`,
                 }
@@ -390,7 +390,7 @@ export default function Human_Bot() {
                 rate_btn.classList.add("active")
             }
             rateModel = true
-            fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_rate", {
+            fetch("http://127.0.0.1:8080/get_rate", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -620,6 +620,8 @@ export default function Human_Bot() {
         }
 
         async function swap(chess, box, newPos, selected_pos) {
+            const pre_your_pos = [...gameState.positions[0]]
+            const pre_opp_pos = [...gameState.positions[1]]
             let valid_remove
             cv2.clearRect(0, 0, canvas.width, canvas.height);
             moveSound.play()
@@ -628,6 +630,7 @@ export default function Human_Bot() {
             gameState.move_counter += 1
             const chesses = $$(".chess")
             if(box) {
+
                 handle_canvas(chess, "rgba(87, 125, 255, 0.6)")
 
                 chess.style.left = box.offsetLeft + "px"
@@ -648,8 +651,8 @@ export default function Human_Bot() {
                 if(valid_remove.length > 0) valid_remove.forEach(item => intervention.remove_red(...item))
                 
                 move_list.push({
-                    your_pos: [...gameState.positions[0]],
-                    opp_pos: [...gameState.positions[1]],
+                    your_pos: pre_your_pos,
+                    opp_pos: pre_opp_pos,
                     board: preBoard,
                     side: 1,
                     remove: valid_remove,
@@ -687,8 +690,8 @@ export default function Human_Bot() {
                 if(valid_remove.length > 0) valid_remove.forEach(item => intervention.remove_blue(...item))
         
                 move_list.push({
-                    your_pos: [...gameState.positions[0]],
-                    opp_pos: [...gameState.positions[1]],
+                    your_pos: pre_your_pos,
+                    opp_pos: pre_opp_pos,
                     board: preBoard,
                     side: -1,
                     remove: valid_remove,
@@ -743,7 +746,7 @@ export default function Human_Bot() {
                     })
                 })
 
-                fetch("https://coganh-cloud-827199215700.asia-southeast1.run.app/get_pos_of_playing_chess", {
+                fetch("http://127.0.0.1:8080/get_pos_of_playing_chess", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
